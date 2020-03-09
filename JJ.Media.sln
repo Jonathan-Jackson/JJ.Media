@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ.Media.Common", "JJ.Media.Common", "{24D42764-AAE0-4E78-B744-70861A4CDBCE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ.Media.Information", "JJ.Media.Information", "{242B2C02-F649-4910-91DC-D3B3D410FD3D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AB98DADC-C360-4E61-887F-7DA3C916FAD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ.Media.Processor", "JJ.Media.Processor", "{7142A160-B30B-4E98-BA57-307CA9719CBE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ.Media.Downloader", "JJ.Media.Downloader", "{AD31F0E6-A5D1-4FCE-B0DD-A4534CAA9F86}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6334CF9-4D9B-4151-9ACE-5B9F1B6F8254}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ.Media.Audit", "JJ.Media.Audit", "{1CADE5E5-F6FB-4C32-8B2E-0530B4BA7DB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJ.Media.Information.API", "JJ.Media.Information.API\JJ.Media.Information.API.csproj", "{80B1DA51-21EC-4883-8247-EC424901F940}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJ.Media.Information.Services", "JJ.Media.Information.Services\JJ.Media.Information.Services.csproj", "{3713357C-61F9-4D19-AF8E-58E6D9476A59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJ.Media.Information.Data", "JJ.Media.Information.Data\JJ.Media.Information.Data.csproj", "{65DD75F2-CEE6-425E-BC63-39DE41DA0327}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80B1DA51-21EC-4883-8247-EC424901F940}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80B1DA51-21EC-4883-8247-EC424901F940}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80B1DA51-21EC-4883-8247-EC424901F940}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80B1DA51-21EC-4883-8247-EC424901F940}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3713357C-61F9-4D19-AF8E-58E6D9476A59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3713357C-61F9-4D19-AF8E-58E6D9476A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3713357C-61F9-4D19-AF8E-58E6D9476A59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3713357C-61F9-4D19-AF8E-58E6D9476A59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65DD75F2-CEE6-425E-BC63-39DE41DA0327}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65DD75F2-CEE6-425E-BC63-39DE41DA0327}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65DD75F2-CEE6-425E-BC63-39DE41DA0327}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65DD75F2-CEE6-425E-BC63-39DE41DA0327}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24D42764-AAE0-4E78-B744-70861A4CDBCE} = {AB98DADC-C360-4E61-887F-7DA3C916FAD2}
+		{242B2C02-F649-4910-91DC-D3B3D410FD3D} = {AB98DADC-C360-4E61-887F-7DA3C916FAD2}
+		{7142A160-B30B-4E98-BA57-307CA9719CBE} = {AB98DADC-C360-4E61-887F-7DA3C916FAD2}
+		{AD31F0E6-A5D1-4FCE-B0DD-A4534CAA9F86} = {AB98DADC-C360-4E61-887F-7DA3C916FAD2}
+		{1CADE5E5-F6FB-4C32-8B2E-0530B4BA7DB5} = {AB98DADC-C360-4E61-887F-7DA3C916FAD2}
+		{80B1DA51-21EC-4883-8247-EC424901F940} = {242B2C02-F649-4910-91DC-D3B3D410FD3D}
+		{3713357C-61F9-4D19-AF8E-58E6D9476A59} = {242B2C02-F649-4910-91DC-D3B3D410FD3D}
+		{65DD75F2-CEE6-425E-BC63-39DE41DA0327} = {242B2C02-F649-4910-91DC-D3B3D410FD3D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BDAC7526-4F78-49C0-BF45-FBFFFCF36B72}
+	EndGlobalSection
+EndGlobal
