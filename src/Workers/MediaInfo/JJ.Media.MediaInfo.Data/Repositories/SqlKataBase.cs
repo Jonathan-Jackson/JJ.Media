@@ -2,6 +2,7 @@
 using JJ.Media.MediaInfo.Data.Models;
 using SqlKata.Compilers;
 using System;
+using System.Data;
 
 namespace JJ.Media.MediaInfo.Data.Repositories {
 
@@ -14,7 +15,10 @@ namespace JJ.Media.MediaInfo.Data.Repositories {
             _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
         }
 
-        protected DisposableQuery ConnectToDb()
+        protected DisposableQuery ConnectQuery()
             => new DisposableQuery(_dbFactory.Create(), _compiler);
+
+        protected IDbConnection ConnectDb()
+            => _dbFactory.Create();
     }
 }

@@ -10,16 +10,16 @@ namespace JJ.Media.MediaInfo.Services.Interfaces {
 
         Task<IEnumerable<TEntity>> FindAsync(IEnumerable<int> ids);
 
-        Task InsertAsync(TEntity entity);
+        Task<int> InsertAsync(TEntity entity);
 
-        Task InsertAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<int>> InsertAsync(IEnumerable<TEntity> entities);
 
-        Task UpdateAsync(TEntity entity);
+        Task<int> UpdateAsync(TEntity entity);
 
-        Task UpdateAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<int>> UpdateAsync(IEnumerable<TEntity> entities);
 
-        Task DeleteAsync(TEntity entity);
+        Task DeleteAsync(int id);
 
-        Task DeleteAsync(IEnumerable<TEntity> entities);
+        Task DeleteAsync(IEnumerable<int> id);
     }
 }

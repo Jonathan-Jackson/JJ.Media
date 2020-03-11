@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\Movies\" />
+    <Folder Include="Entities\Shows\" />
+  </ItemGroup>
 </Project>

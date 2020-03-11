@@ -8,4 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="..\JJ.Media.MediaInfo.Core\JJ.Media.MediaInfo.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Movie\" />
+    <Folder Include="Cache\" />
+    <Folder Include="Show\" />
+  </ItemGroup>
 </Project>

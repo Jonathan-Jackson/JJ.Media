@@ -18,13 +18,13 @@ namespace JJ.Media.MediaInfo.Data.Repositories {
             _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
         }
 
-        public async Task DeleteAsync(TEntity entity)
-            => await DeleteAsync(new[] { entity });
+        public async Task DeleteAsync(int id)
+            => await DeleteAsync(new[] { id });
 
-        public async Task DeleteAsync(IEnumerable<TEntity> entities) {
+        public async Task DeleteAsync(IEnumerable<int> ids) {
             Func<DisposableQuery, Task> query = async (DisposableQuery db) => {
                 await db.Query(_tableName)
-                    .Where("Id", entities)
+                    .Where("Id", ids)
                     .DeleteAsync();
             };
 
@@ -35,42 +35,51 @@ namespace JJ.Media.MediaInfo.Data.Repositories {
             => (await FindAsync(new[] { id })).First();
 
         public async Task<IEnumerable<TEntity>> FindAsync(IEnumerable<int> ids) {
-            Func<DisposableQuery, Task<IEnumerable<TEntity>>> query = async (DisposableQuery db)
+            return await Execute(async (DisposableQuery db)
+                    => await db.Query(_tableName)
+                        .Where("Id", ids)
+                        .GetAsync<TEntity>()
+            );
+        }
+
+        public async Task<int> InsertAsync(TEntity entity) {
+            return await Execute(async (DisposableQuery db)
+                => await db.Query(_tableName).InsertAsync(entity)
+            );
+        }
+
+        public async Task<IEnumerable<int>> InsertAsync(IEnumerable<TEntity> entities) {
+            throw new NotImplementedException();
+        }
+
+        public async Task<int> UpdateAsync(TEntity entity) {
+            return await Execute(async (DisposableQuery db)
                 => await db.Query(_tableName)
-                    .Where("Id", ids)
-                    .GetAsync<TEntity>();
-
-            return await Execute(query);
+                            .Where("Id", entity.Id)
+                            .UpdateAsync(entity)
+            );
         }
 
-        public async Task InsertAsync(TEntity entity) {
+        public async Task<IEnumerable<int>> UpdateAsync(IEnumerable<TEntity> entities) {
             throw new NotImplementedException();
         }
 
-        public async Task InsertAsync(IEnumerable<TEntity> entities) {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(TEntity entity) {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(IEnumerable<TEntity> entities) {
-            throw new NotImplementedException();
-        }
+        #region Privates
 
         private async Task<TResult> Execute<TResult>(Func<DisposableQuery, Task<TResult>> dbAction) {
             // TODO: add retry for transient errors.
-            using (DisposableQuery db = ConnectToDb()) {
+            using (DisposableQuery db = ConnectQuery()) {
                 return await dbAction(db);
             }
         }
 
         private async Task Execute(Func<DisposableQuery, Task> dbAction) {
             // TODO: add retry for transient errors.
-            using (DisposableQuery db = ConnectToDb()) {
+            using (DisposableQuery db = ConnectQuery()) {
                 await dbAction(db);
             }
         }
+
+        #endregion Privates
     }
 }
