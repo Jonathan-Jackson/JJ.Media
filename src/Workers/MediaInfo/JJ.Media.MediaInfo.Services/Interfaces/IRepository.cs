@@ -1,4 +1,4 @@
-﻿using JJ.Media.MediaInfo.Core.Entities;
+﻿using JJ.Media.Core.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -9,4 +9,8 @@
     <Folder Include="Entities\Movies\" />
     <Folder Include="Entities\Shows\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\JJ.Media.Core\JJ.Media.Core.csproj" />
+  </ItemGroup>
 </Project>

@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\JJ.Media.Core\JJ.Media.Core.csproj" />
     <ProjectReference Include="..\JJ.Media.MediaInfo.Core\JJ.Media.MediaInfo.Core.csproj" />
   </ItemGroup>
 
