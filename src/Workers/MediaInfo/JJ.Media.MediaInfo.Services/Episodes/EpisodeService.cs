@@ -1,32 +1,35 @@
 ﻿using JJ.Media.MediaInfo.Core.Entities.Episodes;
 using JJ.Media.MediaInfo.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace JJ.Media.MediaInfo.Services.Episodes {
 
     public class EpisodeService {
-        private readonly IRepository<Episode> _episodeRepository;
+        private readonly IEpisodeRepository _episodeRepository;
 
-        public EpisodeService(IRepository<Episode> episodeRepository) {
+        public EpisodeService(IEpisodeRepository episodeRepository) {
             _episodeRepository = episodeRepository ?? throw new ArgumentNullException(nameof(episodeRepository));
         }
 
         //public virtual Episode GetRecent() {
         //}
 
-        public virtual async Task<Episode> GetById(int id) {
+        public virtual async Task<Episode> Get(int id) {
             if (id <= 0)
                 throw new ArgumentException(nameof(id));
 
-            return await _episodeRepository.FindAsync(id);
+            return await _episodeRepository.FindAsync(id)
+                ?? throw new KeyNotFoundException();
         }
 
-        //public virtual IList<Episode> GetByShow(int showId) {
-        //}
+        public virtual async Task<Episode?> Find(int showId, uint seasonNumber, uint episodeNumber) {
+            if (showId <= 0)
+                throw new ArgumentException(nameof(showId));
 
-        //public virtual IList<Episode> GetByTvDb(int tvDbId) {
-        //}
+            return await _episodeRepository.FindAsync(showId, seasonNumber, episodeNumber);
+        }
 
         public virtual async Task<int> Add(Episode episode) {
             // add validator

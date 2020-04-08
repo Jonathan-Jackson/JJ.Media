@@ -13,8 +13,8 @@ namespace JJ.Media.MediaInfo.API.Controllers {
     public class SearchController : ControllerBase {
 
         // GET: api/Search/5
-        [HttpGet("{showId}", Name = "Get")]
-        public IEnumerable<Episode> Episodes(int showId) {
+        [HttpGet("{episodeName}", Name = "Get")]
+        public IEnumerable<Episode> Episode(string episodeName) {
             return null;
         }
 
