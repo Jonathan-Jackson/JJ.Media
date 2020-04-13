@@ -25,12 +25,10 @@ namespace JJ.Media.MediaInfo.Data.Repositories {
                         .FirstOrDefaultAsync<int>()
             );
 
-            if (showId > 0) {
+            if (showId > 0)
                 return await FindAsync(showId);
-            }
-            else {
+            else
                 return null;
-            }
         }
 
         public async Task<IEnumerable<Show>> FindAsync(IEnumerable<string> titles) {
@@ -41,12 +39,10 @@ namespace JJ.Media.MediaInfo.Data.Repositories {
                         .GetAsync<int>()).ToArray()
             );
 
-            if (showIds.Length > 0) {
+            if (showIds.Length > 0)
                 return await FindAsync(showIds);
-            }
-            else {
+            else
                 return Enumerable.Empty<Show>();
-            }
         }
     }
 }

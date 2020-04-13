@@ -10,6 +10,11 @@ namespace JJ.Media.MediaInfo.Services.Search {
         private readonly IApiSearchService _apiSearchService;
         private readonly IShowRepository _showRepository;
 
+        public ShowSearchService(IApiSearchService apiSearchService, IShowRepository showRepository) {
+            _apiSearchService = apiSearchService;
+            _showRepository = showRepository;
+        }
+
         public async Task<Show?> SearchAsync(IEnumerable<string> possibleNames) {
             // DB Search
             var dbResults = await _showRepository.FindAsync(possibleNames);
@@ -31,6 +36,10 @@ namespace JJ.Media.MediaInfo.Services.Search {
             return allMatch;
         }
 
+        /// <summary>
+        /// Returns the show that matches the strongest against the possible names.
+        /// </summary>
+        /// <param name="possibleNames"> Names of possible matches. It's important that these are ordered by most likely.</param>
         private Show? FindMatch(IEnumerable<Show> shows, IEnumerable<string> possibleNames) {
         }
 

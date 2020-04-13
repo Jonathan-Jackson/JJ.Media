@@ -29,7 +29,7 @@ namespace JJ.Media.MediaInfo.Services.Search {
                 return null; // We can't find the show, so we cant find the episode.
         }
 
-        private async Task<Episode?> SearchAsync(Show show, uint seasonNumber, uint episodeNumber) {
+        public async Task<Episode?> SearchAsync(Show show, uint seasonNumber, uint episodeNumber) {
             // Check the DB.
             var result = await _episodeService.Find(show.Id, seasonNumber, episodeNumber);
             if (result != null)
