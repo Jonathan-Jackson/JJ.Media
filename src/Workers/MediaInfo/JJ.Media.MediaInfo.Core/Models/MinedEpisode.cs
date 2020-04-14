@@ -12,7 +12,7 @@ namespace JJ.Media.MediaInfo.Core.Models {
             get; set;
         }
 
-        public uint SeasonNumber {
+        public uint? SeasonNumber {
             get; set;
         }
 

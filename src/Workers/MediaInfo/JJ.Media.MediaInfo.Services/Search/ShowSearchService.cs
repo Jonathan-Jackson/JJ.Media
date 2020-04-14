@@ -1,5 +1,6 @@
 ﻿using JJ.Media.MediaInfo.Core.Models;
 using JJ.Media.MediaInfo.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,9 +42,11 @@ namespace JJ.Media.MediaInfo.Services.Search {
         /// </summary>
         /// <param name="possibleNames"> Names of possible matches. It's important that these are ordered by most likely.</param>
         private Show? FindMatch(IEnumerable<Show> shows, IEnumerable<string> possibleNames) {
+            throw new NotImplementedException();
         }
 
         private Show? FindSimilarMatch(IEnumerable<Show> shows, IEnumerable<string> possibleNames) {
+            throw new NotImplementedException();
         }
     }
 }
