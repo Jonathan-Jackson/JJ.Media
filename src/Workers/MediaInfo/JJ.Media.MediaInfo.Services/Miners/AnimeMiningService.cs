@@ -23,6 +23,11 @@ namespace JJ.Media.MediaInfo.Services.Miners {
         }
 
         public MinedEpisode MineEpisodeName(string episodeName) {
+            if (episodeName == null)
+                throw new ArgumentNullException(episodeName);
+            if (string.IsNullOrWhiteSpace(episodeName))
+                throw new ArgumentException(nameof(episodeName));
+
             episodeName = episodeName.RemoveAtEnd(MediaFormats, StringComparison.OrdinalIgnoreCase);
 
             return new MinedEpisode {
@@ -32,7 +37,11 @@ namespace JJ.Media.MediaInfo.Services.Miners {
             };
         }
 
-        private string AggregateActions(string source, IEnumerable<Func<string, string>> actions) {
+        /// <summary>
+        /// Attempts to aggregate a collection of functions against a source string.
+        /// If an exception is thrown, it is caught.
+        /// </summary>
+        private string TryAggregateActions(string source, IEnumerable<Func<string, string>> actions) {
             try {
                 foreach (var action in actions) {
                     source = action(source);
@@ -94,13 +103,14 @@ namespace JJ.Media.MediaInfo.Services.Miners {
             }.GetPermutations().ToArray();
 
             // 5! = 120 combinations
-            var secondaryPermutations = new List<Func<string, string>> {
-                SpliceOnSecondHyphen,
+            var secondary = new List<Func<string, string>> {
+                SpliceOnHyphen,
                 RemoveSeasonLetter,
                 RemoveRomanNumerals,
                 RemoveBuzzwords,
                 RemoveSpecialSeasonWords
-            }.GetPermutations().ToArray();
+            };
+            var secondaryPermutations = secondary.GetPermutations().ToArray();
 
             // 2! = 2 combinations
             var tertiaryPermutations = new List<Func<string, string>> {
@@ -110,18 +120,23 @@ namespace JJ.Media.MediaInfo.Services.Miners {
 
             HashSet<string> results = new HashSet<string>();
 
+            // This needs better comments and refactoring.
+            // In Short:
+            // We randomize our functions with permutations, our secondary
+            // functions we want to execute each individually, not just all.
             foreach (var priorityActions in priorityPermutations) {
-                string result1 = AggregateActions(episodeName, priorityActions).Trim();
+                string result1 = TryAggregateActions(episodeName, priorityActions).Trim();
                 results.TryAdd(result1);
+                results.TryAdd(secondary.Select(x => x(result1)));
 
                 foreach (var secondaryActions in secondaryPermutations) {
                     var secondarySequence = priorityActions.Concat(secondaryActions).ToArray();
-                    string result2 = AggregateActions(episodeName, secondarySequence).Trim();
+                    string result2 = TryAggregateActions(episodeName, secondarySequence).Trim();
                     results.TryAdd(result2);
 
                     foreach (var tertiaryActions in tertiaryPermutations) {
                         var tertiarySequence = priorityActions.Concat(secondaryActions).ToArray();
-                        string result3 = AggregateActions(episodeName, secondarySequence).Trim();
+                        string result3 = TryAggregateActions(episodeName, secondarySequence).Trim();
                         results.TryAdd(result3);
                     }
                 }
@@ -132,7 +147,14 @@ namespace JJ.Media.MediaInfo.Services.Miners {
             }
 
             return results
+                .Where(x => x.Length > 2 || x.Length == episodeName.Length)
                 .Select(x => x.Trim())
+                // Prioritize the longest values
+                // We do this because going down the permutations will only result
+                // in small results - and these are commonly less likely.
+                .OrderByDescending(x => x)
+                .Distinct()
+                .DefaultIfEmpty(episodeName)
                 .ToArray();
         }
 
@@ -250,7 +272,7 @@ namespace JJ.Media.MediaInfo.Services.Miners {
             => Regex.Replace(arg, @" ?\[.*?\]", string.Empty);
 
         private string RemoveTriangleBrackets(string arg)
-                    => Regex.Replace(arg, @" ?\<.*?\>", string.Empty);
+            => Regex.Replace(arg, @" ?\<.*?\>", string.Empty);
 
         private string SpliceOnHyphen(string arg) {
             var split = arg.Split('-');
@@ -258,16 +280,7 @@ namespace JJ.Media.MediaInfo.Services.Miners {
             if (split.Length == 1)
                 return arg;
 
-            return string.Concat(split.Take(split.Length - 1));
-        }
-
-        private string SpliceOnSecondHyphen(string arg) {
-            var split = arg.Split('-');
-
-            if (split.Length < 3)
-                return arg;
-
-            return string.Concat(split.Take(split.Length - 2));
+            return string.Concat(string.Join('-', split.Take(split.Length - 1)));
         }
 
         private bool StartsWithNumberedWord(string fileName) {

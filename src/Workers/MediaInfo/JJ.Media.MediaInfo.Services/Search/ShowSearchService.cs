@@ -1,4 +1,4 @@
-﻿using JJ.Media.MediaInfo.Core.Models;
+﻿using JJ.Media.MediaInfo.Core.Entities;
 using JJ.Media.MediaInfo.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace JJ.Media.MediaInfo.Services.Search {
                 return dbMatch;
 
             // API Search
-            var apiResults = await _apiSearchService.FindShow(possibleNames);
+            var apiResults = await _apiSearchService.FindShowAsync(possibleNames);
             var apiMatch = FindMatch(apiResults, possibleNames);
             if (apiMatch != null)
                 return apiMatch;
@@ -42,11 +42,35 @@ namespace JJ.Media.MediaInfo.Services.Search {
         /// </summary>
         /// <param name="possibleNames"> Names of possible matches. It's important that these are ordered by most likely.</param>
         private Show? FindMatch(IEnumerable<Show> shows, IEnumerable<string> possibleNames) {
-            throw new NotImplementedException();
+            foreach (var name in possibleNames) {
+                var titleMatches = shows.Where(show => HasTitle(show, name));
+
+                if (titleMatches.Any())
+                    return titleMatches.OrderByDescending(show => HasPrimaryTitle(show, name)).First();
+            }
+
+            return null;
         }
 
+        private string GetLetters(string arg)
+            => new string(arg.Where(char.IsLetter).ToArray());
+
+        private bool HasTitle(Show show, string name)
+            => show.Titles.Any(title => string.Equals(title.Name, name, StringComparison.OrdinalIgnoreCase));
+
+        private bool HasPrimaryTitle(Show show, string name)
+            => show.Titles.Any(title => title.IsPrimary && string.Equals(title.Name, name, StringComparison.OrdinalIgnoreCase));
+
         private Show? FindSimilarMatch(IEnumerable<Show> shows, IEnumerable<string> possibleNames) {
-            throw new NotImplementedException();
+            // Try non-numeric/special char matches.
+            foreach (var name in possibleNames.Select(GetLetters)) {
+                var titleMatches = shows.Where(show => HasTitle(show, name));
+
+                if (titleMatches.Any())
+                    return titleMatches.OrderByDescending(show => HasPrimaryTitle(show, name)).First();
+            }
+
+            return null;
         }
     }
 }

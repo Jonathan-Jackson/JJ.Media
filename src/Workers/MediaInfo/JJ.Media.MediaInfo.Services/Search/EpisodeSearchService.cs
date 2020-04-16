@@ -1,8 +1,11 @@
-﻿using JJ.Media.MediaInfo.Core.Entities.Episodes;
+﻿using JJ.Media.MediaInfo.Core.Entities;
+using JJ.Media.MediaInfo.Core.Entities.Episodes;
 using JJ.Media.MediaInfo.Core.Models;
 using JJ.Media.MediaInfo.Services.Episodes;
 using JJ.Media.MediaInfo.Services.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JJ.Media.MediaInfo.Services.Search {
@@ -44,12 +47,18 @@ namespace JJ.Media.MediaInfo.Services.Search {
 
             // Check API.
             if (show.TvDbId > 0) {
-                result = await _apiSearchService.FindEpisode(show.TvDbId, seasonNumber, episodeNumber);
-                if (result != null)
+                var results = await _apiSearchService.FindEpisodeAsync(show.TvDbId, seasonNumber, episodeNumber);
+                if (results.Any()) {
+                    result = GetPriorityEpisode(results, seasonNumber, episodeNumber);
                     await _episodeService.Add(result);
+                }
             }
 
             return result;
+        }
+
+        private Episode GetPriorityEpisode(IEnumerable<Episode> results, uint seasonNumber, uint episodeNumber) {
+            throw new NotImplementedException();
         }
     }
 }

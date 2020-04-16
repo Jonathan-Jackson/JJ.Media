@@ -1,5 +1,5 @@
-﻿using JJ.Media.MediaInfo.Core.Entities.Episodes;
-using JJ.Media.MediaInfo.Core.Models;
+﻿using JJ.Media.MediaInfo.Core.Entities;
+using JJ.Media.MediaInfo.Core.Entities.Episodes;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,10 +7,12 @@ namespace JJ.Media.MediaInfo.Services.Interfaces {
 
     public interface IApiSearchService {
 
-        Task<Show[]> FindShow(IEnumerable<string> showNames);
+        Task AuthenticateAsync();
 
-        Task<Show?> FindShow(string showName);
+        Task<Show[]> FindShowAsync(IEnumerable<string> showNames);
 
-        Task<Episode?> FindEpisode(int apiShowId, uint seasonNumber, uint episodeNumber);
+        Task<Show[]> FindShowAsync(string showName);
+
+        Task<Episode[]> FindEpisodeAsync(int apiShowId, uint seasonNumber, uint episodeNumber);
     }
 }

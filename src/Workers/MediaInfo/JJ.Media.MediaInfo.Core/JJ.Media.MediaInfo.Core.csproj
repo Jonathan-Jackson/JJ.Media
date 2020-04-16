@@ -6,8 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Movies\" />
-    <Folder Include="Entities\Shows\" />
+    <Folder Include="Dto\Movies\" />
   </ItemGroup>
 
   <ItemGroup>

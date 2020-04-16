@@ -12,5 +12,13 @@ namespace JJ.Media.Core.Extensions {
             set.Add(value);
             return true;
         }
+
+        public static void TryAdd<T>(this HashSet<T> set, IEnumerable<T> values) {
+            foreach (var value in values) {
+                if (!set.Contains(value)) {
+                    set.Add(value);
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using JJ.Media.MediaInfo.Core.Entities.Episodes;
-using JJ.Media.MediaInfo.Core.Models;
+﻿using JJ.Media.MediaInfo.Core.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -1,4 +1,5 @@
-﻿using JJ.Media.MediaInfo.Core.Models;
+﻿using JJ.Media.MediaInfo.Core.Entities;
+using JJ.Media.MediaInfo.Core.Models;
 using JJ.Media.MediaInfo.Data.Interfaces;
 using JJ.Media.MediaInfo.Data.Models;
 using JJ.Media.MediaInfo.Services.Interfaces;
