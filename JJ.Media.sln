@@ -12,6 +12,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{87CE44ED-BA78-4423-89BE-7DBCB9D59DDF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MediaInfo", "MediaInfo", "{1E0FD72E-50FE-4D10-BF0E-81A3EC66B6EE}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{4093D781-3F55-4763-B923-1BD8000A7DF7}"
 EndProject
