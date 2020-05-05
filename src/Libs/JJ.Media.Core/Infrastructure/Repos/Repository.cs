@@ -1,7 +1,4 @@
 ﻿using JJ.Media.Core.Entities;
-using MediaInfo.Domain.Helpers.Repository;
-using MediaInfo.Infrastructure.Helpers.Factories;
-using MediaInfo.Infrastructure.Helpers.Models;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 using System;
@@ -9,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MediaInfo.Infrastructure.Repositories {
+namespace JJ.Media.Core.Infrastructure {
 
     /// <summary>
     /// Base class for Repositories.

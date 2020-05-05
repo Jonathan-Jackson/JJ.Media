@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JJ.Media.MediaInfo.Services\MediaInfo.Domain.csproj" />
+    <ProjectReference Include="..\..\MediaInfo.Domain\MediaInfo.Domain.csproj" />
   </ItemGroup>
-
 </Project>

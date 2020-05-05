@@ -1,5 +1,5 @@
-﻿using MediaInfo.Domain.Helpers.DTOs.Shows;
-using MediaInfo.Domain.Helpers.Repository;
+﻿using JJ.Media.Core.Infrastructure;
+using MediaInfo.Domain.Helpers.DTOs.Shows;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

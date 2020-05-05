@@ -1,4 +1,5 @@
-﻿using MediaInfo.Domain.Helpers.DTOs.Episodes;
+﻿using JJ.Media.Core.Infrastructure;
+using MediaInfo.Domain.Helpers.DTOs.Episodes;
 using System.Threading.Tasks;
 
 namespace MediaInfo.Domain.Helpers.Repository {

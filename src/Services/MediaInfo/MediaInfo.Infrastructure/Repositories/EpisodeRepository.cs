@@ -1,7 +1,6 @@
-﻿using MediaInfo.Domain.Helpers.DTOs.Episodes;
+﻿using JJ.Media.Core.Infrastructure;
+using MediaInfo.Domain.Helpers.DTOs.Episodes;
 using MediaInfo.Domain.Helpers.Repository;
-using MediaInfo.Infrastructure.Helpers.Factories;
-using MediaInfo.Infrastructure.Helpers.Models;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 using System;

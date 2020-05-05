@@ -1,10 +1,8 @@
-﻿using MediaInfo.Infrastructure.Helpers.Factories;
-using MediaInfo.Infrastructure.Helpers.Models;
-using SqlKata.Compilers;
+﻿using SqlKata.Compilers;
 using System;
 using System.Data;
 
-namespace MediaInfo.Infrastructure.Repositories {
+namespace JJ.Media.Core.Infrastructure {
 
     /// <summary>
     /// Base class for SqlKata logic wrapping.

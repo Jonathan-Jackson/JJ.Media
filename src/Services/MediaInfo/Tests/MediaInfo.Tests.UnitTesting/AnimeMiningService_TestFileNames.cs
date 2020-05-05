@@ -1,7 +1,5 @@
-﻿using JJ.Media.Core.Extensions;
-using JJ.Media.MediaInfo.Core.Models;
-using JJ.Media.MediaInfo.Services.Miners;
-using Microsoft.Extensions.Logging;
+﻿using MediaInfo.Domain.Helpers.DTOs.Miners;
+using MediaInfo.DomainLayer.Miners;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -9,11 +7,10 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
 
     [TestClass]
     public class AnimeMiningService_TestFileNames {
-        private readonly AnimeMiner _service;
+        private readonly AnimeMiner _miner;
 
         public AnimeMiningService_TestFileNames() {
-            var logger = new LoggerFactory().CreateLogger<AnimeMiner>();
-            _service = new AnimeMiner(logger);
+            _miner = new AnimeMiner();
         }
 
         [TestMethod]
@@ -48,9 +45,9 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
 
         [TestMethod]
         public void MineEpisodeNames_InvalidArgumentsTest() {
-            Assert.ThrowsException<ArgumentNullException>(() => _service.MineEpisodeName(null));
-            Assert.ThrowsException<ArgumentException>(() => _service.MineEpisodeName(""));
-            Assert.ThrowsException<ArgumentException>(() => _service.MineEpisodeName(" "));
+            Assert.ThrowsException<ArgumentNullException>(() => _miner.MineEpisodeName(null));
+            Assert.ThrowsException<ArgumentException>(() => _miner.MineEpisodeName(""));
+            Assert.ThrowsException<ArgumentException>(() => _miner.MineEpisodeName(" "));
         }
 
         [TestMethod]
@@ -90,11 +87,14 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
         }
 
         private void AssertResult(string episodeName, MinedEpisode expectedResult) {
-            var result = _service.MineEpisodeName(episodeName);
+            var result = _miner.MineEpisodeName(episodeName);
 
             Assert.AreEqual(expectedResult.SeasonNumber, result.SeasonNumber);
             Assert.AreEqual(expectedResult.EpisodeNumber, result.EpisodeNumber);
-            Assert.IsTrue(result.PossibleNames.HasEqualContents(expectedResult.PossibleNames));
+
+            Assert.AreEqual(result.PossibleNames.Length, expectedResult.PossibleNames.Length);
+            for (int i = 0; i < result.PossibleNames.Length; i++)
+                Assert.AreEqual(result.PossibleNames[i], expectedResult.PossibleNames[i]);
         }
     }
 }

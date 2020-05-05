@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MediaInfo.Domain.Helpers.Repository {
+namespace JJ.Media.Core.Infrastructure {
 
     public interface IRepository<TEntity> where TEntity : Entity {
 

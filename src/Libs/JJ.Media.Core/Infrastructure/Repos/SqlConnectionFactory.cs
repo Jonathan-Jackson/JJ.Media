@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace MediaInfo.Infrastructure.Helpers.Factories {
+namespace JJ.Media.Core.Infrastructure {
 
     /// <summary>
     /// Wrapper for an SQL connection to be created.

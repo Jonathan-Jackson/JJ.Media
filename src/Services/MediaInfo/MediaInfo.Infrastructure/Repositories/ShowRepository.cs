@@ -1,7 +1,6 @@
-﻿using JJ.Media.MediaInfo.Services.Interfaces;
+﻿using JJ.Media.Core.Infrastructure;
+using JJ.Media.MediaInfo.Services.Interfaces;
 using MediaInfo.Domain.Helpers.DTOs.Shows;
-using MediaInfo.Infrastructure.Helpers.Factories;
-using MediaInfo.Infrastructure.Helpers.Models;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 using System;

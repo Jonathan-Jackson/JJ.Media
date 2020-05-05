@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MediaInfo", "MediaInfo", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{4093D781-3F55-4763-B923-1BD8000A7DF7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processor", "Processor", "{9CD70DE2-3448-4091-BD04-542600F66AB6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{9CD70DE2-3448-4091-BD04-542600F66AB6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaInfo.API", "src\Services\MediaInfo\MediaInfo.API\MediaInfo.API.csproj", "{43B5C384-D6D1-47F4-B014-63259C342F7A}"
 EndProject
@@ -34,6 +34,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JJ.Media.Core", "src\Libs\JJ.Media.Core\JJ.Media.Core.csproj", "{E1911624-D4B8-4F77-9D77-56C3B93197B1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{74A7CADD-909A-4DC5-B3F6-00DD11E8A977}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloader.Console", "src\Services\Downloader\Downloader.Console\Downloader.Console.csproj", "{1CFAF89B-C672-42D5-930E-5486504B50A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloader.Core", "src\Services\Downloader\Downloader.Core\Downloader.Core.csproj", "{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +65,14 @@ Global
 		{E1911624-D4B8-4F77-9D77-56C3B93197B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1911624-D4B8-4F77-9D77-56C3B93197B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1911624-D4B8-4F77-9D77-56C3B93197B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CFAF89B-C672-42D5-930E-5486504B50A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CFAF89B-C672-42D5-930E-5486504B50A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CFAF89B-C672-42D5-930E-5486504B50A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CFAF89B-C672-42D5-930E-5486504B50A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +90,8 @@ Global
 		{96FAA25C-0A9E-41E3-8BC6-D9D961898A27} = {74A7CADD-909A-4DC5-B3F6-00DD11E8A977}
 		{E1911624-D4B8-4F77-9D77-56C3B93197B1} = {87CE44ED-BA78-4423-89BE-7DBCB9D59DDF}
 		{74A7CADD-909A-4DC5-B3F6-00DD11E8A977} = {1E0FD72E-50FE-4D10-BF0E-81A3EC66B6EE}
+		{1CFAF89B-C672-42D5-930E-5486504B50A4} = {4093D781-3F55-4763-B923-1BD8000A7DF7}
+		{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8} = {4093D781-3F55-4763-B923-1BD8000A7DF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC7526-4F78-49C0-BF45-FBFFFCF36B72}

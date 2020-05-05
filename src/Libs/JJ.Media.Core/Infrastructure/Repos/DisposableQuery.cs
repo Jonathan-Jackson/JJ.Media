@@ -3,7 +3,7 @@ using SqlKata.Execution;
 using System;
 using System.Data;
 
-namespace MediaInfo.Infrastructure.Helpers.Models {
+namespace JJ.Media.Core.Infrastructure {
 
     /// <summary>
     /// Wrapper around a query factory to allow for disposing.
