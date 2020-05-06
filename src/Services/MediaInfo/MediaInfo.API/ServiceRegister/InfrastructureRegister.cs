@@ -1,9 +1,7 @@
-﻿using JJ.Media.MediaInfo.Services;
+﻿using JJ.Media.Core.Infrastructure;
 using JJ.Media.MediaInfo.Services.Interfaces;
-using MediaInfo.Domain.DomainLayer.Search;
 using MediaInfo.Domain.Helpers.Repository;
 using MediaInfo.Domain.Helpers.Repository.Interfaces;
-using MediaInfo.Infrastructure.Helpers.Factories;
 using MediaInfo.Infrastructure.Helpers.Models;
 using MediaInfo.Infrastructure.Remote;
 using MediaInfo.Infrastructure.Repositories;

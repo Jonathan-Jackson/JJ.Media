@@ -10,13 +10,13 @@ namespace JJ.Media.Core.Infrastructure.Notifier {
 
         public abstract Task Notify(Notification<TNotifyType> notification);
 
-        protected virtual async Task PostNotification(string address, Notification<TNotifyType> notification, string body) {
+        protected virtual async Task<HttpResponseMessage> PostNotification(string address, Notification<TNotifyType> notification, string body) {
             var request = new HttpRequestMessage(HttpMethod.Post, address) {
                 Headers = { { "X-Request-ID", notification.Token.ToString() } },
                 Content = new StringContent(body, Encoding.UTF8, "application/json")
             };
 
-            await _client.SendAsync(request);
+            return await _client.SendAsync(request);
         }
     }
 }
