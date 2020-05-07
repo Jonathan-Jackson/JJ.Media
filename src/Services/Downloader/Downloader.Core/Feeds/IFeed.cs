@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace Downloader.Core.Feeds {
 
-    internal interface IFeed {
+    public interface IFeed {
 
-        Task<IEnumerable<Torrent>> Read();
+        Task<IEnumerable<Torrent>> ReadAsync();
     }
 }

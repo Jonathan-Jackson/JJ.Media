@@ -56,11 +56,35 @@ namespace JJ.Media.Core.Infrastructure {
 
         public abstract Task<int> InsertAsync(TEntity entity);
 
-        public abstract Task<IEnumerable<int>> InsertAsync(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// Inserts entities in parallel.
+        /// Consider overriding for performance (i.e. bulk insert).
+        /// </summary>
+        public async virtual Task<IEnumerable<int>> InsertAsync(IEnumerable<TEntity> entities) {
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities));
+
+            if (!entities.Any())
+                return Enumerable.Empty<int>();
+
+            return await Task.WhenAll(entities.Select(InsertAsync));
+        }
 
         public abstract Task<int> UpdateAsync(TEntity entity);
 
-        public abstract Task<IEnumerable<int>> UpdateAsync(IEnumerable<TEntity> entities);
+        /// <summary>
+        /// Updates entities in parallel.
+        /// Consider overriding for performance (i.e. bulk insert).
+        /// </summary>
+        public async virtual Task<IEnumerable<int>> UpdateAsync(IEnumerable<TEntity> entities) {
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities));
+
+            if (!entities.Any())
+                return Enumerable.Empty<int>();
+
+            return await Task.WhenAll(entities.Select(UpdateAsync));
+        }
 
         #region Privates
 

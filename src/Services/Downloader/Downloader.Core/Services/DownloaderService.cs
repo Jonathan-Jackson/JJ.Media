@@ -20,6 +20,14 @@ namespace Downloader.Core.Services {
         private const int ProcessTrackedIntervalMiliseconds = 15_000;       // 15 seconds.
         private const int UntrackedDelayIntervalMiliseconds = 126_000;      // 2.1 minutes.
 
+        public DownloaderService(IReadOnlyCollection<IFeed> feeds, ILogger<DownloaderService> log,
+                TorrentService torrentService, HistoryRepository historyRepo) {
+            _feeds = feeds;
+            _log = log;
+            _torrentService = torrentService;
+            _historyRepo = historyRepo;
+        }
+
         /// <summary>
         /// Runs the service. This executes
         /// processing downloads via the feed, picking up
@@ -107,7 +115,7 @@ namespace Downloader.Core.Services {
         /// Returns all feed torrents.
         /// </summary>
         private async Task<IList<Torrent>> GetFeedsAsync() {
-            var torrents = await Task.WhenAll(_feeds.Select(x => x.Read()));
+            var torrents = await Task.WhenAll(_feeds.Select(x => x.ReadAsync()));
             return torrents.SelectMany(x => x).ToList();
         }
 

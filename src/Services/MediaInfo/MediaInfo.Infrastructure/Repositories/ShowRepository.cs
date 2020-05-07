@@ -139,16 +139,5 @@ namespace MediaInfo.Infrastructure.Repositories {
             // Some complex checking here to also insert any missing titles.
             throw new System.NotImplementedException();
         }
-
-        /// <summary>
-        /// Updates a show within the repository.
-        /// </summary>
-        /// <returns>Record changes counts.</returns>
-        public override async Task<IEnumerable<int>> UpdateAsync(IEnumerable<Show> shows) {
-            if (shows?.Any() != true)
-                return Enumerable.Empty<int>();
-
-            throw new System.NotImplementedException();
-        }
     }
 }

@@ -72,16 +72,6 @@ namespace MediaInfo.Infrastructure.Repositories {
         }
 
         /// <summary>
-        /// Inserts a collection of episodes into the repository.
-        /// </summary>
-        public override async Task<IEnumerable<int>> InsertAsync(IEnumerable<Episode> episodes) {
-            if (episodes?.Any() != true)
-                return Enumerable.Empty<int>();
-
-            return await Task.WhenAll(episodes.Select(InsertAsync));
-        }
-
-        /// <summary>
         /// Updates an episode in the repository with its current details.
         /// </summary>
         public override async Task<int> UpdateAsync(Episode episode) {
@@ -100,16 +90,6 @@ namespace MediaInfo.Infrastructure.Repositories {
                     episode.AbsoluteNumber
                 })
             );
-        }
-
-        /// <summary>
-        /// Updates episodes in the repository with their current details.
-        /// </summary>
-        public override async Task<IEnumerable<int>> UpdateAsync(IEnumerable<Episode> episodes) {
-            if (episodes == null)
-                throw new ArgumentNullException(nameof(episodes));
-
-            return await Task.WhenAll(episodes.Select(UpdateAsync));
         }
     }
 }

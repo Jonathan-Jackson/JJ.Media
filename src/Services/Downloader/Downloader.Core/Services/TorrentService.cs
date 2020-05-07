@@ -1,5 +1,6 @@
 ﻿using Downloader.Core.Helpers;
 using Downloader.Core.Helpers.DTOs;
+using Downloader.Core.Helpers.Options;
 using Downloader.Core.Infrastructure;
 using JJ.Media.Core.Entities;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,15 @@ namespace Downloader.Core.Services {
     public class TorrentService {
         private readonly ILogger<TorrentService> _log;
         private readonly ITorrentClient _torrentClient;
-        private readonly StorageNotifier _storage;
-        private readonly string _downloadLocation;
+        private readonly StorageProcessNotifier _storage;
+        private readonly string _downloadTorrentPath;
+
+        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, StorageProcessNotifier storage, TorrentServiceOptions options) {
+            _log = log;
+            _torrentClient = torrentClient;
+            _storage = storage;
+            _downloadTorrentPath = options.DownloadTorrentPath;
+        }
 
         /// <summary>
         /// Removes finished torrents in the torrent service and
@@ -38,7 +46,7 @@ namespace Downloader.Core.Services {
         /// which are not being tracked by the torrent service.
         /// </summary>
         public async Task CompleteUntrackedDownloads() {
-            IEnumerable<DirectoryInfo> files = Directory.GetFiles(_downloadLocation).Select(x => new DirectoryInfo(x));
+            IEnumerable<DirectoryInfo> files = Directory.GetFiles(_downloadTorrentPath).Select(x => new DirectoryInfo(x));
 
             IEnumerable<string> torrentNames = (await _torrentClient.GetTorrentsAsync()).Select(x => x.Name.ToLower());
             var untracked = files.Where(x => !torrentNames.Contains(x.Name.ToLower()));
@@ -83,7 +91,7 @@ namespace Downloader.Core.Services {
         private async Task NotifyToProcessFiles(IEnumerable<string> fileNames) {
             foreach (string fileName in fileNames) {
                 try {
-                    var notification = new Notification<string>($"{_downloadLocation}/{fileName}");
+                    var notification = new Notification<string>($"{_downloadTorrentPath}/{fileName}");
                     await _storage.Notify(notification);
                     _log.LogInformation($"Notified Processor of: {fileName}");
                 }
