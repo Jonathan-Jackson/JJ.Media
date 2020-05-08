@@ -1,9 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JJ.Media.Core.Extensions {
 
     public static class LinqExtensions {
+
+        public static async IAsyncEnumerable<T> WhereAsync<T>(this IEnumerable<T> enumerable, Func<T, Task<bool>> predicate) {
+            foreach (var item in enumerable) {
+                if (await predicate(item)) {
+                    yield return item;
+                }
+            }
+        }
 
         public static IEnumerable<IEnumerable<T>> GetPermutations<T>(this IEnumerable<T> enumerable) {
             var array = enumerable as T[] ?? enumerable.ToArray();

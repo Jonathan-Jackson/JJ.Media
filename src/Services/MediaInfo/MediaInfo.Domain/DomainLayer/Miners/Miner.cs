@@ -10,10 +10,12 @@ namespace MediaInfo.DomainLayer.Miners {
     /// </summary>
     public abstract class Miner {
 
-        protected static readonly string[] _mediaFormats = new[] {
+        protected static readonly string[] SupportedMediaFormats = new[] {
             ".mkv",
             ".mp4"
         };
+
+        protected static readonly char[] SupportedRomanNumerals = new[] { 'i', 'v', 'I', 'V' };
 
         protected virtual bool ContainsRomanNumerals(string arg)
             // Only do realistically seasoned roman'd
@@ -33,11 +35,11 @@ namespace MediaInfo.DomainLayer.Miners {
                 return arg;
 
             string result = string.Empty;
-            for (var i = 0; i < arg.Length - 1; i++) {
-                result += arg[i];
+            for (var i = 0; i < splitSpaces.Length - 1; i++) {
+                result += splitSpaces[i] + " ";
             }
 
-            return result;
+            return result.TrimEnd();
         }
 
         protected string RemoveNumbersAtEnd(string arg) {
@@ -52,17 +54,17 @@ namespace MediaInfo.DomainLayer.Miners {
         }
 
         protected string RemoveRomanNumerals(string arg)
-                    => arg.Replace(" i ", string.Empty, StringComparison.OrdinalIgnoreCase)
-                        .Replace(" ii ", string.Empty, StringComparison.OrdinalIgnoreCase)
-                        .Replace(" iii ", string.Empty, StringComparison.OrdinalIgnoreCase)
-                        .Replace(" v ", string.Empty, StringComparison.OrdinalIgnoreCase)
-                        .Replace(" iv ", string.Empty, StringComparison.OrdinalIgnoreCase);
+            => arg.Replace(" i ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace(" ii ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace(" iii ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace(" v ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace(" iv ", string.Empty, StringComparison.OrdinalIgnoreCase);
 
         protected string RemoveSquareBrackets(string arg)
-                    => Regex.Replace(arg, @" ?\[.*?\]", string.Empty);
+            => Regex.Replace(arg, @" ?\[.*?\]", string.Empty);
 
         protected string RemoveTriangleBrackets(string arg)
-                    => Regex.Replace(arg, @" ?\<.*?\>", string.Empty);
+            => Regex.Replace(arg, @" ?\<.*?\>", string.Empty);
 
         protected string SpliceOnHyphen(string arg) {
             var split = arg.Split('-');

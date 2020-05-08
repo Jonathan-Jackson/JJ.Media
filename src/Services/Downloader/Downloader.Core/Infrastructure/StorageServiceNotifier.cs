@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace Downloader.Core.Infrastructure {
 
-    public class StorageProcessNotifier : Notifier<string> {
+    public class StorageServiceNotifier : Notifier<string> {
         private string _address;
 
-        public StorageProcessNotifier(StorageProcessOptions options) {
+        public StorageServiceNotifier(StorageServiceOptions options) {
             _address = options.Address;
         }
 
         public override async Task Notify(Notification<string> notification) {
-            await PostNotification(_address, notification, notification.Data);
+            await PostNotification($"{_address}/media/process", notification, notification.Data);
         }
     }
 }

@@ -19,12 +19,12 @@ namespace Downloader.Core.Infrastructure {
 
         public async Task<bool> AnyAsync(string title) {
             if (string.IsNullOrWhiteSpace(title))
-                throw new ArgumentException("No title supplied.");
+                throw new ArgumentException("The title supplied is empty.");
 
             return await Execute(async (DisposableQuery db)
                     => await db.Query(_tableName)
-                        .Where("", "")
-                        .CountAsync<int>("1") > 0
+                        .Where("Title", title)
+                        .CountAsync<int>("*") > 0
             );
         }
 
@@ -35,7 +35,8 @@ namespace Downloader.Core.Infrastructure {
             return await Execute(async (DisposableQuery db)
                     => await db.Query(_tableName).InsertAsync(new {
                         history.MagnetUri,
-                        history.Title
+                        history.Title,
+                        history.DownloadedOn
                     })
             );
         }
@@ -53,7 +54,8 @@ namespace Downloader.Core.Infrastructure {
             return await Execute(async (DisposableQuery db)
                     => await db.Query(_tableName).UpdateAsync(new {
                         history.MagnetUri,
-                        history.Title
+                        history.Title,
+                        history.DownloadedOn
                     })
             );
         }

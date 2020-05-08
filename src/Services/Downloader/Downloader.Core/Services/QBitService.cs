@@ -1,5 +1,6 @@
 ﻿using Downloader.Core.Helpers;
 using Downloader.Core.Helpers.DTOs;
+using Downloader.Core.Helpers.Options;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
@@ -23,7 +24,7 @@ namespace Downloader.Core.Services {
         // Cookie auth for each request.
         private string _authKey = string.Empty;
 
-        public QBitService(ILogger<QBitService> log, QBitSettings settings) {
+        public QBitService(ILogger<QBitService> log, QBitOptions settings) {
             _log = log;
             _address = settings.Address;
             _username = settings.UserName;

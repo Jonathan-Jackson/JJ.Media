@@ -2,6 +2,6 @@
 
     public interface IStore {
 
-        string Save(string source, string folderPath, string fileName);
+        string SaveDownload(string source, string folderPath, string fileName);
     }
 }

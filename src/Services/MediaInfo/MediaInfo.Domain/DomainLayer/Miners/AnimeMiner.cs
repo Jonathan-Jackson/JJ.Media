@@ -17,7 +17,7 @@ namespace MediaInfo.DomainLayer.Miners {
             if (string.IsNullOrWhiteSpace(episodeName))
                 throw new ArgumentException(nameof(episodeName));
 
-            episodeName = episodeName.RemoveAtEnd(_mediaFormats, StringComparison.OrdinalIgnoreCase);
+            episodeName = episodeName.RemoveAtEnd(SupportedMediaFormats, StringComparison.OrdinalIgnoreCase);
 
             return new MinedEpisode {
                 PossibleNames = GetPossibleNames(episodeName).ToArray(),
@@ -63,7 +63,6 @@ namespace MediaInfo.DomainLayer.Miners {
             // 4! = 24 combinations
             var priorityPermutations = new List<Func<string, string>> {
                 RemoveSquareBrackets,
-                RemoveCircularBrackets,
                 RemoveTriangleBrackets,
                 SpliceOnHyphen
             }.GetPermutations().ToArray();
@@ -76,7 +75,10 @@ namespace MediaInfo.DomainLayer.Miners {
                 RemoveBuzzwords,
                 RemoveSpecialSeasonWords
             };
-            var secondaryPermutations = secondary.GetPermutations().ToArray();
+            var secondaryPermutations = secondary.GetPermutations()
+                // add an extra sequence to remove circular brackets (some shows have a year on the end).
+                .Concat(new[] { secondary.Append(RemoveCircularBrackets) })
+                .ToList();
 
             // 2! = 2 combinations
             var tertiaryPermutations = new List<Func<string, string>> {
@@ -101,8 +103,8 @@ namespace MediaInfo.DomainLayer.Miners {
                     results.TryAdd(result2);
 
                     foreach (var tertiaryActions in tertiaryPermutations) {
-                        var tertiarySequence = priorityActions.Concat(secondaryActions).ToArray();
-                        string result3 = TryAggregateActions(episodeName, secondarySequence).Trim();
+                        var tertiarySequence = secondarySequence.Concat(tertiaryActions).ToArray();
+                        string result3 = TryAggregateActions(episodeName, tertiarySequence).Trim();
                         results.TryAdd(result3);
                     }
                 }
@@ -180,13 +182,15 @@ namespace MediaInfo.DomainLayer.Miners {
         }
 
         private string RemoveSeasonLetter(string arg) {
-            arg = RemoveNumbersAtEnd(arg);
-            arg = arg.RemoveAtEnd("s", StringComparison.OrdinalIgnoreCase);
+            var sentence = new List<string>();
+            foreach (string word in arg.Split(' ')) {
+                string change = RemoveNumbersAtEnd(word);
+                change = change.RemoveAtEnd("s", StringComparison.OrdinalIgnoreCase);
+                if (!string.IsNullOrWhiteSpace(change))
+                    sentence.Add(word);
+            }
 
-            var romanNumerals = new[] { 'i', 'v', 'I', 'V' };
-            arg = arg.TrimEnd(romanNumerals);
-
-            return arg;
+            return string.Join(' ', sentence);
         }
 
         private string RemoveSpecialSeasonWords(string arg) {

@@ -24,14 +24,11 @@ namespace Storage.Domain.DomainLayer.Processor {
         }
 
         public override async Task ProcessAsync(string path) {
-            if (!File.Exists(path))
-                throw new IOException($"File cannot be processed as it does not exist: {path}");
-
             string episodeFileName = GetFileName(path);
             EpisodeSearch episode = await _mediaInfoRepository.SearchEpisode(episodeFileName);
 
             if (episode.Id > 0) {
-                var destination = _episodeStore.Save(path, GetFolderPath(episode), CreateFileName(path, episode));
+                var destination = _episodeStore.SaveDownload(path, GetFolderPath(episode), CreateFileName(path, episode));
                 await _processedRepository.InsertAsync(new ProcessedHistory { Type = eProcessedType.Episode, Source = path, Output = destination });
                 _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {destination}");
             }
@@ -46,10 +43,10 @@ namespace Storage.Domain.DomainLayer.Processor {
 
         private string CreateFileName(string path, EpisodeSearch episode) {
             if (HasLargeName(episode) || string.IsNullOrWhiteSpace(episode.EpisodeTitle)) {
-                return $"{episode.ShowTitle} - S{FormattedSeasonNumber(episode)}E{FormattedEpisodeNumber(episode)} ({episode.EpisodeTitle}).{GetFileExtension(path)}";
+                return $"{episode.ShowTitle} - S{FormattedSeasonNumber(episode)}E{FormattedEpisodeNumber(episode)}{GetFileExtension(path)}";
             }
             else {
-                return $"{episode.ShowTitle} - S{FormattedSeasonNumber(episode)}E{FormattedEpisodeNumber(episode)}.{GetFileExtension(path)}";
+                return $"{episode.ShowTitle} - S{FormattedSeasonNumber(episode)}E{FormattedEpisodeNumber(episode)} ({episode.EpisodeTitle}){GetFileExtension(path)}";
             }
         }
 

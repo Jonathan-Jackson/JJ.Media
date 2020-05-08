@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JJ.Media.Core.Extensions;
 
 namespace Downloader.Core.Services {
 
@@ -101,8 +102,13 @@ namespace Downloader.Core.Services {
             for (; ; await Task.Delay(GetFeedIntervalMiliSeconds)) {
                 try {
                     IList<Torrent> torrents = await GetFeedsAsync();
-                    IAsyncEnumerable<Torrent> toDownload = GetTorrentsToDownloadAsync(torrents);
-                    await _torrentService.Download(toDownload);
+                    torrents = torrents.Take(1).ToList(); // DEBUG!!!
+
+                    await foreach (var torrent in torrents.WhereAsync(IsTorrentEligibleToDownloadAsync)) {
+                        await _torrentService.Download(torrent);
+                        await _historyRepo.InsertAsync(new DownloadHistory { Title = torrent.Title, MagnetUri = torrent.MagnetUri });
+                    }
+
                     _log.LogInformation($"Processed torrent feed. Next process in {(GetFeedIntervalMiliSeconds / 1000) / 60} minutes.");
                 }
                 catch (Exception ex) {
@@ -117,19 +123,6 @@ namespace Downloader.Core.Services {
         private async Task<IList<Torrent>> GetFeedsAsync() {
             var torrents = await Task.WhenAll(_feeds.Select(x => x.ReadAsync()));
             return torrents.SelectMany(x => x).ToList();
-        }
-
-        /// <summary>
-        /// Gets torrents that are eligible for download.
-        /// </summary>
-        /// <param name="torrents">Torrents to check.</param>
-        /// <returns>Eligible torrents.</returns>
-        private async IAsyncEnumerable<Torrent> GetTorrentsToDownloadAsync(IEnumerable<Torrent> torrents) {
-            foreach (var torrent in torrents) {
-                if (await IsTorrentEligibleToDownloadAsync(torrent)) {
-                    yield return torrent;
-                }
-            }
         }
 
         /// <summary>

@@ -50,7 +50,7 @@ namespace MediaInfo.Infrastructure.Repositories {
             int[] showIds = await Execute(async (DisposableQuery db)
                     => (await db.Query(ShowTitlesTable)
                         .Select("ShowId")
-                        .Where("Title", titles)
+                        .WhereIn("Title", titles)
                         .GetAsync<int>()).ToArray()
             );
 

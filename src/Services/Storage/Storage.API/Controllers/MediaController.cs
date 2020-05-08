@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Storage.Domain.DomainLayer.Processor;
-using System.Collections.Generic;
-using System.Linq;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace Storage.API.Controllers {
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class MediaController : ControllerBase {
         private readonly ILogger<MediaController> _logger;
         private readonly EpisodeProcessor _episodeProcessor;
@@ -18,15 +18,24 @@ namespace Storage.API.Controllers {
             _episodeProcessor = episodeProcessor;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Process(string filePath) {
+        [HttpGet("process")]
+        public async Task<IActionResult> Process([FromBody]string filePath) {
             if (string.IsNullOrWhiteSpace(filePath))
                 return BadRequest($"File Path supplied is empty.");
 
-            // TODO: QUEUE!
-            await _episodeProcessor.ProcessAsync(filePath);
+            try {
+                // TODO: QUEUE!
+                await _episodeProcessor.ProcessAsync(filePath);
 
-            return Ok();
+                return Ok();
+            }
+            catch (ValidationException validation) {
+                return BadRequest(validation.Message);
+            }
+            catch (Exception ex) {
+                _logger.LogError(ex, "An error occured when processing a file.");
+                throw;
+            }
         }
     }
 }

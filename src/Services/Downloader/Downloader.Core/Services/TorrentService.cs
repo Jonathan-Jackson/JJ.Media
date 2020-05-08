@@ -15,10 +15,10 @@ namespace Downloader.Core.Services {
     public class TorrentService {
         private readonly ILogger<TorrentService> _log;
         private readonly ITorrentClient _torrentClient;
-        private readonly StorageProcessNotifier _storage;
+        private readonly StorageServiceNotifier _storage;
         private readonly string _downloadTorrentPath;
 
-        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, StorageProcessNotifier storage, TorrentServiceOptions options) {
+        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, StorageServiceNotifier storage, TorrentServiceOptions options) {
             _log = log;
             _torrentClient = torrentClient;
             _storage = storage;
@@ -58,17 +58,6 @@ namespace Downloader.Core.Services {
 
         /// <summary>
         /// Notifies the torrent service to download
-        /// a collection of torrents.
-        /// </summary>
-        /// <param name="torrents">Torrents to download.</param>
-        public async Task Download(IAsyncEnumerable<Torrent> torrents) {
-            await foreach (var torrent in torrents) {
-                await Download(torrent);
-            }
-        }
-
-        /// <summary>
-        /// Notifies the torrent service to download
         /// a torrent.
         /// </summary>
         /// <param name="torrent">Torrent to download.</param>
@@ -91,7 +80,7 @@ namespace Downloader.Core.Services {
         private async Task NotifyToProcessFiles(IEnumerable<string> fileNames) {
             foreach (string fileName in fileNames) {
                 try {
-                    var notification = new Notification<string>($"{_downloadTorrentPath}/{fileName}");
+                    var notification = new Notification<string>($"{fileName}");
                     await _storage.Notify(notification);
                     _log.LogInformation($"Notified Processor of: {fileName}");
                 }

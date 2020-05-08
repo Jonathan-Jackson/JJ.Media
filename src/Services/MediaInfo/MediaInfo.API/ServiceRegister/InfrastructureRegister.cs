@@ -20,15 +20,15 @@ namespace MediaInfo.API.ServiceRegister {
             services
                 // Helpers.
                 .AddSingleton<ITvDbClient, TvDbClient>()
-                .AddScoped<IMemoryCache, MemoryCache>()
-                .AddScoped<Compiler>(x => new SqlServerCompiler())
+                .AddSingleton<IMemoryCache, MemoryCache>()
+                .AddSingleton<Compiler>(x => new SqlServerCompiler())
                 // Repos
-                .AddScoped<IShowRepository, ShowRepository>()
-                .AddScoped<IEpisodeRepository, EpisodeRepository>()
+                .AddTransient<IShowRepository, ShowRepository>()
+                .AddTransient<IEpisodeRepository, EpisodeRepository>()
                 // API
-                .AddScoped<IApiSearch, TvDbSearch>()
-                .AddScoped<IEpisodeApiSearch, TvDbSearch>()
-                .AddScoped<IShowApiSearch, TvDbSearch>();
+                .AddTransient<IApiSearch, TvDbSearch>()
+                .AddTransient<IEpisodeApiSearch, TvDbSearch>()
+                .AddTransient<IShowApiSearch, TvDbSearch>();
 
             // Add Config Dependencies.
             var tvDbOptions = configuration.GetSection("TvDb").Get<TvDbOptions>();
@@ -40,7 +40,7 @@ namespace MediaInfo.API.ServiceRegister {
                 tvDbOptions.Token = Environment.GetEnvironmentVariable("TvDb_Token", EnvironmentVariableTarget.User) ?? throw new ApplicationException("TvDb:Token is missing.");
 
             return services
-                .AddScoped<IDbConnectionFactory>(_ => new SqlConnectionFactory(mediaInfoConnString))
+                .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(mediaInfoConnString))
                 .AddSingleton(tvDbOptions);
         }
     }

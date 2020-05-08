@@ -1,8 +1,8 @@
-﻿namespace Downloader.Core.Helpers.DTOs {
+﻿namespace Downloader.Core.Helpers.Options {
 
     public class HorribleSubsOptions {
         public string Uri { get; set; } = string.Empty;
 
-        public int Quality { get; set; }
+        public string Quality { get; set; }
     }
 }

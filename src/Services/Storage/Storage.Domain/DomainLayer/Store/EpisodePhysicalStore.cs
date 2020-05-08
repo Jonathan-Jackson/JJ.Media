@@ -10,12 +10,14 @@ namespace Storage.Domain.DomainLayer.Store {
         private readonly ImmutableArray<string> _storePaths;
         private readonly ILogger<EpisodePhysicalStore> _logger;
 
-        public EpisodePhysicalStore(ILogger<EpisodePhysicalStore> logger, EpisodeStorageOptions options) {
+        public EpisodePhysicalStore(ILogger<EpisodePhysicalStore> logger, EpisodeStorageOptions episodeOptions, DownloadStorageOptions downloadOptions)
+                : base(downloadOptions) {
             _logger = logger;
-            _storePaths = ImmutableArray.Create(options.Paths);
+            _storePaths = ImmutableArray.Create(episodeOptions.Paths);
         }
 
-        public string Save(string source, string folderPath, string fileName) {
+        public string SaveDownload(string sourceFile, string folderPath, string fileName) {
+            string source = GetDownloadPath(sourceFile);
             string outputPath = CreateOutputPath(folderPath, fileName);
 
             if (File.Exists(outputPath)) {
@@ -29,8 +31,12 @@ namespace Storage.Domain.DomainLayer.Store {
 
         private string CreateOutputPath(string folderPath, string fileName) {
             string storePath = GetAvailablePath(_storePaths);
+
+            string storeFolder = string.Concat(Path.Combine(storePath, folderPath).Split(Path.GetInvalidPathChars()));
+            Directory.CreateDirectory(storeFolder);
+
             string sanitizedFileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
-            return string.Concat(Path.Combine(storePath, folderPath, sanitizedFileName).Split(Path.GetInvalidPathChars()));
+            return Path.Combine(storeFolder, sanitizedFileName);
         }
     }
 }

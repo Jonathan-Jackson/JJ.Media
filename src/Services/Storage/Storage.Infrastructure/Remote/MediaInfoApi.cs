@@ -15,11 +15,13 @@ namespace Storage.Infrastructure.Remote {
         private readonly HttpClient _client;
         private readonly string _address;
         private readonly ILogger<MediaInfoApi> _logger;
+        private readonly JsonSerializerOptions _jsonOptions;
 
-        public MediaInfoApi(HttpClient client, ILogger<MediaInfoApi> logger, MediaInfoOptions options) {
+        public MediaInfoApi(HttpClient client, ILogger<MediaInfoApi> logger, MediaInfoOptions options, JsonSerializerOptions jsonOptions) {
             _client = client;
             _logger = logger;
             _address = options.Address;
+            _jsonOptions = jsonOptions;
         }
 
         public async Task<EpisodeSearch> SearchEpisode(string fileName) {
@@ -35,7 +37,7 @@ namespace Storage.Infrastructure.Remote {
             var response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode) {
                 string json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<EpisodeSearch>(json);
+                return JsonSerializer.Deserialize<EpisodeSearch>(json, _jsonOptions);
             }
             else {
                 _logger.LogError($"API Request failed. TOKEN: {token} / ADDRESS: {target}");

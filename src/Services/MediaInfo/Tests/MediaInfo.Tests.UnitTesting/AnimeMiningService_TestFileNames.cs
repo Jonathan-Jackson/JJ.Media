@@ -14,14 +14,20 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
         }
 
         [TestMethod]
+        public void MineEpisodeNames_HorribleSubs_FruitBasket2019() {
+            var expected = new MinedEpisode { EpisodeNumber = 1, SeasonNumber = 2, PossibleNames = new[] { "Fruits Basket S2 (2019)", "Fruits Basket (2019)", "Fruits Basket", "Fruits" } };
+            AssertResult("[HorribleSubs] Fruits Basket S2 (2019) - 01 [720p].mkv", expected);
+        }
+
+        [TestMethod]
         public void MineEpisodeNames_HorribleSubs_Baruto() {
-            var expected = new MinedEpisode { EpisodeNumber = 151, SeasonNumber = null, PossibleNames = new[] { "Boruto - Naruto Next Generations", "Boruto - Naruto Next Generation", "Boruto" } };
+            var expected = new MinedEpisode { EpisodeNumber = 151, SeasonNumber = null, PossibleNames = new[] { "Boruto - Naruto Next Generations", "Boruto" } };
             AssertResult("[HorribleSubs] Boruto - Naruto Next Generations - 151 [1080p].mkv", expected);
         }
 
         [TestMethod]
         public void MineEpisodeNames_HorribleSubs_K() {
-            var expected = new MinedEpisode { EpisodeNumber = 3, SeasonNumber = null, PossibleNames = new[] { "K - Seven Stories", "K - Seven Storie" } };
+            var expected = new MinedEpisode { EpisodeNumber = 3, SeasonNumber = null, PossibleNames = new[] { "K - Seven Stories" } };
             AssertResult("[HorribleSubs] K - Seven Stories - 03 [1080p].mkv", expected);
         }
 
@@ -33,7 +39,7 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
 
         [TestMethod]
         public void MineEpisodeNames_HorribleSubs_OnePiece() {
-            var expected = new MinedEpisode { EpisodeNumber = 19, SeasonNumber = 1, PossibleNames = new[] { "One Piece S01", "One Piece" } };
+            var expected = new MinedEpisode { EpisodeNumber = 19, SeasonNumber = 1, PossibleNames = new[] { "One Piece S01", "One Piece", "One" } };
             AssertResult("[HorribleSubs] One Piece S01 - 19 [720p].mkv", expected);
         }
 
@@ -92,9 +98,9 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
             Assert.AreEqual(expectedResult.SeasonNumber, result.SeasonNumber);
             Assert.AreEqual(expectedResult.EpisodeNumber, result.EpisodeNumber);
 
-            Assert.AreEqual(result.PossibleNames.Length, expectedResult.PossibleNames.Length);
+            Assert.AreEqual(expectedResult.PossibleNames.Length, result.PossibleNames.Length);
             for (int i = 0; i < result.PossibleNames.Length; i++)
-                Assert.AreEqual(result.PossibleNames[i], expectedResult.PossibleNames[i]);
+                Assert.AreEqual(expectedResult.PossibleNames[i], result.PossibleNames[i]);
         }
     }
 }

@@ -99,8 +99,9 @@ namespace MediaInfo.Infrastructure.Remote {
         /// Creates a show from the series search result.
         /// </summary>
         private Show CreateShow(SeriesSearchResult record) {
-            var titles = record.Aliases.Select(alias => new ShowTitle { Title = alias }).ToList();
+            var titles = record.Aliases.Distinct().Select(alias => new ShowTitle { Title = alias }).ToList();
             titles.Add(new ShowTitle { Title = record.SeriesName, IsPrimary = true });
+
             return new Show {
                 Titles = titles,
                 Overview = record.Overview ?? string.Empty,

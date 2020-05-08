@@ -1,4 +1,5 @@
 ﻿using Downloader.Core.Helpers.DTOs;
+using Downloader.Core.Helpers.Options;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ using System.Xml;
 namespace Downloader.Core.Feeds {
 
     public class HorribleSubsFeed : IFeed {
-        private string _uri;
-        private int _quality;
-        private ILogger<HorribleSubsFeed> _log;
+        private readonly string _uri;
+        private readonly string _quality;
+        private readonly ILogger<HorribleSubsFeed> _log;
 
         public HorribleSubsFeed(ILogger<HorribleSubsFeed> log, HorribleSubsOptions options) {
             _log = log;
