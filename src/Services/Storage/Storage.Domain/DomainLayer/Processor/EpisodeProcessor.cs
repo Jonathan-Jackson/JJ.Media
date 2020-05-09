@@ -28,7 +28,7 @@ namespace Storage.Domain.DomainLayer.Processor {
             EpisodeSearch episode = await _mediaInfoRepository.SearchEpisode(episodeFileName);
 
             if (episode.Id > 0) {
-                var destination = _episodeStore.SaveDownload(path, GetFolderPath(episode), CreateFileName(path, episode));
+                var destination = await _episodeStore.SaveDownload(path, GetFolderPath(episode), CreateFileName(path, episode));
                 await _processedRepository.InsertAsync(new ProcessedHistory { Type = eProcessedType.Episode, Source = path, Output = destination });
                 _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {destination}");
             }

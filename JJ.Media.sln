@@ -39,11 +39,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader.Console", "src\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader.Core", "src\Services\Downloader\Downloader.Core\Downloader.Core.csproj", "{4922FBE0-86F5-42B7-B2A6-7DC311BB0EC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.API", "src\Services\Storage\Storage.API\Storage.API.csproj", "{D1718F26-00EF-4028-8EE5-30AE2AC1E1F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.API", "src\Services\Storage\Storage.API\Storage.API.csproj", "{D1718F26-00EF-4028-8EE5-30AE2AC1E1F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Domain", "src\Services\Storage\Storage.Domain\Storage.Domain.csproj", "{CDB5AE23-D442-44DF-93E2-9B539AEC324F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Domain", "src\Services\Storage\Storage.Domain\Storage.Domain.csproj", "{CDB5AE23-D442-44DF-93E2-9B539AEC324F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Infrastructure", "src\Services\Storage\Storage.Infrastructure\Storage.Infrastructure.csproj", "{AEF39310-B13F-4E7B-A634-BB1AA33A76F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Infrastructure", "src\Services\Storage\Storage.Infrastructure\Storage.Infrastructure.csproj", "{AEF39310-B13F-4E7B-A634-BB1AA33A76F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F4F6F01A-46D1-4B79-9CA7-F593D61B48C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.UnitTesting", "src\Services\Storage\Tests\Storage.UnitTesting\Storage.UnitTesting.csproj", "{E75CBD65-03C7-4B36-AC98-84E18345081E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.IntegrationTesting", "src\Services\Storage\Tests\Storage.IntegrationTesting\Storage.IntegrationTesting.csproj", "{89E6A195-EA5C-4B1D-AF1B-3A536A130D8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaInfo.IntegrationTesting", "src\Services\MediaInfo\Tests\MediaInfo.IntegrationTesting\MediaInfo.IntegrationTesting.csproj", "{31E4F2B3-F96C-42FF-8469-AF054D72BD42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +99,18 @@ Global
 		{AEF39310-B13F-4E7B-A634-BB1AA33A76F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEF39310-B13F-4E7B-A634-BB1AA33A76F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEF39310-B13F-4E7B-A634-BB1AA33A76F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E75CBD65-03C7-4B36-AC98-84E18345081E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E75CBD65-03C7-4B36-AC98-84E18345081E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E75CBD65-03C7-4B36-AC98-84E18345081E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E75CBD65-03C7-4B36-AC98-84E18345081E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89E6A195-EA5C-4B1D-AF1B-3A536A130D8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89E6A195-EA5C-4B1D-AF1B-3A536A130D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89E6A195-EA5C-4B1D-AF1B-3A536A130D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89E6A195-EA5C-4B1D-AF1B-3A536A130D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31E4F2B3-F96C-42FF-8469-AF054D72BD42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31E4F2B3-F96C-42FF-8469-AF054D72BD42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31E4F2B3-F96C-42FF-8469-AF054D72BD42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31E4F2B3-F96C-42FF-8469-AF054D72BD42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +133,10 @@ Global
 		{D1718F26-00EF-4028-8EE5-30AE2AC1E1F4} = {9CD70DE2-3448-4091-BD04-542600F66AB6}
 		{CDB5AE23-D442-44DF-93E2-9B539AEC324F} = {9CD70DE2-3448-4091-BD04-542600F66AB6}
 		{AEF39310-B13F-4E7B-A634-BB1AA33A76F9} = {9CD70DE2-3448-4091-BD04-542600F66AB6}
+		{F4F6F01A-46D1-4B79-9CA7-F593D61B48C1} = {9CD70DE2-3448-4091-BD04-542600F66AB6}
+		{E75CBD65-03C7-4B36-AC98-84E18345081E} = {F4F6F01A-46D1-4B79-9CA7-F593D61B48C1}
+		{89E6A195-EA5C-4B1D-AF1B-3A536A130D8F} = {F4F6F01A-46D1-4B79-9CA7-F593D61B48C1}
+		{31E4F2B3-F96C-42FF-8469-AF054D72BD42} = {74A7CADD-909A-4DC5-B3F6-00DD11E8A977}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC7526-4F78-49C0-BF45-FBFFFCF36B72}

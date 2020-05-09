@@ -2,7 +2,7 @@
 
 namespace Storage.Domain.Helpers.Options {
 
-    public class EpisodeStorageOptions {
+    public class MediaStorageOptions {
         public string[] Paths { get; set; } = Array.Empty<string>();
     }
 }

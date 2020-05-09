@@ -1,22 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
 using Storage.Domain.Helpers.Abstraction;
 using Storage.Domain.Helpers.Options;
-using System.Collections.Immutable;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Store {
 
     public class EpisodePhysicalStore : PhysicalStore, IEpisodeStore {
-        private readonly ImmutableArray<string> _storePaths;
         private readonly ILogger<EpisodePhysicalStore> _logger;
 
-        public EpisodePhysicalStore(ILogger<EpisodePhysicalStore> logger, EpisodeStorageOptions episodeOptions, DownloadStorageOptions downloadOptions)
-                : base(downloadOptions) {
+        public EpisodePhysicalStore(ILogger<EpisodePhysicalStore> logger, DownloadStorageOptions downloadOptions, MediaStorageOptions mediaOptions)
+                : base(downloadOptions, mediaOptions) {
             _logger = logger;
-            _storePaths = ImmutableArray.Create(episodeOptions.Paths);
         }
 
-        public string SaveDownload(string sourceFile, string folderPath, string fileName) {
+        public async Task<string> SaveDownload(string sourceFile, string folderPath, string fileName) {
             string source = GetDownloadPath(sourceFile);
             string outputPath = CreateOutputPath(folderPath, fileName);
 
@@ -25,14 +23,15 @@ namespace Storage.Domain.DomainLayer.Store {
                 File.Delete(outputPath);
             }
 
-            File.Move(source, outputPath);
+            await RetryFileMove(source, outputPath, 5);
             return outputPath;
         }
 
         private string CreateOutputPath(string folderPath, string fileName) {
             string storePath = GetAvailablePath(_storePaths);
 
-            string storeFolder = string.Concat(Path.Combine(storePath, folderPath).Split(Path.GetInvalidPathChars()));
+            string sanitizedFolderName = string.Concat(folderPath.Split(InvalidPathCharacters));
+            string storeFolder = Path.Combine(storePath, sanitizedFolderName);
             Directory.CreateDirectory(storeFolder);
 
             string sanitizedFileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));

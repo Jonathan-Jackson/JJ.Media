@@ -5,6 +5,9 @@ namespace MediaInfo.API.ViewModels {
 
     public class EpisodeSearchResponse {
 
+        public EpisodeSearchResponse() {
+        }
+
         public EpisodeSearchResponse(Episode episode, Show show) {
             Id = episode.Id;
             ShowId = show.Id;
@@ -26,11 +29,11 @@ namespace MediaInfo.API.ViewModels {
 
         public string ShowTitle {
             get; set;
-        }
+        } = string.Empty;
 
         public string EpisodeTitle {
             get; set;
-        }
+        } = string.Empty;
 
         public int? SeasonNumber {
             get; set;
@@ -46,6 +49,6 @@ namespace MediaInfo.API.ViewModels {
 
         public string Overview {
             get; set;
-        }
+        } = string.Empty;
     }
 }

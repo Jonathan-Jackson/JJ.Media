@@ -1,6 +1,8 @@
 ﻿using JJ.Media.MediaInfo.Services.Interfaces;
 using MediaInfo.API.ViewModels;
 using MediaInfo.Domain.DomainLayer.Search;
+using MediaInfo.Domain.Helpers.DTOs.Episodes;
+using MediaInfo.Domain.Helpers.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -32,17 +34,16 @@ namespace JJ.Media.MediaInfo.API.Controllers {
             if (string.IsNullOrWhiteSpace(episodeName))
                 return BadRequest($"Search value cannot be empty.");
 
-            var episode = await _episodeSearch.SearchAsync(episodeName);
-
-            if (episode == null) {
-                _logger.LogInformation($"Could not find result for Search Request: {episodeName}");
-                return NotFound($"No results found for: {episodeName}");
-            }
-            else {
+            try {
+                var episode = await _episodeSearch.SearchAsync(episodeName);
                 var show = await _showRepo.FindAsync(episode.ShowId);
                 _logger.LogDebug($"Found Episode for Show {show.GetPrimaryTitle()} (ID: {show.Id}), Episode Number {episode.EpisodeNumber} (ID: {episode.Id})");
                 return Ok(new EpisodeSearchResponse(episode, show));
             }
+            catch (SearchNotFoundException) {
+                _logger.LogInformation($"Could not find result for Search Request: {episodeName}");
+                return NotFound($"No results found for: {episodeName}");
+            };
         }
 
         /// <summary>

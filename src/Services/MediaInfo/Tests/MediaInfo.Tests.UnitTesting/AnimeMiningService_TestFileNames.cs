@@ -1,93 +1,92 @@
 ﻿using MediaInfo.Domain.Helpers.DTOs.Miners;
 using MediaInfo.DomainLayer.Miners;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Xunit;
 
 namespace JJ.Media.MediaInfo.Tests.Unit {
 
-    [TestClass]
-    public class AnimeMiningService_TestFileNames {
+    public class AnimeMinerTests {
         private readonly AnimeMiner _miner;
 
-        public AnimeMiningService_TestFileNames() {
+        public AnimeMinerTests() {
             _miner = new AnimeMiner();
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_HorribleSubs_FruitBasket2019() {
+        [Fact]
+        public void PineappleSubs_FruitBasket2019() {
             var expected = new MinedEpisode { EpisodeNumber = 1, SeasonNumber = 2, PossibleNames = new[] { "Fruits Basket S2 (2019)", "Fruits Basket (2019)", "Fruits Basket", "Fruits" } };
-            AssertResult("[HorribleSubs] Fruits Basket S2 (2019) - 01 [720p].mkv", expected);
+            AssertResult("[PineappleSubs] Fruits Basket S2 (2019) - 01 [720p].mkv", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_HorribleSubs_Baruto() {
+        [Fact]
+        public void PineappleSubs_Baruto() {
             var expected = new MinedEpisode { EpisodeNumber = 151, SeasonNumber = null, PossibleNames = new[] { "Boruto - Naruto Next Generations", "Boruto" } };
-            AssertResult("[HorribleSubs] Boruto - Naruto Next Generations - 151 [1080p].mkv", expected);
+            AssertResult("[PineappleSubs] Boruto - Naruto Next Generations - 151 [1080p].mkv", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_HorribleSubs_K() {
+        [Fact]
+        public void PineappleSubs_K() {
             var expected = new MinedEpisode { EpisodeNumber = 3, SeasonNumber = null, PossibleNames = new[] { "K - Seven Stories" } };
-            AssertResult("[HorribleSubs] K - Seven Stories - 03 [1080p].mkv", expected);
+            AssertResult("[PineappleSubs] K - Seven Stories - 03 [1080p].mkv", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_HorribleSubs_Jashin() {
+        [Fact]
+        public void PineappleSubs_Jashin() {
             var expected = new MinedEpisode { EpisodeNumber = 6, SeasonNumber = 2, PossibleNames = new[] { "Jashin-chan Dropkick S2", "Jashin-chan Dropkick", "Jashin" } };
-            AssertResult("[HorribleSubs] Jashin-chan Dropkick S2 - 06 [1080p].mkv", expected);
+            AssertResult("[PineappleSubs] Jashin-chan Dropkick S2 - 06 [1080p].mkv", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_HorribleSubs_OnePiece() {
+        [Fact]
+        public void PineappleSubs_OnePiece() {
             var expected = new MinedEpisode { EpisodeNumber = 19, SeasonNumber = 1, PossibleNames = new[] { "One Piece S01", "One Piece", "One" } };
-            AssertResult("[HorribleSubs] One Piece S01 - 19 [720p].mkv", expected);
+            AssertResult("[PineappleSubs] One Piece S01 - 19 [720p].mkv", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_HorribleSubs_Pet() {
+        [Fact]
+        public void PineappleSubs_Pet() {
             var expected = new MinedEpisode { EpisodeNumber = 13, SeasonNumber = null, PossibleNames = new[] { "Pet" } };
-            AssertResult("[HorribleSubs] Pet - 13 [1080p].mkv", expected);
+            AssertResult("[PineappleSubs] Pet - 13 [1080p].mkv", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_InvalidArgumentsTest() {
-            Assert.ThrowsException<ArgumentNullException>(() => _miner.MineEpisodeName(null));
-            Assert.ThrowsException<ArgumentException>(() => _miner.MineEpisodeName(""));
-            Assert.ThrowsException<ArgumentException>(() => _miner.MineEpisodeName(" "));
+        [Fact]
+        public void InvalidArgumentsTest() {
+            Assert.Throws<ArgumentNullException>(() => _miner.MineEpisodeName(null));
+            Assert.Throws<ArgumentException>(() => _miner.MineEpisodeName(""));
+            Assert.Throws<ArgumentException>(() => _miner.MineEpisodeName(" "));
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_Junk_Mp4Extension() {
+        [Fact]
+        public void Junk_Mp4Extension() {
             var expected = new MinedEpisode { EpisodeNumber = 0, SeasonNumber = null, PossibleNames = new[] { "" } };
             AssertResult(".mp4", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_Junk_RightAngular() {
+        [Fact]
+        public void Junk_RightAngular() {
             var expected = new MinedEpisode { EpisodeNumber = 0, SeasonNumber = null, PossibleNames = new[] { ">>>>>>>" } };
             AssertResult(">>>>>>>", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_Junk_RightSquare() {
+        [Fact]
+        public void Junk_RightSquare() {
             var expected = new MinedEpisode { EpisodeNumber = 0, SeasonNumber = null, PossibleNames = new[] { "[" } };
             AssertResult("[", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_Junk_RomanNumeral() {
+        [Fact]
+        public void Junk_RomanNumeral() {
             var expected = new MinedEpisode { EpisodeNumber = 0, SeasonNumber = 1, PossibleNames = new[] { " I " } };
             AssertResult(" I ", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_Junk_SeasonNumber() {
+        [Fact]
+        public void Junk_SeasonNumber() {
             var expected = new MinedEpisode { EpisodeNumber = 1, SeasonNumber = null, PossibleNames = new[] { "s01" } };
             AssertResult("s01", expected);
         }
 
-        [TestMethod]
-        public void MineEpisodeNames_Junk_Special() {
+        [Fact]
+        public void Junk_Special() {
             var expected = new MinedEpisode { EpisodeNumber = 0, SeasonNumber = 0, PossibleNames = new[] { "special" } };
             AssertResult(" special ", expected);
         }
@@ -95,12 +94,12 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
         private void AssertResult(string episodeName, MinedEpisode expectedResult) {
             var result = _miner.MineEpisodeName(episodeName);
 
-            Assert.AreEqual(expectedResult.SeasonNumber, result.SeasonNumber);
-            Assert.AreEqual(expectedResult.EpisodeNumber, result.EpisodeNumber);
+            Assert.Equal(expectedResult.SeasonNumber, result.SeasonNumber);
+            Assert.Equal(expectedResult.EpisodeNumber, result.EpisodeNumber);
 
-            Assert.AreEqual(expectedResult.PossibleNames.Length, result.PossibleNames.Length);
+            Assert.Equal(expectedResult.PossibleNames.Length, result.PossibleNames.Length);
             for (int i = 0; i < result.PossibleNames.Length; i++)
-                Assert.AreEqual(expectedResult.PossibleNames[i], result.PossibleNames[i]);
+                Assert.Equal(expectedResult.PossibleNames[i], result.PossibleNames[i]);
         }
     }
 }

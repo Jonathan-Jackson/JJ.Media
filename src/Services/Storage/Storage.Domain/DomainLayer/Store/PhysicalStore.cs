@@ -4,15 +4,24 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Store {
 
     public class PhysicalStore {
         protected const long MinimumSpaceThresholdBytes = 150_000_000_00; // 10gb.
         protected readonly ImmutableArray<string> _downloadPaths;
+        protected readonly ImmutableArray<string> _storePaths;
 
-        public PhysicalStore(DownloadStorageOptions downloadOptions) {
+        protected static char[] InvalidPathCharacters
+            => Path.GetInvalidPathChars()
+            // ^ does not return all invalid path characters!
+            .Concat(new[] { '*', ':', '"', '>', '<', '?' })
+            .ToArray();
+
+        public PhysicalStore(DownloadStorageOptions downloadOptions, MediaStorageOptions mediaOptions) {
             _downloadPaths = ImmutableArray.Create(downloadOptions.Paths);
+            _storePaths = ImmutableArray.Create(mediaOptions.Paths);
         }
 
         protected string GetAvailablePath(IEnumerable<string> paths) {
@@ -42,6 +51,21 @@ namespace Storage.Domain.DomainLayer.Store {
             }
 
             throw new IOException($"File does not exist in downloads: {source}");
+        }
+
+        protected async Task RetryFileMove(string source, string target, int attempts) {
+            for (int i = 0; ; i++) {
+                try {
+                    File.Move(source, target);
+                    break;
+                }
+                catch (IOException) {
+                    if (i >= attempts)
+                        throw;
+                    else
+                        await Task.Delay(1000 * i);
+                }
+            }
         }
     }
 }

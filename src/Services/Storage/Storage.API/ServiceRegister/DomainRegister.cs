@@ -15,7 +15,7 @@ namespace Storage.API.ServiceRegister {
                 .AddTransient<IEpisodeStore, EpisodePhysicalStore>();
 
             // Add Config Options.
-            var episodePaths = configuration.GetSection("EpisodeStorageOptions").Get<EpisodeStorageOptions>();
+            var episodePaths = configuration.GetSection("EpisodeStorageOptions").Get<MediaStorageOptions>();
 
             return services
                 .AddSingleton(episodePaths);
