@@ -102,7 +102,6 @@ namespace Downloader.Core.Services {
             for (; ; await Task.Delay(GetFeedIntervalMiliSeconds)) {
                 try {
                     IList<Torrent> torrents = await GetFeedsAsync();
-                    torrents = torrents.Take(1).ToList(); // DEBUG!!!
 
                     await foreach (var torrent in torrents.WhereAsync(IsTorrentEligibleToDownloadAsync)) {
                         await _torrentService.Download(torrent);

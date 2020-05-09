@@ -81,8 +81,8 @@ namespace Downloader.Core.Services {
             foreach (string fileName in fileNames) {
                 try {
                     var notification = new Notification<string>($"{fileName}");
-                    await _storage.Notify(notification);
-                    _log.LogInformation($"Notified Processor of: {fileName}");
+                    var response = await _storage.Notify(notification);
+                    _log.LogInformation($"Notified Processor of: {fileName} / Response: {response.ReasonPhrase} - {await response.Content.ReadAsStringAsync()}");
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, $"Failed to notify of completion for torrent: {fileName}");

@@ -12,7 +12,7 @@ namespace Storage.API {
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => {
-                    webBuilder.UseStartup<Startup>().UseUrls("https://*:2001");
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

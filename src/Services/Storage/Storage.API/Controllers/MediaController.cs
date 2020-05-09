@@ -18,22 +18,23 @@ namespace Storage.API.Controllers {
             _episodeProcessor = episodeProcessor;
         }
 
-        [HttpGet("process")]
+        [HttpPost("process")]
         public async Task<IActionResult> Process([FromBody]string filePath) {
+            _logger.LogDebug($"Media Process Request: {filePath ?? "NULL"}");
+
             if (string.IsNullOrWhiteSpace(filePath))
                 return BadRequest($"File Path supplied is empty.");
 
             try {
                 // TODO: QUEUE!
                 await _episodeProcessor.ProcessAsync(filePath);
-
                 return Ok();
             }
-            catch (ValidationException validation) {
-                return BadRequest(validation.Message);
+            catch (ValidationException) {
+                return BadRequest($"File could not be saved.");
             }
             catch (Exception ex) {
-                _logger.LogError(ex, "An error occured when processing a file.");
+                _logger.LogError(ex, $"An error occured when processing a file: {filePath}");
                 throw;
             }
         }

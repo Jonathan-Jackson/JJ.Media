@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace JJ.Media.MediaInfo.API {
 
@@ -21,7 +22,8 @@ namespace JJ.Media.MediaInfo.API {
 
             services
                 .AddDomain(Configuration)
-                .AddInfrastructure(Configuration);
+                .AddInfrastructure(Configuration)
+                .AddLogging(config => config.AddConsole());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

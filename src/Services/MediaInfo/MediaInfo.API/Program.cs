@@ -13,6 +13,7 @@ namespace JJ.Media.MediaInfo.API {
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => {
                     webBuilder.UseStartup<Startup>();
+                    //.UseUrls("http://*:2051");
                 });
     }
 }
