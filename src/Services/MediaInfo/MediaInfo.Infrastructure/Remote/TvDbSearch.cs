@@ -54,6 +54,23 @@ namespace MediaInfo.Infrastructure.Remote {
         }
 
         /// <summary>
+        /// Returns a link to the show on the TvDb.
+        /// </summary>
+        public string GetShowLink(int showTvDbId)
+            => $"https://www.thetvdb.com/dereferrer/series/{showTvDbId}";
+
+        /// <summary>
+        /// Returns show banners for a show.
+        /// </summary>
+        public async Task<string[]> GetShowBannersAsync(int showTvDbId) {
+            var imagesQuery = new ImagesQuery { KeyType = KeyType.Poster };
+            var images = await _client.Series.GetImagesAsync(showTvDbId, imagesQuery);
+            return images.Data
+                .Select(img => $"https://artworks.thetvdb.com/banners/{img.FileName}")
+                .ToArray();
+        }
+
+        /// <summary>
         /// Returns episodes which match the season and episode number.
         /// </summary>
         public async Task<Episode[]> FindEpisodeAsync(Show show, int seasonNumber, int episodeNumber) {

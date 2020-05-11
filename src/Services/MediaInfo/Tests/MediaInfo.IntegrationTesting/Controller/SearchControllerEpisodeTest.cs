@@ -6,7 +6,7 @@ using Xunit;
 
 namespace MediaInfo.IntegrationTesting.Controller {
 
-    public class SearchControllerEpisodeTest : ControllerTestBase {
+    public class SearchControllerEpisodeTest : TestBase {
 
         [Theory]
         [InlineData("aaa")]

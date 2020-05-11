@@ -9,5 +9,9 @@ namespace MediaInfo.Domain.Helpers.Repository {
         Task<Show[]> FindShowAsync(IEnumerable<string> showNames);
 
         Task<Show[]> FindShowAsync(string showName);
+
+        Task<string[]> GetShowBannersAsync(int showApiId);
+
+        string GetShowLink(int showTvDbId);
     }
 }

@@ -10,31 +10,34 @@ using Xunit;
 namespace Storage.IntegrationTesting.Controller {
 
     public class MediaControllerProcessTests : ControllerTestBase {
-        private const string MockFileName = "[HorribleSubs] Kaguya-sama wa Kokurasetai S2 - 05 [1080p].mkv";
 
-        [Fact]
-        public async Task ProcessMockFile() {
-            string fileName = CreateMockFile();
+        [Theory]
+        [InlineData("[PineappleSubs] Kaguya-sama wa Kokurasetai S2 - 05 [1080p].mkv")]
+        [InlineData("One Piece - 05.mkv")]
+        public async Task MockFile(string fileName) {
+            string fullPath = CreateMockFile(fileName);
             var response = await _client.PostAsync("/api/media/process", new StringContent($"\"{fileName}\"", Encoding.UTF8, "application/json"));
             Assert.True(response.IsSuccessStatusCode);
+            Assert.False(File.Exists(fullPath));
         }
 
         [Fact]
-        public async Task ProcessMissingFile() {
+        public async Task MissingFile() {
             var response = await _client.PostAsync("/api/media/process", new StringContent($"\"dsafafdsf\"", Encoding.UTF8, "application/json"));
             Assert.False(response.IsSuccessStatusCode);
         }
 
-        private string CreateMockFile() {
+        private string CreateMockFile(string fileName) {
             // Create a fake file in the
             var downloader = _services.GetRequiredService<DownloadStorageOptions>();
             string path = downloader.Paths.First();
+            string fullPath = Path.Combine(path, fileName);
 
-            if (!File.Exists(Path.Combine(path, MockFileName)))
-                File.Create(Path.Combine(path, MockFileName))
+            if (!File.Exists(fullPath))
+                File.Create(fullPath)
                     .Dispose();
 
-            return MockFileName;
+            return fullPath;
         }
     }
 }

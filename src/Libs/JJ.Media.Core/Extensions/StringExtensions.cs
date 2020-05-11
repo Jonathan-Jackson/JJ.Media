@@ -7,7 +7,16 @@ namespace JJ.Media.Core.Extensions {
     public static class StringExtensions {
 
         public static string RemoveLetters(this string value, char replace)
-            => new string(value.Select(x => char.IsDigit(x) ? x : replace).ToArray());
+            => new string(value.Select(x => !char.IsLetter(x) ? x : replace).ToArray());
+
+        public static string RemoveLetters(this string value)
+            => new string(value.Where(x => !char.IsLetter(x)).ToArray());
+
+        public static string RemoveDigits(this string value, char replace)
+            => new string(value.Select(x => !char.IsDigit(x) ? x : replace).ToArray());
+
+        public static string RemoveDigits(this string value)
+            => new string(value.Where(x => !char.IsDigit(x)).ToArray());
 
         public static string RemoveAtEnd(this string value, IEnumerable<string> endValues, StringComparison comparison = StringComparison.Ordinal) {
             foreach (var end in endValues) {

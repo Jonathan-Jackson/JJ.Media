@@ -30,7 +30,7 @@ namespace JJ.Media.Core.Infrastructure {
         public virtual async Task DeleteAsync(IEnumerable<int> ids) {
             Func<DisposableQuery, Task> query = async (DisposableQuery db) => {
                 await db.Query(_tableName)
-                    .Where("Id", ids)
+                    .WhereIn("Id", ids)
                     .DeleteAsync();
             };
 
@@ -41,7 +41,7 @@ namespace JJ.Media.Core.Infrastructure {
         /// Finds an entity in the database using its specified Id.
         /// </summary>
         public virtual async Task<TEntity> FindAsync(int id)
-            => (await FindAsync(new[] { id })).First();
+            => (await FindAsync(new[] { id })).FirstOrDefault();
 
         /// <summary>
         /// Finds a collection of entities in the database using their specified Ids.
