@@ -14,6 +14,7 @@ namespace Storage.IntegrationTesting.Controller {
         [Theory]
         [InlineData("[PineappleSubs] Kaguya-sama wa Kokurasetai S2 - 05 [1080p].mkv")]
         [InlineData("One Piece - 05.mkv")]
+        [InlineData("[HorribleSubs] Tsugumomo S2 - 05 [1080p].mkv")]
         public async Task MockFile(string fileName) {
             string fullPath = CreateMockFile(fileName);
             var response = await _client.PostAsync("/api/media/process", new StringContent($"\"{fileName}\"", Encoding.UTF8, "application/json"));

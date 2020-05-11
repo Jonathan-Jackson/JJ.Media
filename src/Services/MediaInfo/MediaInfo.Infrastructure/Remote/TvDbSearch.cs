@@ -90,11 +90,18 @@ namespace MediaInfo.Infrastructure.Remote {
         /// Returns shows found via the API that match the name.
         /// </summary>
         public async Task<Show[]> FindShowAsync(string showName) {
-            var results = await _cache.GetOrCreateAsync($"TvDbSearchService.FindShowAsync.{showName}", (cacheFactory) => {
-                cacheFactory.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(10);
-                return _client.Search.SearchSeriesByNameAsync(showName);
-            });
-            return results.Data.Select(CreateShow).ToArray();
+            try {
+                var results = await _cache.GetOrCreateAsync($"TvDbSearchService.FindShowAsync.{showName}", (cacheFactory) => {
+                    cacheFactory.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(10);
+                    return _client.Search.SearchSeriesByNameAsync(showName);
+                });
+
+                return results.Data.Select(CreateShow).ToArray();
+            }
+            catch (TvDbServerException) {
+                // This is thrown if no results are found from the search.
+                return Array.Empty<Show>();
+            }
         }
 
         /// <summary>
