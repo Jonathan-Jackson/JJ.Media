@@ -3,8 +3,6 @@ using Storage.Domain.Helpers.Abstraction;
 using Storage.Domain.Helpers.DTOs;
 using Storage.Domain.Helpers.Events;
 using Storage.Domain.Helpers.Repository;
-using Storage.Domain.Plugins;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,15 +15,16 @@ namespace Storage.Domain.DomainLayer.Processor {
         private readonly ILogger<EpisodeProcessor> _logger;
         private readonly IMediaInfoRepository _mediaInfoRepository;
         private readonly IProcessedRepository _processedRepository;
-        private readonly DiscordPlugin _discord; // update to be event handler
+        private readonly EventInvoker<ProcessedEpisode> _events;
 
         public EpisodeProcessor(IEpisodeStore episodeStore, ILogger<EpisodeProcessor> logger,
-                IMediaInfoRepository mediaInfoRepository, IProcessedRepository processedRepository, DiscordPlugin discord) {
+                IMediaInfoRepository mediaInfoRepository, IProcessedRepository processedRepository,
+                EventInvoker<ProcessedEpisode> events) {
             _episodeStore = episodeStore;
             _logger = logger;
             _mediaInfoRepository = mediaInfoRepository;
             _processedRepository = processedRepository;
-            _discord = discord;
+            _events = events;
         }
 
         /// <summary>
@@ -39,9 +38,7 @@ namespace Storage.Domain.DomainLayer.Processor {
                 var destination = await _episodeStore.SaveDownload(path, GetFolderPath(episode), CreateFileName(path, episode));
                 await _processedRepository.InsertAsync(new ProcessedHistory { Type = eProcessedType.Episode, Source = path, Output = destination });
                 _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {destination}");
-
-                // Update the below to be a proper event handler ~ need to do research on how this is done with DI.
-                await _discord.TryPromptMessage(new ProcessedEpisodeEventArgs(episode));
+                await _events.InvokeAsync(new ProcessedEpisode(episode));
             }
             else {
                 _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Full path: {path}");

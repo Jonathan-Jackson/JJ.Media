@@ -1,11 +1,10 @@
 ﻿using Storage.Domain.Helpers.DTOs;
-using System;
 
 namespace Storage.Domain.Helpers.Events {
 
-    public class ProcessedEpisodeEventArgs : EventArgs {
+    public class ProcessedEpisode {
 
-        public ProcessedEpisodeEventArgs(EpisodeSearch episode) {
+        public ProcessedEpisode(EpisodeSearch episode) {
             EpisodeId = episode.Id;
             ShowId = episode.ShowId;
             ShowTitle = episode.ShowTitle ?? string.Empty;

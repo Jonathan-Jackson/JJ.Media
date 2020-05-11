@@ -13,6 +13,12 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
         }
 
         [Fact]
+        public void PineappleSubs_ToaruKagakuNoRailgun() {
+            var expected = new MinedEpisode { EpisodeNumber = 13, SeasonNumber = null, PossibleNames = new[] { "Toaru Kagaku no Railgun T", "Toaru Kagaku no Railgun" } };
+            AssertResult("[HorribleSubs] Toaru Kagaku no Railgun T - 13 [1080p].mkv", expected);
+        }
+
+        [Fact]
         public void PineappleSubs_FruitBasket2019() {
             var expected = new MinedEpisode { EpisodeNumber = 1, SeasonNumber = 2, PossibleNames = new[] { "Fruits Basket S2 (2019)", "Fruits Basket (2019)", "Fruits Basket", "Fruits" } };
             AssertResult("[PineappleSubs] Fruits Basket S2 (2019) - 01 [720p].mkv", expected);

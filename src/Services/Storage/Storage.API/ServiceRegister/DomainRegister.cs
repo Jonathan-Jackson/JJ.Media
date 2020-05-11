@@ -16,8 +16,7 @@ namespace Storage.API.ServiceRegister {
         public static IServiceCollection AddDomain(this IServiceCollection services, IConfiguration configuration) {
             services
                 .AddTransient<EpisodeProcessor>()
-                .AddTransient<IEpisodeStore, EpisodePhysicalStore>()
-                .AddSingleton(new EventHandler<ProcessedEpisodeEventArgs>(async (s, e) => await Task.CompletedTask));
+                .AddTransient<IEpisodeStore, EpisodePhysicalStore>();
 
             // Add Config Options.
             var episodePaths = configuration.GetSection("EpisodeStorageOptions").Get<MediaStorageOptions>();
@@ -31,7 +30,12 @@ namespace Storage.API.ServiceRegister {
                 .AddSingleton(episodePaths);
 
             // Plugins
-            return services.AddSingleton<DiscordPlugin>();
+            services.AddSingleton<DiscordPlugin>();
+
+            // Register Events.
+            return services
+                .AddSingleton<EventInvoker<ProcessedEpisode>>()
+                .AddSingleton(provider => new IEventHandler<ProcessedEpisode>[] { provider.GetRequiredService<DiscordPlugin>() });
         }
     }
 }

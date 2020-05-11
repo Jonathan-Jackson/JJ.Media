@@ -25,10 +25,13 @@ namespace MediaInfo.IntegrationTesting.Controller {
         [InlineData("Kitsutsuki Tanteidokoro - 04 [720p].mkv")]
         [InlineData("[--] Princess Connect! Re Dive - 05 [480p].mkv")]
         [InlineData("[WallySubs] A3! Season Spring & Summer - 05 [360p].mkv")]
-        [InlineData("[HorribleSubs] Tsugumomo S2 - 05 [1080p].mkv")]
+        [InlineData("[CheeseTown] Tsugumomo S2 - 05 [1080p].mkv")]
         public async Task OK(string fileName) {
             var response = await _client.GetAsync($"/api/search/episode/{fileName}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.NotEmpty(content);
         }
 
         [Theory]
