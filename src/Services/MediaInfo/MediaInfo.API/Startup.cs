@@ -23,7 +23,7 @@ namespace JJ.Media.MediaInfo.API {
             services
                 .AddDomain(Configuration)
                 .AddInfrastructure(Configuration)
-                .AddLogging(config => config.AddConsole());
+                .AddLogging(config => config.AddConsole().AddEventLog());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
