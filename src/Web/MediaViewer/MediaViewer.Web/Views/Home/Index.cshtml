@@ -1,0 +1,26 @@
+﻿@model IndexViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        colorSplash.start('backgroundCanvas');
+    });</script>
+
+<div class="index" style="height:100vh; width:100vw; position:relative;">
+
+    @if (Model.IsValid) {
+        <video id="player" playsinline controls style="
+            height: 36.5vw;
+            width: 65vw;
+            margin-top: 15vh;
+            margin-left: 15vw;
+            ">
+            <source src="@Model.Path" type="video/mp4" />
+        </video>
+    }
+    else {
+        <span>No Episode Found</span>
+    }
+</div>

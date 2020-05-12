@@ -71,11 +71,15 @@ namespace MediaInfo.Domain.DomainLayer.Search {
 
             // DB + API 'close' match.
             foundShow = FindSimilarShow(names, dbShows.Concat(apiShows));
-            if (foundShow != null) {
+            if (foundShow == null) {
+                throw new SearchNotFoundException(string.Join(", ", names));
+            }
+            else if (foundShow.Id == 0) {
                 return await SaveShow(foundShow, names.First());
             }
-            else
-                throw new SearchNotFoundException(string.Join(", ", names));
+            else {
+                return foundShow;
+            }
         }
 
         /// <summary>
