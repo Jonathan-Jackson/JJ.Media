@@ -10,11 +10,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Storage.Domain.Plugins {
 
-    public class DiscordPlugin : IEventHandler<ProcessedEpisode> {
+    /// <summary>
+    /// TODO:
+    /// Moved into it's own service!
+    /// Lots of functionality to add..
+    /// </summary>
+    public class DiscordPlugin : IEventHandler<ProcessedEpisodeEvent> {
         private readonly string _channelName;
+        private readonly string _viewerDomain;
         private readonly DiscordClient _discord;
         private readonly ILogger<DiscordPlugin> _logger;
         private readonly IMediaInfoRepository _mediaInfoRepository;
@@ -28,6 +35,7 @@ namespace Storage.Domain.Plugins {
             _logger = logger;
             _mediaInfoRepository = mediaRepo;
             _channelName = options.AlertChannelName;
+            _viewerDomain = options.ViewerDomain;
             _discord.ConnectAsync().GetAwaiter().GetResult();
         }
 
@@ -35,14 +43,14 @@ namespace Storage.Domain.Plugins {
         /// Invokes the specific actions of ProcessedEpisode
         /// with the discord plugin.
         /// </summary>
-        public Task InvokeAsync(ProcessedEpisode @event)
+        public Task InvokeAsync(ProcessedEpisodeEvent @event)
             => TryPromptMessageAsync(@event);
 
         /// <summary>
         /// Attempts to post a message into discord regarding the episode processed event.
         /// Any failures are caught and logged.
         /// </summary>
-        public async Task TryPromptMessageAsync(ProcessedEpisode @event) {
+        public async Task TryPromptMessageAsync(ProcessedEpisodeEvent @event) {
             try {
                 var channels = GetConfiguredChannels();
                 var message = await CreateMessage(@event);
@@ -55,19 +63,30 @@ namespace Storage.Domain.Plugins {
             }
         }
 
-        private async Task<string> CreateDescription(ProcessedEpisode @event) {
+        private async Task<string> CreateDescription(ProcessedEpisodeEvent @event) {
+            var infoLinkTask = _mediaInfoRepository.GetShowRemoteLink(@event.ShowId);
+            var overviewTask = _mediaInfoRepository.GetShowOverview(@event.ShowId);
+
             string seasonEpisodeHeader = Formatter.Bold($"Season {@event.SeasonNumber} Episode {@event.EpisodeNumber}");
             string episodeDescription = IsDefaultedTitle(@event.EpisodeTitle) ? string.Empty : @event.EpisodeTitle;
-            string viewUrl = "@: {view-url-here}";
-            string infoUrl = "info: " + await _mediaInfoRepository.GetShowRemoteLink(@event.ShowId);
+            string viewUrl = $"@ {_viewerDomain}/{HttpUtility.UrlEncode(@event.Guid.ToString())}";
+            string overview = FormatOverview(await overviewTask);
+            string infoUrl = await infoLinkTask;
 
             if (string.IsNullOrWhiteSpace(episodeDescription))
-                return string.Join("\r\n", seasonEpisodeHeader, viewUrl, infoUrl);
+                return string.Join("\r\n", seasonEpisodeHeader, viewUrl, "", overview, "", infoUrl);
             else
-                return string.Join("\r\n", seasonEpisodeHeader, episodeDescription, viewUrl, infoUrl);
+                return string.Join("\r\n", seasonEpisodeHeader, episodeDescription, viewUrl, "", overview, "", infoUrl);
         }
 
-        private async Task<DiscordEmbedBuilder> CreateMessage(ProcessedEpisode @event) {
+        private string FormatOverview(string overview) {
+            if (overview.Length > 301)
+                return $"{overview.Substring(0, 300)}...";
+            else
+                return overview;
+        }
+
+        private async Task<DiscordEmbedBuilder> CreateMessage(ProcessedEpisodeEvent @event) {
             var descriptionTask = CreateDescription(@event);
             var bannerTask = GetRandomShowBanner(@event.ShowId);
 

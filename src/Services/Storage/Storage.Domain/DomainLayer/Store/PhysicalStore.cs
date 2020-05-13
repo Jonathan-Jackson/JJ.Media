@@ -1,4 +1,5 @@
-﻿using Storage.Domain.Helpers.Options;
+﻿using Storage.Domain.Helpers.DTOs;
+using Storage.Domain.Helpers.Options;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -10,8 +11,8 @@ namespace Storage.Domain.DomainLayer.Store {
 
     public class PhysicalStore {
         protected const long MinimumSpaceThresholdBytes = 150_000_000_00; // 10gb.
-        protected readonly ImmutableArray<string> _downloadPaths;
-        protected readonly ImmutableArray<string> _storePaths;
+        protected readonly ImmutableArray<StoreArea> _downloadStores;
+        protected readonly ImmutableArray<StoreArea> _mediaStores;
 
         protected static char[] InvalidPathCharacters
             => Path.GetInvalidPathChars()
@@ -19,32 +20,16 @@ namespace Storage.Domain.DomainLayer.Store {
             .Concat(new[] { '*', ':', '"', '>', '<', '?' })
             .ToArray();
 
-        public PhysicalStore(DownloadStorageOptions downloadOptions, MediaStorageOptions mediaOptions) {
-            _downloadPaths = ImmutableArray.Create(downloadOptions.Paths);
-            _storePaths = ImmutableArray.Create(mediaOptions.Paths);
+        public PhysicalStore(MediaStorageOptions mediaOptions) {
+            _downloadStores = ImmutableArray.Create(mediaOptions.Downloads);
+            _mediaStores = ImmutableArray.Create(mediaOptions.Stores);
         }
 
-        protected string GetAvailablePath(IEnumerable<string> paths) {
-            var drives = DriveInfo.GetDrives();
-
-            foreach (string path in paths) {
-                if (drives.Any(drive => drive.IsReady && path.StartsWith(drive.Name) && drive.AvailableFreeSpace > MinimumSpaceThresholdBytes)) {
-                    return path;
-                }
-            }
-
-            // A suitable drive not found.. Throw a suitable error.
-            if (paths.Any(path => !drives.Any(drive => path.StartsWith(drive.Name)))) {
-                string path = paths.First(path => !drives.Any(drive => path.StartsWith(drive.Name)));
-                throw new IOException($"A path is not routed to a local drive, so it cannot be checked for available space: {path}. To resolve this change the path to be a drive path i.e. {@"D:\\Shows"}");
-            }
-            else {
-                throw new InsufficientMemoryException($"There are no free storage locations provided by the storage settings. The last {MinimumSpaceThresholdBytes / 1000000000} of a drive are reserved.");
-            }
-        }
+        protected string GetAvailablePath(IEnumerable<StoreArea> paths)
+            => paths.FirstOrDefault(x => x.Write)?.Path ?? throw new IOException("There are no stores available to write to.");
 
         protected string GetDownloadPath(string source) {
-            foreach (string path in _downloadPaths) {
+            foreach (string path in _downloadStores.Select(x => x.Path)) {
                 string filePath = Path.Combine(path, source);
                 if (File.Exists(filePath))
                     return filePath;

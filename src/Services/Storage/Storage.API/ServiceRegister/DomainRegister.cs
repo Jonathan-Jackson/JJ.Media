@@ -24,6 +24,8 @@ namespace Storage.API.ServiceRegister {
 
             if (string.IsNullOrWhiteSpace(discordOptions.Token))
                 discordOptions.Token = Environment.GetEnvironmentVariable("JJ.NetDiscordToken", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: Token is missing.");
+            if (string.IsNullOrWhiteSpace(discordOptions.ViewerDomain))
+                discordOptions.ViewerDomain = Environment.GetEnvironmentVariable("ViewerDomain", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: Viewer Domain is missing.");
 
             services
                 .AddSingleton(discordOptions)
@@ -34,8 +36,8 @@ namespace Storage.API.ServiceRegister {
 
             // Register Events.
             return services
-                .AddSingleton<EventInvoker<ProcessedEpisode>>()
-                .AddSingleton(provider => new IEventHandler<ProcessedEpisode>[] { provider.GetRequiredService<DiscordPlugin>() });
+                .AddSingleton<EventInvoker<ProcessedEpisodeEvent>>()
+                .AddSingleton(provider => new IEventHandler<ProcessedEpisodeEvent>[] { provider.GetRequiredService<DiscordPlugin>() });
         }
     }
 }

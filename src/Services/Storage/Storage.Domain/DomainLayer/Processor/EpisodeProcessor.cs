@@ -14,12 +14,12 @@ namespace Storage.Domain.DomainLayer.Processor {
         private readonly IEpisodeStore _episodeStore;
         private readonly ILogger<EpisodeProcessor> _logger;
         private readonly IMediaInfoRepository _mediaInfoRepository;
-        private readonly IProcessedRepository _processedRepository;
-        private readonly EventInvoker<ProcessedEpisode> _events;
+        private readonly IProcessedEpisodeRepository _processedRepository;
+        private readonly EventInvoker<ProcessedEpisodeEvent> _events;
 
         public EpisodeProcessor(IEpisodeStore episodeStore, ILogger<EpisodeProcessor> logger,
-                IMediaInfoRepository mediaInfoRepository, IProcessedRepository processedRepository,
-                EventInvoker<ProcessedEpisode> events) {
+                IMediaInfoRepository mediaInfoRepository, IProcessedEpisodeRepository processedRepository,
+                EventInvoker<ProcessedEpisodeEvent> events) {
             _episodeStore = episodeStore;
             _logger = logger;
             _mediaInfoRepository = mediaInfoRepository;
@@ -35,14 +35,21 @@ namespace Storage.Domain.DomainLayer.Processor {
             EpisodeSearch episode = await _mediaInfoRepository.SearchEpisode(episodeFileName);
 
             if (episode.Id > 0) {
-                var destination = await _episodeStore.SaveDownload(path, GetFolderPath(episode), CreateFileName(path, episode));
-                await _processedRepository.InsertAsync(new ProcessedHistory { Type = eProcessedType.Episode, Source = path, Output = destination });
-                _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {destination}");
-                await _events.InvokeAsync(new ProcessedEpisode(episode));
+                await ProcessFoundEpisodeAsync(path, episode);
             }
             else {
-                _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Full path: {path}");
+                _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Show Id: {episode.ShowId} / Full path: {path}");
+                // throw exception? unproc. entity http result?
             }
+        }
+
+        private async Task ProcessFoundEpisodeAsync(string path, EpisodeSearch episode) {
+            var destination = await _episodeStore.SaveDownload(path, GetFolderPath(episode), CreateFileName(path, episode));
+            var processInfo = new ProcessedEpisode { EpisodeId = episode.Id, Source = path, Output = destination };
+            await _processedRepository.InsertAsync(processInfo);
+
+            _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {destination}");
+            await _events.InvokeAsync(new ProcessedEpisodeEvent(episode, processInfo));
         }
 
         private string GetFolderPath(EpisodeSearch episode)

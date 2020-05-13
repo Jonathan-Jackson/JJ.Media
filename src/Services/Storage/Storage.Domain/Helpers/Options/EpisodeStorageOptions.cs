@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Storage.Domain.Helpers.DTOs;
+using System;
 
 namespace Storage.Domain.Helpers.Options {
 
     public class MediaStorageOptions {
-        public string[] Paths { get; set; } = Array.Empty<string>();
+        public StoreArea[] Stores { get; set; } = Array.Empty<StoreArea>();
+
+        public StoreArea[] Downloads { get; set; } = Array.Empty<StoreArea>();
     }
 }

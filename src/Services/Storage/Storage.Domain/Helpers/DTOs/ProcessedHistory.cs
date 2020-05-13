@@ -3,18 +3,15 @@ using System;
 
 namespace Storage.Domain.Helpers.DTOs {
 
-    public class ProcessedHistory : Entity {
-        public eProcessedType Type { get; set; }
-
+    public class ProcessedEpisode : Entity {
         public string Source { get; set; } = string.Empty;
 
         public string Output { get; set; } = string.Empty;
 
-        public DateTimeOffset ProcessedOn { get; set; } = DateTimeOffset.UtcNow;
-    }
+        public int EpisodeId { get; set; }
 
-    public enum eProcessedType {
-        Unknown = 0,
-        Episode = 1
+        public DateTimeOffset ProcessedOn { get; set; } = DateTimeOffset.UtcNow;
+
+        public Guid Guid { get; set; } = Guid.NewGuid();
     }
 }

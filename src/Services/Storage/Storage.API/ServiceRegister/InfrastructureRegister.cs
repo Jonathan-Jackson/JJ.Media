@@ -19,14 +19,13 @@ namespace Storage.API.ServiceRegister {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) {
             services
                 .AddTransient<IMediaInfoRepository, MediaInfoApi>()
-                .AddTransient<IProcessedRepository, ProcessedRepository>()
+                .AddTransient<IProcessedEpisodeRepository, ProcessedEpisodesRepository>()
                 .AddSingleton<IMemoryCache, MemoryCache>()
                 .AddSingleton<Compiler>(x => new SqlServerCompiler())
                 .AddSingleton<HttpClient>();
 
             // Add Config Options.
             var mediaInfoOptions = configuration.GetSection("MediaInfoOptions").Get<MediaInfoOptions>();
-            var downloadStorageOptions = configuration.GetSection("DownloadStorageOptions").Get<DownloadStorageOptions>();
             var storageFactoryConnString = configuration.GetConnectionString("StorageFactory");
 
             if (string.IsNullOrWhiteSpace(storageFactoryConnString))
@@ -34,7 +33,6 @@ namespace Storage.API.ServiceRegister {
 
             return services
                 .AddSingleton(mediaInfoOptions)
-                .AddSingleton(downloadStorageOptions)
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(storageFactoryConnString))
                 .AddSingleton(_ => new JsonSerializerOptions {
                     PropertyNameCaseInsensitive = true

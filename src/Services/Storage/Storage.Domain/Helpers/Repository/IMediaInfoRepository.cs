@@ -10,5 +10,7 @@ namespace Storage.Domain.Helpers.Repository {
         Task<string[]> GetShowImages(int showId);
 
         Task<string> GetShowRemoteLink(int showId);
+
+        Task<string> GetShowOverview(int showId);
     }
 }

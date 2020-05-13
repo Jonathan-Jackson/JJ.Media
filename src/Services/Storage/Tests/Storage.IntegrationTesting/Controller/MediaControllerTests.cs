@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Storage.IntegrationTesting.Controller {
+namespace Storage.IntegrationTesting {
 
-    public class MediaControllerProcessTests : ControllerTestBase {
+    public class MediaControllerTests : TestBase {
 
         [Theory]
         [InlineData("[PineappleSubs] Kaguya-sama wa Kokurasetai S2 - 05 [1080p].mkv")]
@@ -30,8 +30,8 @@ namespace Storage.IntegrationTesting.Controller {
 
         private string CreateMockFile(string fileName) {
             // Create a fake file in the
-            var downloader = _services.GetRequiredService<DownloadStorageOptions>();
-            string path = downloader.Paths.First();
+            var downloader = _services.GetRequiredService<MediaStorageOptions>();
+            string path = downloader.Downloads.First().Path;
             string fullPath = Path.Combine(path, fileName);
 
             if (!File.Exists(fullPath))

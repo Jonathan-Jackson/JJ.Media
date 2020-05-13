@@ -2,6 +2,7 @@
 using Storage.Domain.Helpers.Abstraction;
 using Storage.Domain.Helpers.Options;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Store {
@@ -9,8 +10,8 @@ namespace Storage.Domain.DomainLayer.Store {
     public class EpisodePhysicalStore : PhysicalStore, IEpisodeStore {
         private readonly ILogger<EpisodePhysicalStore> _logger;
 
-        public EpisodePhysicalStore(ILogger<EpisodePhysicalStore> logger, DownloadStorageOptions downloadOptions, MediaStorageOptions mediaOptions)
-                : base(downloadOptions, mediaOptions) {
+        public EpisodePhysicalStore(ILogger<EpisodePhysicalStore> logger, MediaStorageOptions mediaOptions)
+                : base(mediaOptions) {
             _logger = logger;
         }
 
@@ -24,11 +25,21 @@ namespace Storage.Domain.DomainLayer.Store {
             }
 
             await RetryFileMove(source, outputPath, 5);
-            return outputPath;
+
+            return RemoveStorePath(outputPath);
+        }
+
+        private string RemoveStorePath(string path) {
+            var store = _mediaStores.FirstOrDefault(store => path.StartsWith(store.Path));
+            string storeRemoved = path.Substring(store.Path.Length, path.Length - store.Path.Length).TrimStart('\\');
+
+            return store != null
+                ? Path.Combine(store.Alias, storeRemoved)
+                : path;
         }
 
         private string CreateOutputPath(string folderPath, string fileName) {
-            string storePath = GetAvailablePath(_storePaths);
+            string storePath = GetAvailablePath(_mediaStores);
 
             string sanitizedFolderName = string.Concat(folderPath.Split(InvalidPathCharacters));
             string storeFolder = Path.Combine(storePath, sanitizedFolderName);

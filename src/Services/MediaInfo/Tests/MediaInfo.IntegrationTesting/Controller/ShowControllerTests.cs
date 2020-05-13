@@ -1,10 +1,61 @@
-﻿using System.Net;
+﻿using MediaInfo.Domain.Helpers.DTOs.Shows;
+using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace MediaInfo.IntegrationTesting.Controller {
 
     public class ShowControllerTests : TestBase {
+
+        [Theory]
+        [InlineData(6)]
+        public async Task OK(int showId) {
+            var response = await _client.GetAsync($"/api/show/{showId}");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string data = await response.Content.ReadAsStringAsync();
+            var show = JsonSerializer.Deserialize<Show>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            Assert.Equal(showId, show.Id);
+        }
+
+        [Theory]
+        [InlineData("999999999")]
+        public async Task NotFound(string showId) {
+            var response = await _client.GetAsync($"/api/show/{showId}");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("0")]
+        public async Task BadRequest(string showId) {
+            var response = await _client.GetAsync($"/api/show/{showId}");
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("6")]
+        public async Task Overview_OK(string showId) {
+            var response = await _client.GetAsync($"/api/show/{showId}/overview");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string data = await response.Content.ReadAsStringAsync();
+            Assert.False(string.IsNullOrWhiteSpace(data));
+        }
+
+        [Theory]
+        [InlineData("999999999")]
+        public async Task Overview_NotFound(string showId) {
+            var response = await _client.GetAsync($"/api/show/{showId}/overview");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("0")]
+        public async Task Overview_BadRequest(string showId) {
+            var response = await _client.GetAsync($"/api/show/{showId}/overview");
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
 
         [Theory]
         [InlineData("6")]

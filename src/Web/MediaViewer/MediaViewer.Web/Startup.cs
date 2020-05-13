@@ -1,9 +1,13 @@
+using MediaViewer.Web.Infrastructure;
+using MediaViewer.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace MediaViewer.Web {
 
@@ -18,6 +22,13 @@ namespace MediaViewer.Web {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllersWithViews();
+
+            var storageOptions = Configuration.GetSection("StorageApiOptions").Get<StorageApiOptions>();
+
+            services.AddSingleton<HttpClient>()
+                    .AddTransient<StorageApi>()
+                    .AddSingleton(storageOptions)
+                    .AddLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,9 +44,15 @@ namespace MediaViewer.Web {
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
+
+            // MOVE TO ENV SETTING.
             app.UseStaticFiles(new StaticFileOptions {
-                FileProvider = new PhysicalFileProvider(@"TODO"),
-                RequestPath = "/videos"
+                FileProvider = new PhysicalFileProvider(@"\\htpc\\JJMedia1"),
+                RequestPath = "/JJMedia1"
+            });
+            app.UseStaticFiles(new StaticFileOptions {
+                FileProvider = new PhysicalFileProvider(@"\\htpc\\JJMedia2"),
+                RequestPath = "/JJMedia2"
             });
 
             app.UseRouting();

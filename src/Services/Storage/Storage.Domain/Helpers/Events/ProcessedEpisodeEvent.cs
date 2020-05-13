@@ -1,16 +1,21 @@
 ﻿using Storage.Domain.Helpers.DTOs;
+using System;
 
 namespace Storage.Domain.Helpers.Events {
 
-    public class ProcessedEpisode {
+    public class ProcessedEpisodeEvent {
 
-        public ProcessedEpisode(EpisodeSearch episode) {
+        public ProcessedEpisodeEvent() {
+        }
+
+        public ProcessedEpisodeEvent(EpisodeSearch episode, ProcessedEpisode processInfo) {
             EpisodeId = episode.Id;
             ShowId = episode.ShowId;
             ShowTitle = episode.ShowTitle ?? string.Empty;
             EpisodeTitle = episode.EpisodeTitle ?? string.Empty;
             EpisodeNumber = episode.EpisodeNumber ?? 0;
             SeasonNumber = episode.SeasonNumber ?? 0;
+            Guid = processInfo.Guid;
         }
 
         public int EpisodeId { get; set; }
@@ -19,5 +24,6 @@ namespace Storage.Domain.Helpers.Events {
         public string EpisodeTitle { get; set; }
         public int EpisodeNumber { get; set; }
         public int SeasonNumber { get; set; }
+        public Guid Guid { get; set; }
     }
 }
