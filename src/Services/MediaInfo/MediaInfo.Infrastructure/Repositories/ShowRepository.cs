@@ -1,4 +1,5 @@
-﻿using JJ.Media.Core.Infrastructure;
+﻿using JJ.Framework.Repository;
+using JJ.Framework.Repository.Abstraction;
 using JJ.Media.MediaInfo.Services.Interfaces;
 using MediaInfo.Domain.Helpers.DTOs.Shows;
 using SqlKata.Compilers;
@@ -27,7 +28,7 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (string.IsNullOrWhiteSpace(title))
                 return null;
 
-            int showId = await Execute(async (DisposableQuery db)
+            int showId = await Execute(async (DisposableQueryFactory db)
                     => await db.Query(ShowTitlesTable)
                         .Select("ShowId")
                         .Where("Title", title)
@@ -47,7 +48,7 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (titles?.Any() != true)
                 return Enumerable.Empty<Show>();
 
-            int[] showIds = await Execute(async (DisposableQuery db)
+            int[] showIds = await Execute(async (DisposableQueryFactory db)
                     => (await db.Query(ShowTitlesTable)
                         .Select("ShowId")
                         .WhereIn("Title", titles)
@@ -68,12 +69,12 @@ namespace MediaInfo.Infrastructure.Repositories {
                 return Enumerable.Empty<Show>();
 
             // load shows
-            var shows = await Execute(async (DisposableQuery db)
+            var shows = await Execute(async (DisposableQueryFactory db)
                 => await db.Query(_tableName)
                             .WhereIn("id", ids)
                             .GetAsync<Show>());
             // load titles
-            var titles = await Execute(async (DisposableQuery db)
+            var titles = await Execute(async (DisposableQueryFactory db)
                 => await db.Query(ShowTitlesTable)
                             .WhereIn("ShowId", ids)
                             .GetAsync<ShowTitle>());
@@ -94,7 +95,7 @@ namespace MediaInfo.Infrastructure.Repositories {
                 throw new ArgumentNullException(nameof(show));
 
             // Look into setting up a transaction!
-            int showId = await Execute(async (DisposableQuery db)
+            int showId = await Execute(async (DisposableQueryFactory db)
                 => await db.Query(_tableName).InsertGetIdAsync<int>(new {
                     show.Overview,
                     show.AirDate,
@@ -105,7 +106,7 @@ namespace MediaInfo.Infrastructure.Repositories {
             // Need to look into doing this as bulk!
             // This entire idea needs revisting!
             foreach (var showTitle in show.Titles) {
-                await Execute(async (DisposableQuery db)
+                await Execute(async (DisposableQueryFactory db)
                     => await db.Query(ShowTitlesTable).InsertAsync(new {
                         showTitle.IsPrimary,
                         showTitle.Title,
@@ -132,7 +133,7 @@ namespace MediaInfo.Infrastructure.Repositories {
         /// Updates a show within the repository.
         /// </summary>
         /// <returns>Records changed count.</returns>
-        public override async Task<int> UpdateAsync(Show show) {
+        public override Task<int> UpdateAsync(Show show) {
             if (show == null)
                 throw new ArgumentNullException(nameof(show));
 

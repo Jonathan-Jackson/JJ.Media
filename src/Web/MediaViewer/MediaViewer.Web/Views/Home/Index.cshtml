@@ -10,14 +10,14 @@
 
 <div class="index" style="height:100vh; width:100vw; position:relative;">
 
-    @if (Model.IsValid) {
+    @if (Model.IsDownloaded) {
         <video id="player" playsinline controls style="
             height: 36.5vw;
             width: 65vw;
             margin-top: 15vh;
             margin-left: 15vw;
             ">
-            <source src="@Model.Path" type="video/mp4" />
+            <source src="@Model.Path" type="video/webm" />
         </video>
     }
     else {

@@ -10,7 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libs\JJ.Media.Core\JJ.Media.Core.csproj" />
+    <ProjectReference Include="..\..\Converter\Converter.API.Client\Converter.API.Client.csproj" />
+    <ProjectReference Include="..\..\MediaInfo\MediaInfo.API.Client\MediaInfo.API.Client.csproj" />
   </ItemGroup>
 
 </Project>

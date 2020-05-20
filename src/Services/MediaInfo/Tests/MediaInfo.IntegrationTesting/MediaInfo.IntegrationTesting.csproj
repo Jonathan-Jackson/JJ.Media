@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\MediaInfo.API.Client\MediaInfo.API.Client.csproj" />
     <ProjectReference Include="..\..\MediaInfo.API\MediaInfo.API.csproj" />
   </ItemGroup>
 

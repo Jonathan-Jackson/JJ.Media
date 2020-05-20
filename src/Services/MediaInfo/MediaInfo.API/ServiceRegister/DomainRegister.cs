@@ -3,7 +3,6 @@ using MediaInfo.Domain.DomainLayer.Search;
 using MediaInfo.Domain.Helpers.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace MediaInfo.API.ServiceRegister {
 

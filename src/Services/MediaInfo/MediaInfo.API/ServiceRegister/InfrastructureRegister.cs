@@ -1,9 +1,10 @@
-﻿using JJ.Media.Core.Infrastructure;
+﻿using JJ.Framework.Repository;
+using JJ.Framework.Repository.Abstraction;
 using JJ.Media.MediaInfo.Services.Interfaces;
 using MediaInfo.Domain.Helpers.Repository;
 using MediaInfo.Domain.Helpers.Repository.Interfaces;
-using MediaInfo.Infrastructure.Helpers.Models;
-using MediaInfo.Infrastructure.Remote;
+using MediaInfo.Infrastructure.Client;
+using MediaInfo.Infrastructure.Options;
 using MediaInfo.Infrastructure.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -36,8 +37,8 @@ namespace MediaInfo.API.ServiceRegister {
 
             if (string.IsNullOrWhiteSpace(mediaInfoConnString))
                 mediaInfoConnString = Environment.GetEnvironmentVariable("MediaInfo_DB", EnvironmentVariableTarget.User) ?? throw new ApplicationException("MediaInfo_DB Database Connection value is missing.");
-            if (string.IsNullOrWhiteSpace(tvDbOptions.Token))
-                tvDbOptions.Token = Environment.GetEnvironmentVariable("TvDb_Token", EnvironmentVariableTarget.User) ?? throw new ApplicationException("TvDb:Token is missing.");
+            if (string.IsNullOrWhiteSpace(tvDbOptions.ApiKey))
+                tvDbOptions.ApiKey = Environment.GetEnvironmentVariable("TvDb_Token", EnvironmentVariableTarget.User) ?? throw new ApplicationException("TvDb:Token is missing.");
 
             return services
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(mediaInfoConnString))

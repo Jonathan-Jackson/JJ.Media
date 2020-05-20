@@ -1,10 +1,13 @@
-﻿using JJ.Media.Core.Infrastructure;
+﻿using JJ.Framework.Repository;
+using JJ.Framework.Repository.Abstraction;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 using Storage.Domain.Helpers.DTOs;
 using Storage.Domain.Helpers.Repository;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Storage.Infrastructure.Repositories {
@@ -15,33 +18,44 @@ namespace Storage.Infrastructure.Repositories {
             : base("ProcessedEpisodes", dbFactory, sqlCompiler) {
         }
 
-        public async Task<ProcessedEpisode> FindByEpisodeAsync(int episodeId) {
+        public Task<ProcessedEpisode> FindByEpisodeAsync(int episodeId) {
             if (episodeId < 1)
                 throw new ArgumentOutOfRangeException(nameof(episodeId));
 
-            return await Execute(async (DisposableQuery db)
+            return Execute(async (DisposableQueryFactory db)
                     => await db.Query(_tableName)
-                        .Where("Id", episodeId)
+                        .Where("EpisodeId", episodeId)
                         .FirstOrDefaultAsync<ProcessedEpisode>()
             );
         }
 
-        public async Task<ProcessedEpisode> FindByGuidAsync(Guid guid) {
+        public async Task<ProcessedEpisode[]> FindByEpisodeAsync(IEnumerable<int> episodeIds) {
+            if (!episodeIds.Any())
+                return Array.Empty<ProcessedEpisode>();
+
+            return (await Execute(async (DisposableQueryFactory db)
+                    => await db.Query(_tableName)
+                        .WhereIn("EpisodeId", episodeIds.ToArray())
+                        .GetAsync<ProcessedEpisode>()
+            )).ToArray();
+        }
+
+        public Task<ProcessedEpisode> FindByGuidAsync(Guid guid) {
             if (guid == default)
                 throw new ArgumentOutOfRangeException(nameof(guid));
 
-            return await Execute(async (DisposableQuery db)
+            return Execute(async (DisposableQueryFactory db)
                     => await db.Query(_tableName)
                         .Where("Guid", guid)
                         .FirstOrDefaultAsync<ProcessedEpisode>()
             );
         }
 
-        public async override Task<int> InsertAsync(ProcessedEpisode history) {
+        public override Task<int> InsertAsync(ProcessedEpisode history) {
             if (string.IsNullOrWhiteSpace(history.Output) || string.IsNullOrWhiteSpace(history.Source))
                 throw new ValidationException("History output and cannot be null or empty.");
 
-            return await Execute(async (DisposableQuery db)
+            return Execute(async (DisposableQueryFactory db)
                 => await db.Query(_tableName).InsertGetIdAsync<int>(new {
                     history.Source,
                     history.Output,
@@ -52,11 +66,11 @@ namespace Storage.Infrastructure.Repositories {
             );
         }
 
-        public async override Task<int> UpdateAsync(ProcessedEpisode history) {
+        public override Task<int> UpdateAsync(ProcessedEpisode history) {
             if (history == null)
                 throw new ArgumentNullException(nameof(history));
 
-            return await Execute(async (DisposableQuery db)
+            return Execute(async (DisposableQueryFactory db)
                 => await db.Query(_tableName).UpdateAsync(new {
                     history.Source,
                     history.Output,

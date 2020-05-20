@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using JJ.Framework.Controller;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Storage.Domain.Helpers.DTOs;
 using Storage.Domain.Helpers.Repository;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Storage.API.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
-    public class ProcessedEpisodesController : EntityControllerBase<ProcessedEpisode> {
+    public class ProcessedEpisodesController : EntityController<ProcessedEpisode> {
         private readonly ILogger<ProcessedEpisodesController> _logger;
         private readonly IProcessedEpisodeRepository _repository;
 
@@ -19,14 +21,30 @@ namespace Storage.API.Controllers {
             _repository = repository;
         }
 
+        [HttpPost]
+        [Route("guid/episode")]
+        public async Task<IActionResult> GuidByEpisode([FromBody]int[] episodeIds) {
+            if (episodeIds?.Any() != true)
+                return BadRequest("Episode Ids must be supplied within the body.");
+
+            var processed = await _repository.FindByEpisodeAsync(episodeIds);
+            var result = processed.Select(x => new { x.Guid, x.EpisodeId }).ToArray();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("guid/episode/{episodeId}")]
+        public Task<IActionResult> GuidByEpisode(int episodeId)
+            => FindEntity(episodeId, _repository.FindByEpisodeAsync, (ProcessedEpisode episode) => episode.Guid);
+
         [HttpGet]
         [Route("episode/{episodeId}/output")]
-        public async Task<IActionResult> OutputByEpisode(int episodeId)
-            => await HandleEntityRequest(episodeId, _repository.FindByEpisodeAsync, (ProcessedEpisode episode) => episode.Output);
+        public Task<IActionResult> OutputByEpisode(int episodeId)
+            => FindEntity(episodeId, _repository.FindByEpisodeAsync, (ProcessedEpisode episode) => episode.Output);
 
         [HttpGet]
         [Route("guid/{guid}/output")]
-        public async Task<IActionResult> OutputByEpisode(Guid guid)
-            => await HandleEntityRequest(guid, _repository.FindByGuidAsync, (ProcessedEpisode episode) => episode.Output);
+        public Task<IActionResult> OutputByGuid(Guid guid)
+            => FindEntity(guid, _repository.FindByGuidAsync, (ProcessedEpisode episode) => episode.Output);
     }
 }

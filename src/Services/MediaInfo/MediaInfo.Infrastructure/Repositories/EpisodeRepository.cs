@@ -1,4 +1,5 @@
-﻿using JJ.Media.Core.Infrastructure;
+﻿using JJ.Framework.Repository;
+using JJ.Framework.Repository.Abstraction;
 using MediaInfo.Domain.Helpers.DTOs.Episodes;
 using MediaInfo.Domain.Helpers.Repository;
 using SqlKata.Compilers;
@@ -26,7 +27,7 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (showId < 0 || absoluteNumber < 0)
                 return null;
 
-            return await Execute(async (DisposableQuery db)
+            return await Execute(async (DisposableQueryFactory db)
                     => await db.Query(_tableName)
                         .Where("showId", showId)
                         .Where("AbsoluteNumber", absoluteNumber)
@@ -38,10 +39,10 @@ namespace MediaInfo.Infrastructure.Repositories {
         /// Returns a matching episode with the showId, season and episode number.
         /// </summary>
         public async Task<Episode?> FindAsync(int showId, int seasonNumber, int episodeNumber) {
-            if (showId < 0 || seasonNumber < 0 || episodeNumber < 0)
-                return null;
+            if (showId <= 0 || seasonNumber < 0 || episodeNumber <= 0)
+                throw new ArgumentOutOfRangeException();
 
-            return await Execute(async (DisposableQuery db)
+            return await Execute(async (DisposableQueryFactory db)
                     => await db.Query(_tableName)
                         .Where("showId", showId)
                         .Where("SeasonNumber", seasonNumber)
@@ -51,13 +52,37 @@ namespace MediaInfo.Infrastructure.Repositories {
         }
 
         /// <summary>
+        /// Returns episode ids that match a show id.
+        /// </summary>
+        public Task<Episode[]> FindByShowAsync(int showId) {
+            if (showId <= 0)
+                return Task.FromResult(Array.Empty<Episode>());
+
+            return FindByShowAsync(new[] { showId });
+        }
+
+        /// <summary>
+        /// Returns episode ids that match a show id.
+        /// </summary>
+        public async Task<Episode[]> FindByShowAsync(IEnumerable<int> showIds) {
+            if (!showIds.Any())
+                return Array.Empty<Episode>();
+
+            return (await Execute(async (DisposableQueryFactory db)
+                => await db.Query(_tableName)
+                    .WhereIn("showId", showIds.ToArray())
+                    .GetAsync<Episode>()
+                )).ToArray();
+        }
+
+        /// <summary>
         /// Inserts an episode into the repository.
         /// </summary>
         public override async Task<int> InsertAsync(Episode episode) {
             if (episode == null)
                 throw new ArgumentNullException(nameof(episode));
 
-            return await Execute(async (DisposableQuery db)
+            return await Execute(async (DisposableQueryFactory db)
                 => await db.Query(_tableName).InsertGetIdAsync<int>(new {
                     episode.IsMovie,
                     episode.Overview,
@@ -78,7 +103,7 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (episode == null)
                 throw new ArgumentNullException(nameof(episode));
 
-            return await Execute(async (DisposableQuery db)
+            return await Execute(async (DisposableQueryFactory db)
                 => await db.Query(_tableName).UpdateAsync(new {
                     episode.IsMovie,
                     episode.Overview,

@@ -1,9 +1,8 @@
 ﻿using Downloader.Core.Helpers;
 using Downloader.Core.Helpers.DTOs;
 using Downloader.Core.Helpers.Options;
-using Downloader.Core.Infrastructure;
-using JJ.Media.Core.Entities;
 using Microsoft.Extensions.Logging;
+using Storage.API.Client.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,13 +14,13 @@ namespace Downloader.Core.Services {
     public class TorrentService {
         private readonly ILogger<TorrentService> _log;
         private readonly ITorrentClient _torrentClient;
-        private readonly StorageServiceNotifier _storage;
+        private readonly StorageClient _storageClient;
         private readonly string _downloadTorrentPath;
 
-        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, StorageServiceNotifier storage, TorrentServiceOptions options) {
+        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, StorageClient storageClient, TorrentServiceOptions options) {
             _log = log;
             _torrentClient = torrentClient;
-            _storage = storage;
+            _storageClient = storageClient;
             _downloadTorrentPath = options.DownloadTorrentPath;
         }
 
@@ -80,8 +79,7 @@ namespace Downloader.Core.Services {
         private async Task NotifyToProcessFiles(IEnumerable<string> fileNames) {
             foreach (string fileName in fileNames) {
                 try {
-                    var notification = new Notification<string>($"{fileName}");
-                    var response = await _storage.Notify(notification);
+                    var response = await _storageClient.Process(fileName);
                     _log.LogInformation($"Notified Processor of: {fileName} / Response: {response.ReasonPhrase} - {await response.Content.ReadAsStringAsync()}");
                 }
                 catch (Exception ex) {

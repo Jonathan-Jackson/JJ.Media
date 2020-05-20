@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libs\JJ.Media.Core\JJ.Media.Core.csproj" />
+    <ProjectReference Include="..\..\..\Libs\JJ.Framework\JJ.Framework.csproj" />
+    <ProjectReference Include="..\..\Storage\Storage.API.Client\Storage.API.Client.csproj" />
   </ItemGroup>
 </Project>

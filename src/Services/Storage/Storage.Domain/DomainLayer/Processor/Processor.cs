@@ -1,9 +1,15 @@
-﻿using System.IO;
+﻿using Microsoft.Extensions.Logging;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Processor {
 
     public abstract class Processor {
+        protected readonly ILogger<Processor> _logger;
+
+        protected Processor(ILogger<Processor> logger) {
+            _logger = logger;
+        }
 
         public abstract Task ProcessAsync(string path);
 

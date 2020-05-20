@@ -1,4 +1,4 @@
-﻿// Original Credit: 
+﻿// Original Credit:
 // Color Changin' by Alex Zaworski
 // https://codepen.io/alexzaworski/pen/mEkvAG
 
@@ -12,7 +12,7 @@ var colorSplash = {
         var animations = [];
 
         var colorPicker = (function () {
-            var colors = ["#FF6138", "#202040", "#FFBE53", "#2980B9", "#1b262c" ];
+            var colors = ["#FF6138", "#202040", "#FFBE53", "#2980B9", "#1b262c"];
             var index = 0;
             function next() {
                 index = index++ < colors.length - 1 ? index : 0;
@@ -51,7 +51,7 @@ var colorSplash = {
             var currentColor = colorPicker.current();
             var nextColor = colorPicker.next();
             var targetR = calcPageFillRadius(e.pageX, e.pageY);
-            var rippleSize = Math.min(200, (cW * .4));
+            var rippleSize = Math.min(200, (cW * .4)) / 5;
             var minCoverDuration = 750;
 
             var pageFill = new Circle({
@@ -91,30 +91,7 @@ var colorSplash = {
                 complete: removeAnimation
             });
 
-            var particles = [];
-            for (var i = 0; i < 32; i++) {
-                var particle = new Circle({
-                    x: e.pageX,
-                    y: e.pageY,
-                    fill: currentColor,
-                    r: anime.random(24, 48)
-                });
-                particles.push(particle);
-            }
-            var particlesAnimation = anime({
-                targets: particles,
-                x: function (particle) {
-                    return particle.x + anime.random(rippleSize, -rippleSize);
-                },
-                y: function (particle) {
-                    return particle.y + anime.random(rippleSize * 1.15, -rippleSize * 1.15);
-                },
-                r: 0,
-                easing: "easeOutExpo",
-                duration: anime.random(1000, 1300),
-                complete: removeAnimation
-            });
-            animations.push(fillAnimation, rippleAnimation, particlesAnimation);
+            animations.push(fillAnimation, rippleAnimation);
         }
 
         function extend(a, b) {
@@ -147,7 +124,7 @@ var colorSplash = {
             ctx.globalAlpha = 1;
         };
 
-        var animate = anime({
+        anime({
             duration: Infinity,
             update: function () {
                 ctx.fillStyle = bgColor;

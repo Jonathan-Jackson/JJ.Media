@@ -1,10 +1,10 @@
 ﻿using JJ.Media.MediaInfo.Services.Interfaces;
 using MediaInfo.API.ViewModels;
 using MediaInfo.Domain.DomainLayer.Search;
-using MediaInfo.Domain.Helpers.DTOs.Episodes;
 using MediaInfo.Domain.Helpers.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace JJ.Media.MediaInfo.API.Controllers {
@@ -54,12 +54,13 @@ namespace JJ.Media.MediaInfo.API.Controllers {
             if (string.IsNullOrWhiteSpace(showName))
                 return BadRequest($"Search value cannot be empty.");
 
-            var result = await _showSearch.SearchAsync(showName);
-
-            if (result == null)
+            try {
+                var result = await _showSearch.SearchAsync(showName);
+                return Ok(result.Id);
+            }
+            catch (SearchNotFoundException) {
                 return NotFound($"No results found for: {showName}");
-            else
-                return Ok(result);
+            }
         }
     }
 }

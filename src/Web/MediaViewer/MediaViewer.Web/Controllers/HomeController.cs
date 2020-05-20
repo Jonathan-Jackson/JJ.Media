@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using IO = System.IO;
 
 namespace MediaViewer.Web.Controllers {
 
@@ -22,9 +23,14 @@ namespace MediaViewer.Web.Controllers {
 
         [HttpGet("watch-episode/{episodeGuid}")]
         public async Task<IActionResult> Index(Guid episodeGuid) {
-            string path = "/" + await _storageApi.FindEpisodePath(episodeGuid);
+            string path = await _storageApi.FindEpisodePath(episodeGuid);
+
+            string webmPath = $"/{path.Substring(0, path.Length - 4)}.webm";
+            bool isReady = IO.File.Exists(webmPath);
+
             return View("Index", new IndexViewModel {
-                Path = path
+                Path = webmPath,
+                IsReady = isReady
             });
         }
 

@@ -1,4 +1,5 @@
-﻿using JJ.Media.Core.Extensions;
+﻿using JJ.Framework.Extensions;
+using JJ.Framework.Helpers;
 using MediaInfo.Domain.Helpers.DTOs.Miners;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace MediaInfo.DomainLayer.Miners {
             if (string.IsNullOrWhiteSpace(episodeName))
                 throw new ArgumentException(nameof(episodeName));
 
-            episodeName = episodeName.RemoveAtEnd(SupportedMediaFormats, StringComparison.OrdinalIgnoreCase);
+            episodeName = StringHelper.RemoveAtEnd(episodeName, SupportedMediaFormats, StringComparison.OrdinalIgnoreCase);
 
             return new MinedEpisode {
                 PossibleNames = GetPossibleNames(episodeName).ToArray(),
@@ -52,7 +53,7 @@ namespace MediaInfo.DomainLayer.Miners {
                                     ? metadataRemoved.Split('-').Last()
                                     : episodeName.Split('-').Last();
 
-            string noLetters = removedShow.RemoveLetters(replace: ' ');
+            string noLetters = StringHelper.RemoveLetters(removedShow, replace: ' ');
             return noLetters.Split(' ')
                 .Where(x => int.TryParse(x, out _))
                 .Select(x => int.Parse(x))
@@ -185,7 +186,7 @@ namespace MediaInfo.DomainLayer.Miners {
             var sentence = new List<string>();
             foreach (string word in arg.Split(' ')) {
                 string change = RemoveNumbersAtEnd(word);
-                change = change.RemoveAtEnd("s", StringComparison.OrdinalIgnoreCase);
+                change = StringHelper.RemoveAtEnd(change, "s", StringComparison.OrdinalIgnoreCase);
                 if (!string.IsNullOrWhiteSpace(change))
                     sentence.Add(word);
             }

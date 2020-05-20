@@ -1,4 +1,4 @@
-﻿using JJ.Media.Core.Entities;
+﻿using JJ.Framework.Repository;
 
 namespace MediaInfo.Domain.Helpers.DTOs.Shows {
 

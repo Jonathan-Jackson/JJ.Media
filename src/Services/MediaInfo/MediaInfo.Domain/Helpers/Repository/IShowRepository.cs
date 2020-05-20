@@ -1,4 +1,4 @@
-﻿using JJ.Media.Core.Infrastructure;
+﻿using JJ.Framework.Repository.Abstraction;
 using MediaInfo.Domain.Helpers.DTOs.Shows;
 using System.Collections.Generic;
 using System.Threading.Tasks;

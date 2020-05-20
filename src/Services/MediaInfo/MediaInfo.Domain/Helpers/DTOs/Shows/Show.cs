@@ -1,4 +1,4 @@
-﻿using JJ.Media.Core.Entities;
+﻿using JJ.Framework.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;

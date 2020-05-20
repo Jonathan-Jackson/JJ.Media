@@ -10,12 +10,14 @@ namespace MediaInfo.DomainLayer.Miners {
     /// </summary>
     public abstract class Miner {
 
-        protected static readonly string[] SupportedMediaFormats = new[] {
+        protected static IReadOnlyCollection<string> SupportedMediaFormats { get; } = new HashSet<string> {
             ".mkv",
             ".mp4"
         };
 
-        protected static readonly char[] SupportedRomanNumerals = new[] { 'i', 'v', 'I', 'V' };
+        protected static IReadOnlyCollection<char> SupportedRomanNumerals { get; } = new HashSet<char> {
+            'i', 'v', 'I', 'V'
+        };
 
         protected virtual bool ContainsRomanNumerals(string arg)
             // Only do realistically seasoned roman'd

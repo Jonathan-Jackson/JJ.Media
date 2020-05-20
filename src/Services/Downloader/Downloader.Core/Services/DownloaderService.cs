@@ -1,12 +1,12 @@
 ﻿using Downloader.Core.Feeds;
 using Downloader.Core.Helpers.DTOs;
 using Downloader.Core.Infrastructure;
+using JJ.Framework.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JJ.Media.Core.Extensions;
 
 namespace Downloader.Core.Services {
 
@@ -17,7 +17,7 @@ namespace Downloader.Core.Services {
         private readonly HistoryRepository _historyRepo;
 
         private const int GetFeedIntervalMiliSeconds = 3_600_000;           // 60 minutes.
-        private const int ProcessUntrackedIntervalMiliSeconds = 600_300;    // 10 minutes.
+        private const int ProcessUntrackedIntervalMiliSeconds = 300_200;    // 5 minutes.
         private const int ProcessTrackedIntervalMiliseconds = 15_000;       // 15 seconds.
         private const int UntrackedDelayIntervalMiliseconds = 126_000;      // 2.1 minutes.
 
@@ -50,9 +50,9 @@ namespace Downloader.Core.Services {
                 try {
                     _log.LogInformation("Awaiting Event..");
                     await Task.WhenAll(
-                        ProcessCompletionsAsync()
-                       , ProcessFeedAsync()
-                       , delayedProcessUntrackedDownloadsAsync()
+                       ProcessCompletionsAsync(),
+                       ProcessFeedAsync(),
+                       delayedProcessUntrackedDownloadsAsync()
                     );
                 }
                 catch (Exception ex) {

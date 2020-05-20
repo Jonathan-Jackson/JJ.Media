@@ -1,6 +1,6 @@
 ﻿using MediaInfo.Domain.Helpers.DTOs.Shows;
-using MediaInfo.Infrastructure.Helpers.Models;
-using MediaInfo.Infrastructure.Remote;
+using MediaInfo.Infrastructure.Client;
+using MediaInfo.Infrastructure.Options;
 using Microsoft.Extensions.Caching.Memory;
 using System.Threading.Tasks;
 using TvDbSharper;

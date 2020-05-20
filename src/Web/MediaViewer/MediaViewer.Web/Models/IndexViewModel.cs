@@ -3,7 +3,9 @@
     public class IndexViewModel {
         public string Path { get; set; }
 
-        public bool IsValid
+        public bool IsReady { get; set; }
+
+        public bool IsDownloaded
             => !string.IsNullOrWhiteSpace(Path);
     }
 }

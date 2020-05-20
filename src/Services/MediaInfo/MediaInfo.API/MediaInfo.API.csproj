@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Libs\JJ.Framework\JJ.Framework.csproj" />
     <ProjectReference Include="..\MediaInfo.Domain\MediaInfo.Domain.csproj" />
     <ProjectReference Include="..\MediaInfo.Infrastructure\MediaInfo.Infrastructure.csproj" />
   </ItemGroup>

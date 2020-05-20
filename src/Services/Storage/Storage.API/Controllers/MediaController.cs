@@ -4,6 +4,7 @@ using Storage.Domain.DomainLayer.Processor;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Storage.Domain.Helpers.Exceptions;
 
 namespace Storage.API.Controllers {
 
@@ -26,12 +27,14 @@ namespace Storage.API.Controllers {
                 return BadRequest($"File Path supplied is empty.");
 
             try {
-                // TODO: QUEUE!
                 await _episodeProcessor.ProcessAsync(filePath);
                 return Ok();
             }
             catch (ValidationException) {
                 return BadRequest($"File could not be saved.");
+            }
+            catch (EpisodeNotFoundException) {
+                return UnprocessableEntity();
             }
             catch (Exception ex) {
                 _logger.LogError(ex, $"An error occured when processing a file: {filePath}");
