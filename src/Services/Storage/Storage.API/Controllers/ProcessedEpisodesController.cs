@@ -21,8 +21,7 @@ namespace Storage.API.Controllers {
             _repository = repository;
         }
 
-        [HttpPost]
-        [Route("guid/episode")]
+        [HttpPost("guid/episode")]
         public async Task<IActionResult> GuidByEpisode([FromBody]int[] episodeIds) {
             if (episodeIds?.Any() != true)
                 return BadRequest("Episode Ids must be supplied within the body.");
@@ -32,18 +31,15 @@ namespace Storage.API.Controllers {
             return Ok(result);
         }
 
-        [HttpPost]
-        [Route("guid/episode/{episodeId}")]
+        [HttpGet("guid/episode/{episodeId}")]
         public Task<IActionResult> GuidByEpisode(int episodeId)
             => FindEntity(episodeId, _repository.FindByEpisodeAsync, (ProcessedEpisode episode) => episode.Guid);
 
-        [HttpGet]
-        [Route("episode/{episodeId}/output")]
+        [HttpGet("episode/{episodeId}/output")]
         public Task<IActionResult> OutputByEpisode(int episodeId)
             => FindEntity(episodeId, _repository.FindByEpisodeAsync, (ProcessedEpisode episode) => episode.Output);
 
-        [HttpGet]
-        [Route("guid/{guid}/output")]
+        [HttpGet("guid/{guid}/output")]
         public Task<IActionResult> OutputByGuid(Guid guid)
             => FindEntity(guid, _repository.FindByGuidAsync, (ProcessedEpisode episode) => episode.Output);
     }

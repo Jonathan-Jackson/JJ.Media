@@ -20,11 +20,13 @@ namespace Storage.Domain.DomainLayer.Processor {
         private readonly ConverterClient _converterClient;
 
         public EpisodeProcessor(IEpisodeStore episodeStore, ILogger<EpisodeProcessor> logger,
-                MediaInfoClient mediaInfoClient, IProcessedEpisodeRepository processedRepository)
+                MediaInfoClient mediaInfoClient, IProcessedEpisodeRepository processedRepository,
+                ConverterClient converterClient)
             : base(logger) {
             _episodeStore = episodeStore;
             _mediaInfoRepository = mediaInfoClient;
             _repo = processedRepository;
+            _converterClient = converterClient;
         }
 
         /// <summary>
@@ -58,7 +60,7 @@ namespace Storage.Domain.DomainLayer.Processor {
 
         private async Task TrySendNotifications(ProcessedEpisode processedEpisode) {
             try {
-                await _converterClient.VideoToWebm(processedEpisode.Output);
+                await _converterClient.EpisodeToWebm(processedEpisode.Output, processedEpisode.EpisodeId);
             }
             catch (Exception ex) {
                 _logger.LogError(ex, $"Failed to notify the converter service of: {JsonSerializer.Serialize(processedEpisode)}");

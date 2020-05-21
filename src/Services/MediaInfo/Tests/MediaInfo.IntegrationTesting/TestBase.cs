@@ -25,7 +25,7 @@ namespace MediaInfo.IntegrationTesting {
             else {
                 _client = new HttpClient { BaseAddress = new Uri("http://htpc:4681") };
                 _apiClient = new MediaInfoClient(new HttpClient(), new MediaInfoClientOptions {
-                    Address = _client.BaseAddress.ToString()
+                    Address = "http://htpc:4681"
                 });
             }
         }

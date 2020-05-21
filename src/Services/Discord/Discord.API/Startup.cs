@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Storage.API.Client;
+using Storage.API.Client.Client;
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -42,8 +43,10 @@ namespace Discord.API {
             services
                 .AddTransient<EpisodeAlertService>()
                 .AddTransient<MediaInfoClient>()
+                .AddTransient<StorageClient>()
                 .AddTransient<StorageClientOptions>()
                 .AddSingleton<IBackgroundTaskQueue<DiscordClient>, BackgroundTaskQueue<DiscordClient>>()
+                .AddSingleton<DiscordBackgroundService>()
                 .AddSingleton(mediaInfoOptions)
                 .AddSingleton(discordOptions)
                 .AddSingleton(storageOptions)

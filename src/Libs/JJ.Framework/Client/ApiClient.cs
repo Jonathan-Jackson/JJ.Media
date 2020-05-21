@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -59,7 +60,13 @@ namespace JJ.Framework.Client {
                 throw new HttpRequestException(response.ReasonPhrase);
         }
 
-        private string CreateEndAddress(string path)
-            => string.IsNullOrEmpty(_address) ? path : $"{_address}/{path}";
+        private string CreateEndAddress(string path) {
+            if (string.IsNullOrEmpty(_address))
+                return path;
+            else if (path.First() == '/')
+                return $"{_address}{path}";
+            else
+                return $"{_address}/{path}";
+        }
     }
 }

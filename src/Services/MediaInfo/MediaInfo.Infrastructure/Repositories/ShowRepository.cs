@@ -61,6 +61,29 @@ namespace MediaInfo.Infrastructure.Repositories {
                 return Enumerable.Empty<Show>();
         }
 
+        public override async Task<Show> FindAsync(int id) {
+            if (id < 1)
+                throw new ArgumentOutOfRangeException(nameof(id));
+
+            // load shows
+            var show = await Execute(async (DisposableQueryFactory db)
+                            => await db.Query(_tableName)
+                                        .Where("id", id)
+                                        .FirstOrDefaultAsync<Show>());
+
+            if (show != null) {
+                // load titles
+                var titles = await Execute(async (DisposableQueryFactory db)
+                                => await db.Query(ShowTitlesTable)
+                                            .Where("ShowId", id)
+                                            .GetAsync<ShowTitle>());
+
+                show.Titles = titles.ToList();
+            }
+
+            return show;
+        }
+
         /// <summary>
         /// Returns matching Shows with the ids supplied.
         /// </summary>

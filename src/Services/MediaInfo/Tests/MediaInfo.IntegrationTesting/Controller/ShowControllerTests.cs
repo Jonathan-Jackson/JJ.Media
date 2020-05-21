@@ -17,6 +17,7 @@ namespace MediaInfo.IntegrationTesting.Controller {
             string data = await response.Content.ReadAsStringAsync();
             var show = JsonSerializer.Deserialize<Show>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             Assert.Equal(showId, show.Id);
+            Assert.NotEmpty(show.Titles);
         }
 
         [Theory]

@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Libs\JJ.Framework\JJ.Framework.csproj" />
     <ProjectReference Include="..\..\..\Libs\JJ.HostedService\JJ.HostedService.csproj" />
+    <ProjectReference Include="..\..\Discord\Discord.API.Client\Discord.API.Client.csproj" />
   </ItemGroup>
 
 

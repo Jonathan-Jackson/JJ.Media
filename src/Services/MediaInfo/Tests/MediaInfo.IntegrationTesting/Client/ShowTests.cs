@@ -11,6 +11,7 @@ namespace MediaInfo.IntegrationTesting.Client {
             Show show = await _apiClient.GetShow(13);
 
             Assert.NotNull(show);
+            Assert.NotEmpty(show.Titles);
             Assert.True(show.Id == 13);
         }
 

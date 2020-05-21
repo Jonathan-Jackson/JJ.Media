@@ -1,4 +1,5 @@
 ﻿using Converter.API.Hosted;
+using Converter.API.Models;
 using Converter.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -42,6 +43,18 @@ namespace Converter.API.Controllers {
                 return BadRequest($"Path does not start with a supported alias: {filePath}");
 
             _backgroundConverter.TaskQueue.Enqueue((_) => _mediaService.Convert(filePath));
+            return Ok();
+        }
+
+        [HttpPost("episode-to-webm")]
+        public IActionResult EpisodeToWebm([FromBody]EpisodeFileRequest request) {
+            if (string.IsNullOrWhiteSpace(request.FilePath) || request.EpisodeId < 1)
+                return BadRequest();
+
+            if (!_storeService.TryReplaceAlias(request.FilePath, out string filePath))
+                return BadRequest($"Path does not start with a supported alias: {filePath}");
+
+            _backgroundConverter.TaskQueue.Enqueue((_) => _mediaService.ConvertEpisode(filePath, request.EpisodeId));
             return Ok();
         }
     }

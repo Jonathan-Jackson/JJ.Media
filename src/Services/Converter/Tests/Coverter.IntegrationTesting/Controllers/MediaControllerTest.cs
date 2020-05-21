@@ -1,4 +1,5 @@
-﻿using Converter.IntegrationTesting;
+﻿using Converter.API.Models;
+using Converter.IntegrationTesting;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -15,13 +16,13 @@ namespace Coverter.IntegrationTesting.Controllers {
         private const int ProcessWaitSeconds = 30;
 
         [Fact]
-        public async Task Media_WebmSynchronous() {
+        public async Task EpisodeToWebmSynch_OK() {
             if (File.Exists(ExpectedFile))
                 File.Delete(ExpectedFile);
 
             try {
                 string body = JsonSerializer.Serialize(EscapedTestFile);
-                var response = await _client.PostAsync($"/api/media/webm-synchronous", new StringContent(body, Encoding.UTF8, "application/json"));
+                var response = await _client.PostAsync($"/api/media/video-to-webm-await", new StringContent(body, Encoding.UTF8, "application/json"));
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(File.Exists(ExpectedFile));
                 Assert.NotEqual(0, new FileInfo(ExpectedFile).Length);
@@ -36,13 +37,13 @@ namespace Coverter.IntegrationTesting.Controllers {
         }
 
         [Fact]
-        public async Task Media_Webm() {
+        public async Task MediaToWebm_OK() {
             if (File.Exists(ExpectedFile))
                 File.Delete(ExpectedFile);
 
             try {
                 string body = JsonSerializer.Serialize(EscapedTestFile);
-                var response = await _client.PostAsync($"/api/media/webm", new StringContent(body, Encoding.UTF8, "application/json"));
+                var response = await _client.PostAsync($"/api/media/video-to-webm", new StringContent(body, Encoding.UTF8, "application/json"));
                 Assert.True(HttpStatusCode.OK == response.StatusCode, $"Expected OK, Recieved {response.StatusCode}. Content: {await response.Content.ReadAsStringAsync()}");
 
                 // Seek our result for 30seconds.
@@ -52,6 +53,27 @@ namespace Coverter.IntegrationTesting.Controllers {
                     else
                         await Task.Delay(1000);
 
+                Assert.True(File.Exists(ExpectedFile));
+                Assert.NotEqual(0, new FileInfo(ExpectedFile).Length);
+
+                // Short delay for file locks.
+                await Task.Delay(5000);
+            }
+            finally {
+                if (File.Exists(ExpectedFile))
+                    File.Delete(ExpectedFile);
+            }
+        }
+
+        [Fact]
+        public async Task EpisodeToWebm_OK() {
+            if (File.Exists(ExpectedFile))
+                File.Delete(ExpectedFile);
+
+            try {
+                string body = JsonSerializer.Serialize(new EpisodeFileRequest { FilePath = EscapedTestFile, EpisodeId = 127 });
+                var response = await _client.PostAsync($"/api/media/episode-to-webm", new StringContent(body, Encoding.UTF8, "application/json"));
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(File.Exists(ExpectedFile));
                 Assert.NotEqual(0, new FileInfo(ExpectedFile).Length);
 
