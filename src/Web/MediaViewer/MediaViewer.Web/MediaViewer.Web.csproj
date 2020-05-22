@@ -15,6 +15,10 @@
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Services\Storage\Storage.API.Client\Storage.API.Client.csproj" />
+  </ItemGroup>
+
 
 
 </Project>

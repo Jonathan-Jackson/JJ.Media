@@ -1,4 +1,3 @@
-using MediaViewer.Web.Infrastructure;
 using MediaViewer.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,8 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Storage.API.Client;
+using Storage.API.Client.Client;
 using System.Net.Http;
-using System.Text.Json;
 
 namespace MediaViewer.Web {
 
@@ -23,10 +23,10 @@ namespace MediaViewer.Web {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllersWithViews();
 
-            var storageOptions = Configuration.GetSection("StorageApiOptions").Get<StorageApiOptions>();
+            var storageOptions = Configuration.GetSection("StorageApiOptions").Get<StorageClientOptions>();
 
             services.AddSingleton<HttpClient>()
-                    .AddTransient<StorageApi>()
+                    .AddTransient<StorageClient>()
                     .AddSingleton(storageOptions)
                     .AddLogging();
         }

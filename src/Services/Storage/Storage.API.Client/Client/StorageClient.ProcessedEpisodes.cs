@@ -3,7 +3,6 @@ using Storage.API.Client.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Storage.API.Client.Client {
@@ -14,6 +13,9 @@ namespace Storage.API.Client.Client {
             => Get<string>($"/api/processedepisodes/episode/{episodeId}/output");
 
         public Task<string> GetOutputByGuid(Guid guid)
+            => Get<string>($"/api/processedepisodes/guid/{guid}/output");
+
+        public Task<string> FindOutputByGuid(Guid guid)
             => Get<string>($"/api/processedepisodes/guid/{guid}/output");
 
         public Task<EpisodeGuid[]> GetGuidByEpisode(IEnumerable<int> episodeIds)

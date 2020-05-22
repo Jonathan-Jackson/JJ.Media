@@ -1,7 +1,7 @@
-﻿using MediaViewer.Web.Infrastructure;
-using MediaViewer.Web.Models;
+﻿using MediaViewer.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Storage.API.Client.Client;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -11,10 +11,10 @@ namespace MediaViewer.Web.Controllers {
 
     public class HomeController : Controller {
         private readonly ILogger<HomeController> _logger;
-        private readonly StorageApi _storageApi;
+        private readonly StorageClient _storageClient;
 
-        public HomeController(ILogger<HomeController> logger, StorageApi storageApi) {
-            _storageApi = storageApi;
+        public HomeController(ILogger<HomeController> logger, StorageClient storageClient) {
+            _storageClient = storageClient;
             _logger = logger;
         }
 
@@ -23,9 +23,11 @@ namespace MediaViewer.Web.Controllers {
 
         [HttpGet("watch-episode/{episodeGuid}")]
         public async Task<IActionResult> Index(Guid episodeGuid) {
-            string path = await _storageApi.FindEpisodePath(episodeGuid);
+            string path = await _storageClient.FindOutputByGuid(episodeGuid);
 
-            string webmPath = $"/{path.Substring(0, path.Length - 4)}.webm";
+            string webmPath = string.IsNullOrWhiteSpace(path)
+                                ? ""
+                                : $"/{path.Substring(0, path.Length - 4)}.webm";
             bool isReady = IO.File.Exists(webmPath);
 
             return View("Index", new IndexViewModel {
