@@ -35,8 +35,10 @@ namespace Discord.API.Commands {
                 int id = await _mediaInfoRepository.ShowSearch(showName);
                 if (id == 0)
                     await ctx.RespondAsync($"🥤 Show Not Found 😓");
-                else
-                    await ReplyViewableEpisodes(ctx, id, showName);
+                else {
+                    var show = await _mediaInfoRepository.GetShow(id);
+                    await ReplyViewableEpisodes(ctx, show);
+                }
             }
             // TODO: Add Logging.
             catch {
@@ -44,22 +46,22 @@ namespace Discord.API.Commands {
             }
         }
 
-        private async Task ReplyViewableEpisodes(CommandContext ctx, int showId, string showName) {
-            Episode[] episodes = await _mediaInfoRepository.GetShowEpisodes(showId);
+        private async Task ReplyViewableEpisodes(CommandContext ctx, Show show) {
+            Episode[] episodes = await _mediaInfoRepository.GetShowEpisodes(show.Id);
             var episodeIds = episodes.Select(ep => ep.Id);
             var processedGuids = await _storageRepository.GetGuidByEpisode(episodeIds);
 
             if (!processedGuids.Any())
-                await ctx.RespondAsync($"🥤 No episodes can be viewed for {showName} 😓");
+                await ctx.RespondAsync($"🥤 No episodes can be viewed for {show.PrimaryTitle} 😓");
             else
-                await ctx.RespondAsync(embed: await CreateMessage(showName, showId, episodes, processedGuids));
+                await ctx.RespondAsync(embed: await CreateMessage(show, episodes, processedGuids));
         }
 
-        private async Task<DiscordEmbedBuilder> CreateMessage(string showName, int showId, Episode[] episodes, EpisodeGuid[] processed) {
-            var bannerTask = _mediaInfoRepository.GetShowImages(showId);
+        private async Task<DiscordEmbedBuilder> CreateMessage(Show show, Episode[] episodes, EpisodeGuid[] processed) {
+            var bannerTask = _mediaInfoRepository.GetShowImages(show.Id);
 
             return new DiscordEmbedBuilder {
-                Title = showName,
+                Title = show.PrimaryTitle,
                 Description = CreateDescription(episodes, processed),
                 Color = DiscordColor.CornflowerBlue,
                 ImageUrl = (await bannerTask).FirstOrDefault()

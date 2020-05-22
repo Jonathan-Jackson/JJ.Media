@@ -16,10 +16,12 @@ namespace Storage.API.Client.Client {
             => Get<string>($"/api/processedepisodes/guid/{guid}/output");
 
         public Task<string> FindOutputByGuid(Guid guid)
-            => Get<string>($"/api/processedepisodes/guid/{guid}/output");
+            => Find<string>($"/api/processedepisodes/guid/{guid}/output");
 
         public Task<EpisodeGuid[]> GetGuidByEpisode(IEnumerable<int> episodeIds)
-            => Post<EpisodeGuid[]>($"/api/processedepisodes/guid/episode", episodeIds.ToArray());
+            => episodeIds.Any()
+                ? Post<EpisodeGuid[]>($"/api/processedepisodes/guid/episode", episodeIds.ToArray())
+                : Task.FromResult(Array.Empty<EpisodeGuid>());
 
         public Task<Guid> GetGuidByEpisode(int episodeId)
             => Get<Guid>($"/api/processedepisodes/guid/episode/{episodeId}");
