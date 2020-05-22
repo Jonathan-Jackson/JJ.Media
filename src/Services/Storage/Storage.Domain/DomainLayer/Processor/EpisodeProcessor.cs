@@ -51,11 +51,22 @@ namespace Storage.Domain.DomainLayer.Processor {
 
             // Log.
             var processedEpisode = new ProcessedEpisode { EpisodeId = episode.Id, Source = path, Output = finalDestination };
-            processedEpisode.Id = await _repo.InsertAsync(processedEpisode);
+            await UpdateOrAddToRepo(processedEpisode);
 
             // Notify other services - i.e. discord messages.
             _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {finalDestination}");
             await TrySendNotifications(processedEpisode);
+        }
+
+        private async Task UpdateOrAddToRepo(ProcessedEpisode processedEpisode) {
+            var existingRecord = await _repo.FindByEpisodeAsync(processedEpisode.EpisodeId);
+            if (existingRecord != null) {
+                processedEpisode.Id = existingRecord.Id;
+                await _repo.UpdateAsync(processedEpisode);
+            }
+            else {
+                processedEpisode.Id = await _repo.InsertAsync(processedEpisode);
+            }
         }
 
         private async Task TrySendNotifications(ProcessedEpisode processedEpisode) {

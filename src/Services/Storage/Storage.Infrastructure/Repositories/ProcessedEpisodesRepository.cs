@@ -71,12 +71,14 @@ namespace Storage.Infrastructure.Repositories {
                 throw new ArgumentNullException(nameof(history));
 
             return Execute(async (DisposableQueryFactory db)
-                => await db.Query(_tableName).UpdateAsync(new {
-                    history.Source,
-                    history.Output,
-                    history.ProcessedOn,
-                    history.EpisodeId
-                })
+                => await db.Query(_tableName)
+                    .Where("Id", history.Id)
+                    .UpdateAsync(new {
+                        history.Source,
+                        history.Output,
+                        history.ProcessedOn,
+                        history.EpisodeId
+                    })
             );
         }
     }
