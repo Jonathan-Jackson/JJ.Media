@@ -81,7 +81,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.API.Client", "src\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.API.Client", "src\Services\Discord\Discord.API.Client\Discord.API.Client.csproj", "{27F39F13-A90B-4955-86A6-2CA326AF36B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter.API.Client", "src\Services\Converter\Converter.API.Client\Converter.API.Client.csproj", "{671E975D-9081-484A-B02A-0062CBCE9EEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Converter.API.Client", "src\Services\Converter\Converter.API.Client\Converter.API.Client.csproj", "{671E975D-9081-484A-B02A-0062CBCE9EEA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{5C1CF5DA-CC5B-4F6A-8FC1-5531E38ABAB6}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Storage.RegisterDirectory", "src\Scripts\Storage.RegisterDirectory\Storage.RegisterDirectory.fsproj", "{B8F926A5-C492-4CCB-A52F-93721CAF78FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,6 +185,10 @@ Global
 		{671E975D-9081-484A-B02A-0062CBCE9EEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{671E975D-9081-484A-B02A-0062CBCE9EEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{671E975D-9081-484A-B02A-0062CBCE9EEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8F926A5-C492-4CCB-A52F-93721CAF78FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8F926A5-C492-4CCB-A52F-93721CAF78FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8F926A5-C492-4CCB-A52F-93721CAF78FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8F926A5-C492-4CCB-A52F-93721CAF78FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -222,6 +230,8 @@ Global
 		{9103C986-E2AC-4497-85A4-20458816778E} = {9CD70DE2-3448-4091-BD04-542600F66AB6}
 		{27F39F13-A90B-4955-86A6-2CA326AF36B8} = {A3DB27A5-E89B-4D8A-A4D7-3F79E1B608F3}
 		{671E975D-9081-484A-B02A-0062CBCE9EEA} = {0D58B964-0AA6-4E65-B686-14DA79D34588}
+		{5C1CF5DA-CC5B-4F6A-8FC1-5531E38ABAB6} = {AB98DADC-C360-4E61-887F-7DA3C916FAD2}
+		{B8F926A5-C492-4CCB-A52F-93721CAF78FC} = {5C1CF5DA-CC5B-4F6A-8FC1-5531E38ABAB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC7526-4F78-49C0-BF45-FBFFFCF36B72}

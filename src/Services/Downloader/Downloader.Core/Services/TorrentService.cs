@@ -79,7 +79,7 @@ namespace Downloader.Core.Services {
         private async Task NotifyToProcessFiles(IEnumerable<string> fileNames) {
             foreach (string fileName in fileNames) {
                 try {
-                    var response = await _storageClient.Process(fileName);
+                    var response = await _storageClient.ProcessAnime(fileName);
                     _log.LogInformation($"Notified Processor of: {fileName} / Response: {response.ReasonPhrase} - {await response.Content.ReadAsStringAsync()}");
                 }
                 catch (Exception ex) {

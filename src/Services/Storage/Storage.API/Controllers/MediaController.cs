@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Storage.Domain.Helpers.Exceptions;
+using Storage.Domain.Helpers.DTOs;
 
 namespace Storage.API.Controllers {
 
@@ -19,15 +20,22 @@ namespace Storage.API.Controllers {
             _episodeProcessor = episodeProcessor;
         }
 
-        [HttpPost("process")]
-        public async Task<IActionResult> Process([FromBody]string filePath) {
+        [HttpPost("process-anime")]
+        public Task<IActionResult> ProcessAnime([FromBody]string filePath)
+            => Process(filePath, eEpisodeType.Anime);
+
+        [HttpPost("process-tvshow")]
+        public Task<IActionResult> ProcessTvShow([FromBody]string filePath)
+            => Process(filePath, eEpisodeType.Shows);
+
+        private async Task<IActionResult> Process(string filePath, eEpisodeType episodeType) {
             _logger.LogDebug($"Media Process Request: {filePath ?? "NULL"}");
 
             if (string.IsNullOrWhiteSpace(filePath))
                 return BadRequest($"File Path supplied is empty.");
 
             try {
-                await _episodeProcessor.ProcessAsync(filePath);
+                await _episodeProcessor.ProcessAsync(filePath, episodeType);
                 return Ok();
             }
             catch (ValidationException) {

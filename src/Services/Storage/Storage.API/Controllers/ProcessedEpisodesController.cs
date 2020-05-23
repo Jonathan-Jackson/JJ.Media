@@ -21,6 +21,14 @@ namespace Storage.API.Controllers {
             _repository = repository;
         }
 
+        [HttpGet("{id}")]
+        public Task<IActionResult> Get(int id)
+            => FindEntity(id);
+
+        [HttpPost]
+        public Task<IActionResult> Post([FromBody]ProcessedEpisode episode)
+            => AddEntity(episode);
+
         [HttpPost("guid/episode")]
         public async Task<IActionResult> GuidByEpisode([FromBody]int[] episodeIds) {
             if (episodeIds?.Any() != true)

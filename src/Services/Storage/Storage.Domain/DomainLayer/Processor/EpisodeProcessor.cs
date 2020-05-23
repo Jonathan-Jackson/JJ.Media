@@ -32,12 +32,13 @@ namespace Storage.Domain.DomainLayer.Processor {
         /// <summary>
         /// Processes the episode file passed into storage.
         /// </summary>
-        public override async Task ProcessAsync(string path) {
+        public async Task ProcessAsync(string path, eEpisodeType episodeType) {
             string episodeFileName = GetFileName(path);
             EpisodeSearchResult episode = await _mediaInfoRepository.EpisodeSearch(episodeFileName);
 
             if (episode.Id > 0) {
-                await ProcessFoundEpisodeAsync(path, episode);
+                var processedEpisode = await ProcessFoundEpisodeAsync(path, episode, episodeType);
+                await TrySendNotifications(processedEpisode);
             }
             else {
                 _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Show Id: {episode.ShowId} / Full path: {path}");
@@ -45,17 +46,16 @@ namespace Storage.Domain.DomainLayer.Processor {
             }
         }
 
-        private async Task ProcessFoundEpisodeAsync(string path, EpisodeSearchResult episode) {
-            var namer = new EpisodeNamer(path, episode);
+        private async Task<ProcessedEpisode> ProcessFoundEpisodeAsync(string path, EpisodeSearchResult episode, eEpisodeType episodeType) {
+            var namer = new EpisodeNamer(path, episode, episodeType);
             var finalDestination = await _episodeStore.SaveDownload(path, namer.FolderPath, namer.FileName);
 
-            // Log.
+            // Save.
             var processedEpisode = new ProcessedEpisode { EpisodeId = episode.Id, Source = path, Output = finalDestination };
             await UpdateOrAddToRepo(processedEpisode);
-
-            // Notify other services - i.e. discord messages.
             _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {finalDestination}");
-            await TrySendNotifications(processedEpisode);
+
+            return processedEpisode;
         }
 
         private async Task UpdateOrAddToRepo(ProcessedEpisode processedEpisode) {

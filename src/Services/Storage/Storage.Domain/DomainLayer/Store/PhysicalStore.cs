@@ -10,7 +10,7 @@ namespace Storage.Domain.DomainLayer.Store {
 
     public class PhysicalStore {
         protected const long MinimumSpaceThresholdBytes = 150_000_000_00; // 10gb.
-        protected readonly ImmutableArray<StoreArea> _downloadStores;
+        protected readonly ImmutableArray<StoreArea> _ProcessStores;
         protected readonly ImmutableArray<StoreArea> _mediaStores;
 
         protected static char[] InvalidPathCharacters
@@ -20,15 +20,15 @@ namespace Storage.Domain.DomainLayer.Store {
             .ToArray();
 
         public PhysicalStore(MediaStorageOptions mediaOptions) {
-            _downloadStores = ImmutableArray.Create(mediaOptions.Downloads);
+            _ProcessStores = ImmutableArray.Create(mediaOptions.ProcessStores);
             _mediaStores = ImmutableArray.Create(mediaOptions.Stores);
         }
 
         protected string GetAvailablePath(IEnumerable<StoreArea> paths)
             => paths.FirstOrDefault(x => x.Write)?.Path ?? throw new IOException("There are no stores available to write to.");
 
-        protected string GetDownloadPath(string source) {
-            foreach (string path in _downloadStores.Select(x => x.Path)) {
+        protected string GetProcessPath(string source) {
+            foreach (string path in _ProcessStores.Select(x => x.Path)) {
                 string filePath = Path.Combine(path, source);
                 if (File.Exists(filePath))
                     return filePath;
@@ -47,7 +47,7 @@ namespace Storage.Domain.DomainLayer.Store {
                     if (i >= attempts)
                         throw;
                     else
-                        await Task.Delay(1000 * i);
+                        await Task.Delay(2000 * i);
                 }
             }
         }

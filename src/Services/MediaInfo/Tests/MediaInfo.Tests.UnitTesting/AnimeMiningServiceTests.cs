@@ -13,6 +13,18 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
         }
 
         [Fact]
+        public void AlreadyNamed_BlackClover() {
+            var expected = new MinedEpisode { EpisodeNumber = 32, SeasonNumber = 2, PossibleNames = new[] { "Black Clover", "Black" } };
+            AssertResult("Black Clover - S02E32 (The Lion Awakens).mkv", expected);
+        }
+
+        [Fact]
+        public void AlreadyNamed_OnePiece() {
+            var expected = new MinedEpisode { EpisodeNumber = 13, SeasonNumber = 1, PossibleNames = new[] { "One Piece", "One" } };
+            AssertResult("One Piece - S01E13 (Trouble in Town).mkv", expected);
+        }
+
+        [Fact]
         public void PineappleSubs_ToaruKagakuNoRailgun() {
             var expected = new MinedEpisode { EpisodeNumber = 13, SeasonNumber = null, PossibleNames = new[] { "Toaru Kagaku no Railgun T", "Toaru Kagaku no Railgun" } };
             AssertResult("[HorribleSubs] Toaru Kagaku no Railgun T - 13 [1080p].mkv", expected);

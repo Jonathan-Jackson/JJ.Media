@@ -167,8 +167,11 @@ namespace MediaInfo.DomainLayer.Miners {
         }
 
         private int? GetSeasonNumber(string episodeName) {
+            // This is S01E01 type formatting.
+            if (ContainsSeasonFormat(episodeName, out int season))
+                return season;
             // Look for S2, S3.. in the title
-            if (ContainsSeasonNotation(episodeName))
+            else if (ContainsSeasonNotation(episodeName))
                 return GetSeasonNotation(episodeName);
             else if (ContainsRomanNumerals(episodeName))
                 return GetRomanNumeralSeason(episodeName);
@@ -176,6 +179,37 @@ namespace MediaInfo.DomainLayer.Miners {
                 return 0;
             else // NOT FOUND.
                 return null;
+        }
+
+        private bool ContainsSeasonFormat(string episodeName, out int season) {
+            season = 0;
+
+            episodeName = RemoveMetadata(episodeName);
+            string numbering = episodeName.Split('-').Last().Trim();
+            var indexes = StringHelper.GetIndices(numbering, 's', StringComparison.OrdinalIgnoreCase)
+                    .Where(i => numbering.Substring(i).Contains("e", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(i => i)
+                    .ToQueue();
+
+            foreach (int i in indexes) {
+                int episodeIndex = numbering.Substring(i).IndexOf("e", StringComparison.OrdinalIgnoreCase);
+                string partial = numbering.Substring(i, episodeIndex)
+                                    .Replace(' ', 'x')
+                                    .Replace('.', 'x')
+                                    .TrimStart('s', 'S');
+
+                if (partial.All(char.IsNumber) && int.TryParse(partial, out season)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private string RemoveMetadata(string episodeName) {
+            episodeName = RemoveCircularBrackets(episodeName);
+            episodeName = RemoveSquareBrackets(episodeName);
+            return RemoveTriangleBrackets(episodeName);
         }
 
         private string RemoveBuzzwords(string arg) {

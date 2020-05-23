@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Processor {
 
@@ -10,8 +9,6 @@ namespace Storage.Domain.DomainLayer.Processor {
         protected Processor(ILogger<Processor> logger) {
             _logger = logger;
         }
-
-        public abstract Task ProcessAsync(string path);
 
         /// <summary>
         /// Gets the file name of an episode file path.

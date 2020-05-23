@@ -16,7 +16,7 @@ namespace Storage.Domain.DomainLayer.Store {
         }
 
         public async Task<string> SaveDownload(string sourceFile, string folderPath, string fileName) {
-            string source = GetDownloadPath(sourceFile);
+            string source = GetProcessPath(sourceFile);
             string outputPath = CreateOutputPath(folderPath, fileName);
 
             if (File.Exists(outputPath)) {

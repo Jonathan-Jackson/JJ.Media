@@ -9,6 +9,12 @@ namespace Storage.API.Client.Client {
 
     public partial class StorageClient : ApiClient {
 
+        public Task<ProcessedEpisode> GetProcessedEpisode(int id)
+            => Get<ProcessedEpisode>($"/api/processedepisodes/{id}");
+
+        public Task AddProcessedEpisode(ProcessedEpisode processedEpisode)
+            => Post($"/api/processedepisodes", processedEpisode);
+
         public Task<string> GetOutputByEpisode(int episodeId)
             => Get<string>($"/api/processedepisodes/episode/{episodeId}/output");
 

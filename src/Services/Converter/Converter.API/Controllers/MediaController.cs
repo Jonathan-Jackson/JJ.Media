@@ -51,6 +51,9 @@ namespace Converter.API.Controllers {
             if (string.IsNullOrWhiteSpace(request.FilePath) || request.EpisodeId < 1)
                 return BadRequest();
 
+            if (request.FilePath.EndsWith(".webm", System.StringComparison.OrdinalIgnoreCase))
+                return BadRequest($"File is already a webm: {request.FilePath}");
+
             if (!_storeService.TryReplaceAlias(request.FilePath, out string filePath))
                 return BadRequest($"Path does not start with a supported alias: {filePath}");
 

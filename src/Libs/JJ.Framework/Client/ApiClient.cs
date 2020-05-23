@@ -44,7 +44,7 @@ namespace JJ.Framework.Client {
         public Task<HttpResponseMessage> Post(string path, object body)
             => Post(path, JsonSerializer.Serialize(body));
 
-        public Task<HttpResponseMessage> Post(string path, string body)
+        private Task<HttpResponseMessage> Post(string path, string body)
             => _client.PostAsync(CreateEndAddress(path), new StringContent(body, Encoding.UTF8, "application/json"));
 
         public Task<TResult> Post<TResult>(string path, object body)

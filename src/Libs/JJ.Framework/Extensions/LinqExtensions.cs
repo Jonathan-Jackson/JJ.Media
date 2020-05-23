@@ -7,6 +7,9 @@ namespace JJ.Framework.Extensions {
 
     public static partial class LinqExtensions {
 
+        public static Queue<T> ToQueue<T>(this IEnumerable<T> enumerable)
+            => new Queue<T>(enumerable);
+
         public static T Random<T>(this IEnumerable<T> enumerable) {
             int rand = new Random().Next(0, enumerable.Count() - 1);
             return enumerable.ElementAt(rand);

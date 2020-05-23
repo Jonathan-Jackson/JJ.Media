@@ -1,4 +1,5 @@
 ﻿using MediaInfo.API.Client.Models;
+using Storage.Domain.Helpers.DTOs;
 using System.IO;
 
 namespace Storage.Domain.DomainLayer.Namer {
@@ -8,10 +9,12 @@ namespace Storage.Domain.DomainLayer.Namer {
 
         private readonly string _path;
         private readonly EpisodeSearchResult _search;
+        private readonly eEpisodeType _episodeType;
 
-        public EpisodeNamer(string path, EpisodeSearchResult search) {
+        public EpisodeNamer(string path, EpisodeSearchResult search, eEpisodeType episodeType) {
             _path = path;
             _search = search;
+            _episodeType = episodeType;
         }
 
         public string FileName
@@ -29,8 +32,7 @@ namespace Storage.Domain.DomainLayer.Namer {
             => new FileInfo(_path).Extension;
 
         public string FolderPath
-            // Default to Anime (since thats only whats supported atm).
-            => Path.Combine("Anime", _search.ShowTitle, $"Season {_search.SeasonNumber}");
+            => Path.Combine(_episodeType.ToString(), _search.ShowTitle, $"Season {_search.SeasonNumber}");
 
         private bool HasLargeName
             => (_search?.EpisodeTitle?.Length ?? 0 + _search.ShowTitle.Length) >= MaxFileNameLength;

@@ -14,6 +14,15 @@ namespace JJ.Framework.Controller {
             _repository = repository;
         }
 
+        protected async Task<IActionResult> AddEntity(TEntity entity) {
+            if (entity.Id > 0)
+                return BadRequest($"Entity has an id and cannot be saved.");
+
+            entity.Id = await _repository.InsertAsync(entity);
+
+            return Ok(JsonSerializer.Serialize(entity));
+        }
+
         protected async Task<IActionResult> FindEntities(int id, Func<int, Task<TEntity[]>> findAction) {
             if (id < 1)
                 return BadRequest($"Id must be greater than zero.");

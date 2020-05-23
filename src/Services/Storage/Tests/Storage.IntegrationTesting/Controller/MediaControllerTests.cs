@@ -31,7 +31,7 @@ namespace Storage.IntegrationTesting {
         private string CreateMockFile(string fileName) {
             // Create a fake file in the
             var downloader = _services.GetRequiredService<MediaStorageOptions>();
-            string path = downloader.Downloads.First().Path;
+            string path = downloader.ProcessStores.First().Path;
             string fullPath = Path.Combine(path, fileName);
 
             if (!File.Exists(fullPath))

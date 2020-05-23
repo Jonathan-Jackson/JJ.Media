@@ -6,6 +6,12 @@ namespace JJ.Framework.Helpers {
 
     public static class StringHelper {
 
+        public static IEnumerable<int> GetIndices(string value, char match, StringComparison comparer) {
+            for (int i = 0; i < value.Length; i++)
+                if (string.Equals(value[i].ToString(), match.ToString(), comparer))
+                    yield return i;
+        }
+
         public static string RemoveLetters(string value, char replace)
             => new string(value.Select(x => !char.IsLetter(x) ? x : replace).ToArray());
 

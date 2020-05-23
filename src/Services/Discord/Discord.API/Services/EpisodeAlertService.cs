@@ -46,7 +46,9 @@ namespace Discord.API.Services {
             string seasonEpisodeHeader = Formatter.Bold($"Season {episode.SeasonNumber} Episode {episode.EpisodeNumber}");
             string episodeDescription = IsDefaultedTitle(episode.Title) ? string.Empty : episode.Title;
             string viewUrl = $"@ {_viewerDomain}/{fileGuid.ToString()}";
-            string altShowTitles = Formatter.Italic(string.Join(", ", GetAltTitles(show)));
+            string altShowTitles = show.Titles.Count > 1
+                ? Formatter.Italic(string.Join(", ", GetAltTitles(show)))
+                : string.Empty;
             string overview = FormatOverview(await overviewTask);
             string infoUrl = await infoLinkTask;
 
