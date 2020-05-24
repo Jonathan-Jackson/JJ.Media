@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Storage.Domain.Helpers.Abstraction;
 using Storage.Domain.Helpers.Options;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,13 +20,21 @@ namespace Storage.Domain.DomainLayer.Store {
             string source = GetProcessPath(sourceFile);
             string outputPath = CreateOutputPath(folderPath, fileName);
 
-            if (File.Exists(outputPath)) {
+            // Return if our file is already where we'd put it
+            // We still want to log these as processed so they're in the
+            // database!
+            if (string.Equals(source, outputPath, StringComparison.OrdinalIgnoreCase)) {
+                return RemoveStorePath(outputPath);
+            }
+            else if (File.Exists(outputPath)) {
                 _logger.LogInformation($"File already exists. Deleting existing copy of {fileName} at path: {outputPath}");
                 File.Delete(outputPath);
             }
 
             await RetryFileMove(source, outputPath, 5);
 
+            // We remove the physical path for logging
+            // this allows us to have a 'generic' file path.
             return RemoveStorePath(outputPath);
         }
 
