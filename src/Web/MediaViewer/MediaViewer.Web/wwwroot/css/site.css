@@ -11,4 +11,7 @@
 
 #backgroundCanvas {
     position: absolute;
+    background-color: #212020;
+    width: 100vw;
+    height: 100vh;
 }

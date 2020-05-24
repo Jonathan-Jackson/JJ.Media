@@ -3,24 +3,26 @@
     ViewData["Title"] = "Home Page";
 }
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        colorSplash.start('backgroundCanvas');
-    });</script>
+@if (!Model.IsDownloaded) {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            colorSplash.start('backgroundCanvas');
+        });</script>
+}
 
 <div class="index" style="height:100vh; width:100vw; position:relative;">
 
     @if (Model.IsDownloaded) {
         <video id="player" playsinline controls style="
-            height: 36.5vw;
-            width: 65vw;
-            margin-top: 15vh;
-            margin-left: 15vw;
-            ">
+        height: 100vh;
+        width: 100vw;
+        margin-top: 0;
+        margin-left: 0;
+        ">
             <source src="@Model.Path" type="video/webm" />
         </video>
     }
     else {
-        <span>No Episode Found</span>
+        <span style="color: white"><b>No Episode Found</b></span>
     }
 </div>
