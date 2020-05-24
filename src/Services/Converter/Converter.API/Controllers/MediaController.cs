@@ -30,7 +30,7 @@ namespace Converter.API.Controllers {
             if (!_storeService.TryReplaceAlias(filePath, out filePath))
                 return BadRequest($"Path does not start with a supported alias: {filePath}");
 
-            await _mediaService.Convert(filePath);
+            await _mediaService.Convert(filePath, burnSubtitles: true);
             return Ok();
         }
 
@@ -42,7 +42,7 @@ namespace Converter.API.Controllers {
             if (!_storeService.TryReplaceAlias(filePath, out filePath))
                 return BadRequest($"Path does not start with a supported alias: {filePath}");
 
-            _backgroundConverter.TaskQueue.Enqueue((_) => _mediaService.Convert(filePath));
+            _backgroundConverter.TaskQueue.Enqueue((_) => _mediaService.Convert(filePath, burnSubtitles: true));
             return Ok();
         }
 
@@ -57,7 +57,7 @@ namespace Converter.API.Controllers {
             if (!_storeService.TryReplaceAlias(request.FilePath, out string filePath))
                 return BadRequest($"Path does not start with a supported alias: {filePath}");
 
-            _backgroundConverter.TaskQueue.Enqueue((_) => _mediaService.ConvertEpisode(filePath, request.EpisodeId));
+            _backgroundConverter.TaskQueue.Enqueue((_) => _mediaService.ConvertEpisode(filePath, request.EpisodeId, request.BurnSubtitles));
             return Ok();
         }
     }

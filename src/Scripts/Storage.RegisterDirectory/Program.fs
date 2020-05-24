@@ -41,6 +41,7 @@ while true do
                     |> Array.map(fun(file) -> file.FullName)
 
     let isAnime = directoryPath.Contains("/anime/", StringComparison.InvariantCultureIgnoreCase)
+                || directoryPath.Contains("\\anime\\", StringComparison.InvariantCultureIgnoreCase)
 
     if isAnime then
         for path in paths do

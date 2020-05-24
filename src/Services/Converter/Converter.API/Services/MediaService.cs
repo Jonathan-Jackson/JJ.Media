@@ -3,6 +3,7 @@ using Converter.API.Models;
 using Discord.API.Client.Client;
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Converter.API.Services {
@@ -21,12 +22,12 @@ namespace Converter.API.Services {
             _discordClient = discordClient;
         }
 
-        public async Task ConvertEpisode(string filePath, int episodeId) {
-            await Convert(filePath);
+        public async Task ConvertEpisode(string filePath, int episodeId, bool burnSubtitles) {
+            await Convert(filePath, burnSubtitles);
             await _discordClient.AlertOfEpisode(episodeId);
         }
 
-        public async Task Convert(string filePath) {
+        public async Task Convert(string filePath, bool burnSubtitles) {
             if (!File.Exists(filePath))
                 throw new IOException($"File does not exist: {filePath}");
 
@@ -35,24 +36,26 @@ namespace Converter.API.Services {
             // we copy to a temp path because our CLI may not like
             // the characters in the original path.
             string tmpPath = await CreateTempFileCopy(fileInfo);
+            var settings = new ConvertSettings { FilePath = tmpPath, BurnSubtitles = burnSubtitles };
 
             try {
-                string output = await RetryConvert(tmpPath);
+                string output = await RetryConvert(settings);
                 string destination = Path.Join(fileInfo.Directory.FullName, fileInfo.Name.Replace(fileInfo.Extension, ".webm"));
                 await IORetry(() => File.Move(output, destination));
+                //await IORetry(() => File.Delete(filePath));
             }
             finally {
-                await IORetry(() => File.Delete(filePath));
+                await IORetry(() => File.Delete(tmpPath));
             }
         }
 
-        private async Task<string> RetryConvert(string tmpPath) {
+        private async Task<string> RetryConvert(ConvertSettings settings) {
             for (int i = 0; ; i++) {
-                string output = await _converter.Convert(tmpPath);
+                string output = await _converter.Convert(settings);
                 if (File.Exists(output))
                     return output;
                 if (i >= IORetryCount)
-                    throw new IOException($"Failed to convert file: {tmpPath}");
+                    throw new IOException($"Failed to convert file: {JsonSerializer.Serialize(settings)}");
             }
         }
 

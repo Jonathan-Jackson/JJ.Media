@@ -27,8 +27,14 @@ namespace Discord.API.Commands {
         }
 
         [Command("watch")]
-        [Description("Lists episodes that can be viewed for a show. Example: !watch [show name]")]
+        [Description("Lists episodes that can be viewed for a show. To select a specific season, append 'season [number]' to the end. Example: !watch [show name] or !watch [show name] season 3")]
         public async Task Watch(CommandContext ctx, params string[] values) {
+            int? season = null;
+            if (EndsWithSeason(values)) {
+                season = int.Parse(values.Last());
+                values = values.Take(values.Length - 2).ToArray();
+            }
+
             string showName = string.Join(' ', values);
 
             try {
@@ -37,7 +43,7 @@ namespace Discord.API.Commands {
                     await ctx.RespondAsync($"🥤 Show Not Found 😓");
                 else {
                     var show = await _mediaInfoRepository.GetShow(id);
-                    await ReplyViewableEpisodes(ctx, show);
+                    await ReplyViewableEpisodes(ctx, show, season);
                 }
             }
             // TODO: Add Logging.
@@ -46,7 +52,16 @@ namespace Discord.API.Commands {
             }
         }
 
-        private async Task ReplyViewableEpisodes(CommandContext ctx, Show show) {
+        private bool EndsWithSeason(string[] values) {
+            if (values.Length <= 2)
+                return false;
+
+            var seasonData = values.Skip(values.Length - 2).ToArray();
+            return string.Equals(seasonData[0], "season", StringComparison.OrdinalIgnoreCase)
+                && seasonData[1].All(char.IsDigit);
+        }
+
+        private async Task ReplyViewableEpisodes(CommandContext ctx, Show show, int? season = null) {
             Episode[] episodes = await _mediaInfoRepository.GetShowEpisodes(show.Id);
             var episodeIds = episodes.Select(ep => ep.Id);
             var processedGuids = await _storageRepository.GetGuidByEpisode(episodeIds);
@@ -54,38 +69,56 @@ namespace Discord.API.Commands {
             if (!processedGuids.Any())
                 await ctx.RespondAsync($"🥤 No episodes can be viewed for {show.PrimaryTitle} 😓");
             else
-                await ctx.RespondAsync(embed: await CreateMessage(show, episodes, processedGuids));
+                await ctx.RespondAsync(embed: await CreateMessage(show, episodes, processedGuids, season));
         }
 
-        private async Task<DiscordEmbedBuilder> CreateMessage(Show show, Episode[] episodes, EpisodeGuid[] processed) {
+        private async Task<DiscordEmbedBuilder> CreateMessage(Show show, Episode[] episodes, EpisodeGuid[] processed, int? season = null) {
             var bannerTask = _mediaInfoRepository.GetShowImages(show.Id);
 
             return new DiscordEmbedBuilder {
                 Title = show.PrimaryTitle,
-                Description = CreateDescription(episodes, processed),
+                Description = CreateDescription(episodes, processed, season),
                 Color = DiscordColor.CornflowerBlue,
                 ImageUrl = (await bannerTask).FirstOrDefault()
             };
         }
 
-        private string CreateDescription(Episode[] episodes, EpisodeGuid[] processed) {
+        private string CreateDescription(Episode[] episodes, EpisodeGuid[] processed, int? season = null) {
             var builder = new StringBuilder();
 
             var pairs = processed
                 .Select(item => new { item.Guid, Episode = episodes.First(ep => ep.Id == item.EpisodeId) });
 
-            var seasons = pairs.GroupBy(x => x.Episode.SeasonNumber).OrderBy(x => x.Key);
+            var groupedSeasons = pairs.GroupBy(x => x.Episode.SeasonNumber);
+            var displaySeason = season == null
+                ? groupedSeasons.OrderBy(x => x.Key).First()
+                : pairs.Where(x => x.Episode.SeasonNumber == season);
 
-            foreach (var season in seasons) {
-                builder.AppendLine($"Season {season.Key}");
-
-                foreach (var pair in pairs.OrderBy(p => p.Episode.AbsoluteNumber)) {
+            if (displaySeason.Any()) {
+                // Print the season.
+                builder.AppendLine($"Season {displaySeason.First().Episode.SeasonNumber}");
+                foreach (var pair in displaySeason.OrderBy(p => p.Episode.AbsoluteNumber)) {
                     string text = $"{pair.Episode.EpisodeNumber}. {pair.Episode.Title}";
                     Uri uri = new Uri($@"{_viewerDomain}/{pair.Guid.ToString()}");
-                    builder.AppendLine(Formatter.MaskedUrl(text, uri, "Watch the episode."));
+
+                    if (builder.Length + text.Length <= 1950) {
+                        builder.AppendLine(Formatter.MaskedUrl(text, uri, "Watch the episode."));
+                    }
+                    else {
+                        builder.AppendLine("...");
+                        break;
+                    }
                 }
             }
+            else {
+                builder.AppendLine($"No episodes found for season {season}");
+            }
 
+            builder.AppendLine();
+            builder.AppendLine($"Available Seasons: {string.Join(", ", groupedSeasons.OrderBy(x => x.Key).Select(x => x.Key))}");
+
+            // Description length cannot exceed 2048 characters
+            // (DISCORD RULE).
             return builder.ToString();
         }
     }

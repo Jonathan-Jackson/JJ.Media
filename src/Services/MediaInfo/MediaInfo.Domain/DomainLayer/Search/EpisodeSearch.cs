@@ -76,7 +76,7 @@ namespace MediaInfo.Domain.DomainLayer.Search {
         /// Returns the highest priority episode that matches the season and episode.
         /// </summary>
         private Episode? GetPriorityEpisode(IEnumerable<Episode> episodes, int seasonNumber, int episodeNumber) {
-            var ordered = episodes.OrderBy(x => x.SeasonNumber == seasonNumber && x.EpisodeNumber == episodeNumber);
+            var ordered = episodes.OrderByDescending(x => x.SeasonNumber == seasonNumber && x.EpisodeNumber == episodeNumber);
 
             if (episodeNumber > 24 && seasonNumber == 1)
                 ordered = ordered.ThenBy(x => x.AbsoluteNumber == episodeNumber);

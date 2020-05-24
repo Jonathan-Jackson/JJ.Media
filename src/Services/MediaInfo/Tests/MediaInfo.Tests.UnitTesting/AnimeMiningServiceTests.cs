@@ -13,6 +13,12 @@ namespace JJ.Media.MediaInfo.Tests.Unit {
         }
 
         [Fact]
+        public void AlreadyNamed_StarWarsCloneWars() {
+            var expected = new MinedEpisode { EpisodeNumber = 1, SeasonNumber = 1, PossibleNames = new[] { "Star Wars The Clone Wars", "Star Wars The Clone" } };
+            AssertResult("Star Wars The Clone Wars - S01E01.mkv", expected);
+        }
+
+        [Fact]
         public void AlreadyNamed_BlackClover() {
             var expected = new MinedEpisode { EpisodeNumber = 32, SeasonNumber = 2, PossibleNames = new[] { "Black Clover", "Black" } };
             AssertResult("Black Clover - S02E32 (The Lion Awakens).mkv", expected);

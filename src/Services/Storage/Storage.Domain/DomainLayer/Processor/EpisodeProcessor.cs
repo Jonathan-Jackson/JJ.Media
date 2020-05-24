@@ -38,7 +38,7 @@ namespace Storage.Domain.DomainLayer.Processor {
 
             if (episode.Id > 0) {
                 var processedEpisode = await ProcessFoundEpisodeAsync(path, episode, episodeType);
-                await TrySendNotifications(processedEpisode);
+                await TrySendNotifications(processedEpisode, episodeType);
             }
             else {
                 _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Show Id: {episode.ShowId} / Full path: {path}");
@@ -69,9 +69,10 @@ namespace Storage.Domain.DomainLayer.Processor {
             }
         }
 
-        private async Task TrySendNotifications(ProcessedEpisode processedEpisode) {
+        private async Task TrySendNotifications(ProcessedEpisode processedEpisode, eEpisodeType episodeType) {
             try {
-                await _converterClient.EpisodeToWebm(processedEpisode.Output, processedEpisode.EpisodeId);
+                bool burnSubtitles = episodeType == eEpisodeType.Anime;
+                await _converterClient.EpisodeToWebm(processedEpisode.Output, processedEpisode.EpisodeId, burnSubtitles);
             }
             catch (Exception ex) {
                 _logger.LogError(ex, $"Failed to notify the converter service of: {JsonSerializer.Serialize(processedEpisode)}");

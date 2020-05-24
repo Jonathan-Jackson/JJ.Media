@@ -7,22 +7,25 @@ namespace Converter.API.Converter {
     public class HandbrakeConverter : IMediaConverter {
         private const string ConvertExtension = "webm";
         private const int ProcessTimeout = 7_200_000;
+
+        private readonly string _subtitleArgs;
+        private readonly string _standardArgs;
         private readonly string _cmdPath;
-        private readonly string _cmdArgs;
         private readonly TaskCompletionSource<bool> _processWaiter;
 
         public HandbrakeConverter(HandbrakeOptions options) {
-            _cmdArgs = options.CmdArgs;
+            _subtitleArgs = options.SubtitleArgs;
+            _standardArgs = options.StandardArgs;
             _cmdPath = options.CmdPath;
             _processWaiter = new TaskCompletionSource<bool>();
         }
 
-        public async Task<string> Convert(string filePath) {
-            string outputPath = filePath.Substring(0, filePath.LastIndexOf('.')) + "." + ConvertExtension;
+        public async Task<string> Convert(ConvertSettings settings) {
+            string outputPath = settings.FilePath.Substring(0, settings.FilePath.LastIndexOf('.')) + "." + ConvertExtension;
 
             var info = new ProcessStartInfo() {
                 FileName = _cmdPath,
-                Arguments = $"{_cmdArgs} -i {filePath} -o {outputPath}",
+                Arguments = $"{GetSettingArgs(settings)} -i {settings.FilePath} -o {outputPath}",
                 CreateNoWindow = true
             };
 
@@ -41,5 +44,10 @@ namespace Converter.API.Converter {
 
             return outputPath;
         }
+
+        private string GetSettingArgs(ConvertSettings settings)
+            => settings.BurnSubtitles
+            ? _subtitleArgs
+            : _standardArgs;
     }
 }
