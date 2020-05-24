@@ -42,6 +42,7 @@ namespace Converter.API.Services {
                 string output = await RetryConvert(settings);
                 string destination = Path.Join(fileInfo.Directory.FullName, fileInfo.Name.Replace(fileInfo.Extension, ".webm"));
                 await IORetry(() => File.Move(output, destination));
+                // ~ while still in dev, lets not delete the orginal file.
                 //await IORetry(() => File.Delete(filePath));
             }
             finally {
@@ -52,11 +53,28 @@ namespace Converter.API.Services {
         private async Task<string> RetryConvert(ConvertSettings settings) {
             for (int i = 0; ; i++) {
                 string output = await _converter.Convert(settings);
-                if (File.Exists(output))
+                if (await IsValidOutput(output, settings.FilePath))
                     return output;
                 if (i >= IORetryCount)
                     throw new IOException($"Failed to convert file: {JsonSerializer.Serialize(settings)}");
             }
+        }
+
+        private async Task<bool> IsValidOutput(string output, string originalFile) {
+            if (!File.Exists(output))
+                return false;
+
+            var originalInfo = new FileInfo(originalFile);
+            var outputInfo = new FileInfo(output);
+
+            // Ensure the output is at least 30%
+            // the original size - this helps avoid corrupt files.
+            if (outputInfo.Length < ((originalInfo.Length / 10) * 3)) {
+                await IORetry(() => File.Delete(output), IORetryCount * 2);
+                return false;
+            }
+
+            return true;
         }
 
         private async Task<string> CreateTempFileCopy(FileInfo fileInfo) {
@@ -69,14 +87,14 @@ namespace Converter.API.Services {
             return tmpPath;
         }
 
-        private async Task IORetry(Action action) {
+        private async Task IORetry(Action action, int retryCount = IORetryCount) {
             for (int i = 0; ; i++) {
                 try {
                     action();
                     break;
                 }
                 catch (IOException) {
-                    if (i >= IORetryCount) throw;
+                    if (i >= retryCount) throw;
                     await Task.Delay(FileHandleTimer);
                 }
             }

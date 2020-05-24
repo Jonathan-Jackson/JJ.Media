@@ -97,7 +97,7 @@ namespace Discord.API.Commands {
             if (displaySeason.Any()) {
                 // Print the season.
                 builder.AppendLine($"Season {displaySeason.First().Episode.SeasonNumber}");
-                foreach (var pair in displaySeason.OrderBy(p => p.Episode.AbsoluteNumber)) {
+                foreach (var pair in displaySeason.OrderBy(p => p.Episode.EpisodeNumber)) {
                     string text = $"{pair.Episode.EpisodeNumber}. {pair.Episode.Title}";
                     Uri uri = new Uri($@"{_viewerDomain}/{pair.Guid.ToString()}");
 
