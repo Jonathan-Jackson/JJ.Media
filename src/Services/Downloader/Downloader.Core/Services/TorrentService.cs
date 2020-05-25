@@ -80,7 +80,7 @@ namespace Downloader.Core.Services {
             foreach (string fileName in fileNames) {
                 try {
                     var response = await _storageClient.ProcessAnime(fileName);
-                    _log.LogInformation($"Notified Processor of: {fileName} / Response: {response.ReasonPhrase} - {await response.Content.ReadAsStringAsync()}");
+                    _log.LogInformation($"Notified Storage of: {fileName} / Response: {response.ReasonPhrase} {await response.Content.ReadAsStringAsync()}");
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, $"Failed to notify of completion for torrent: {fileName}");
