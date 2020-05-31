@@ -1,0 +1,1 @@
+{"version":3,"file":"sessionManager.js","sourceRoot":"","sources":["sessionManager.ts"],"names":[],"mappings":"AAAA;IAAA,MAAqB,cAAc;QAG1B,MAAM,CAAC,YAAY;YACxB,IAAI,CAAC,gBAAgB,GAAG,KAAK,CAAC;QAChC,CAAC;QAEM,MAAM,KAAK,eAAe;YAC/B,OAAO,IAAI,CAAC,gBAAgB,CAAC;QAC/B,CAAC;;IARc,+BAAgB,GAAG,IAAI,CAAC;IASzC,qBAAC;KAAA;eAVoB,cAAc"}

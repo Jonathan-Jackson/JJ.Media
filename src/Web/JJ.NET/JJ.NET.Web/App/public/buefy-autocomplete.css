@@ -1,0 +1,235 @@
+/*! Buefy v0.8.20 | MIT License | github.com/buefy/buefy */
+/* THIS IS A HIGHLY EDITED VERSION SPECIFIC FOR AUTOCOMPLETE - Most of the classes are removed. Credit goes to the Buefy author(s). */
+
+.dropdown {
+  display: inline-flex;
+  position: relative;
+  vertical-align: top;
+}
+.dropdown.is-active .dropdown-menu,
+.dropdown.is-hoverable:hover .dropdown-menu {
+  display: block;
+}
+.dropdown.is-right .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+.dropdown.is-up .dropdown-menu {
+  bottom: 100%;
+  padding-bottom: 4px;
+  padding-top: initial;
+  top: auto;
+}
+.dropdown-menu {
+  display: none;
+  left: 0;
+  min-width: 12rem;
+  padding-top: 4px;
+  position: absolute;
+  top: 100%;
+  z-index: 20;
+}
+.dropdown-content {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+}
+.dropdown .dropdown-menu .has-link a,
+.dropdown-item {
+  color: #4a4a4a;
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  padding: 0.375rem 1rem;
+  position: relative;
+}
+.dropdown .dropdown-menu .has-link a,
+a.dropdown-item,
+button.dropdown-item {
+  padding-right: 3rem;
+  text-align: left;
+  white-space: nowrap;
+  width: 100%;
+}
+.dropdown .dropdown-menu .has-link a:hover,
+a.dropdown-item:hover,
+button.dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #0a0a0a;
+}
+.dropdown .dropdown-menu .has-link a.is-active,
+a.dropdown-item.is-active,
+button.dropdown-item.is-active {
+  background-color: #7957d5;
+  color: #fff;
+}
+.dropdown-divider {
+  background-color: #dbdbdb;
+  border: none;
+  display: block;
+  height: 1px;
+  margin: 0.5rem 0;
+}
+.autocomplete {
+  position: relative;
+}
+.autocomplete .dropdown-menu {
+  display: block;
+  min-width: 100%;
+  max-width: 100%;
+}
+.autocomplete .dropdown-menu.is-opened-top {
+  top: auto;
+  bottom: 100%;
+}
+.autocomplete .dropdown-content {
+  overflow: auto;
+  max-height: 200px;
+}
+.autocomplete .dropdown .dropdown-menu .has-link a,
+.autocomplete .dropdown-item,
+.dropdown .dropdown-menu .has-link .autocomplete a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.autocomplete .dropdown .dropdown-menu .has-link a.is-hovered,
+.autocomplete .dropdown-item.is-hovered,
+.dropdown .dropdown-menu .has-link .autocomplete a.is-hovered {
+  background: #f5f5f5;
+  color: #0a0a0a;
+}
+.autocomplete .dropdown .dropdown-menu .has-link a.is-disabled,
+.autocomplete .dropdown-item.is-disabled,
+.dropdown .dropdown-menu .has-link .autocomplete a.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.autocomplete.is-small {
+  border-radius: 2px;
+  font-size: 0.75rem;
+}
+.autocomplete.is-medium {
+  font-size: 1.25rem;
+}
+.autocomplete.is-large {
+  font-size: 1.5rem;
+}
+.dropdown + .dropdown {
+  margin-left: 0.5em;
+}
+.dropdown .background {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  position: fixed;
+  background-color: rgba(10, 10, 10, 0.86);
+  z-index: 40;
+  cursor: pointer;
+}
+@media screen and (min-width: 1024px) {
+  .dropdown .background {
+    display: none;
+  }
+}
+.dropdown.dropdown-menu-animation .dropdown-menu {
+  display: block;
+}
+.dropdown .dropdown-menu .dropdown-item.is-disabled,
+.dropdown .dropdown-menu .has-link a.is-disabled {
+  cursor: not-allowed;
+}
+.dropdown .dropdown-menu .dropdown-item.is-disabled:hover,
+.dropdown .dropdown-menu .has-link a.is-disabled:hover {
+  background: inherit;
+  color: inherit;
+}
+.dropdown .dropdown-menu .has-link a {
+  padding-right: 3rem;
+  white-space: nowrap;
+}
+.dropdown.is-hoverable:not(.is-active) .dropdown-menu {
+  display: none;
+}
+.dropdown.is-hoverable:hover .dropdown-menu {
+  display: inherit;
+}
+.dropdown.is-expanded {
+  width: 100%;
+}
+.dropdown.is-expanded .dropdown-trigger {
+  width: 100%;
+}
+.dropdown.is-expanded .dropdown-menu {
+  width: 100%;
+}
+.dropdown.is-expanded.is-mobile-modal .dropdown-menu {
+  max-width: 100%;
+}
+.dropdown:not(.is-disabled) .dropdown-menu .dropdown-item.is-disabled,
+.dropdown:not(.is-disabled) .dropdown-menu .has-link a.is-disabled {
+  opacity: 0.5;
+}
+.dropdown .navbar-item {
+  height: 100%;
+}
+.dropdown.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dropdown.is-disabled .dropdown-trigger {
+  pointer-events: none;
+}
+.dropdown.is-inline .dropdown-menu {
+  position: static;
+  display: inline-block;
+  padding: 0;
+}
+.dropdown.is-top-right .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+}
+.dropdown.is-top-left .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  right: 0;
+  left: auto;
+}
+.dropdown.is-bottom-left .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+@media screen and (max-width: 1023px) {
+  .dropdown.is-mobile-modal > .dropdown-menu {
+    position: fixed !important;
+    width: calc(100vw - 40px);
+    max-width: 460px;
+    max-height: calc(100vh - 120px);
+    top: 25% !important;
+    left: 50% !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: translate3d(-50%, -25%, 0);
+    white-space: normal;
+    overflow-y: auto;
+    z-index: 50 !important;
+  }
+  .dropdown
+    .dropdown-menu
+    .has-link
+    .dropdown.is-mobile-modal
+    > .dropdown-menu
+    > .dropdown-content
+    > a,
+  .dropdown.is-mobile-modal
+    > .dropdown-menu
+    > .dropdown-content
+    > .dropdown-item,
+  .dropdown.is-mobile-modal > .dropdown-menu > .dropdown-content > .has-link a {
+    padding: 1rem 1.5rem;
+  }
+}

@@ -105,7 +105,7 @@ namespace MediaInfo.DomainLayer.Miners {
                 return source;
             }
             catch {
-                return source;
+                return string.Empty;
             }
         }
     }
