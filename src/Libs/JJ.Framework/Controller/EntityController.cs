@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace JJ.Framework.Controller {
 
     public abstract class EntityController<TEntity> : ControllerBase where TEntity : Entity {
-        private readonly IRepository<TEntity> _repository;
+        protected readonly IRepository<TEntity> _repository;
 
         public EntityController(IRepository<TEntity> repository) {
             _repository = repository;

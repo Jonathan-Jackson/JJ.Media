@@ -1,17 +1,16 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+#Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
+#For more information, please see https://aka.ms/containercompat
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-nanoserver-1903 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1903 AS build
 WORKDIR /src
 COPY ["src/Services/Discord/Discord.API/Discord.API.csproj", "src/Services/Discord/Discord.API/"]
-COPY ["src/Services/Storage/Storage.API.Client/Storage.API.Client.csproj", "src/Services/Storage/Storage.API.Client/"]
-COPY ["src/Libs/JJ.Framework/JJ.Framework.csproj", "src/Libs/JJ.Framework/"]
-COPY ["src/Libs/JJ.HostedService/JJ.HostedService.csproj", "src/Libs/JJ.HostedService/"]
-COPY ["src/Services/MediaInfo/MediaInfo.API.Client/MediaInfo.API.Client.csproj", "src/Services/MediaInfo/MediaInfo.API.Client/"]
 RUN dotnet restore "src/Services/Discord/Discord.API/Discord.API.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Discord/Discord.API"

@@ -1,4 +1,5 @@
-﻿using MediaInfo.API.Client.Models;
+﻿using JJ.Framework.Controller;
+using MediaInfo.API.Client.Models;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -35,6 +36,14 @@ namespace MediaInfo.IntegrationTesting.Client {
             string images = await _apiClient.GetShowOverview(13);
 
             Assert.False(string.IsNullOrWhiteSpace(images));
+        }
+
+        [Fact]
+        public async Task GetShowPaginated_OK() {
+            var request = new PaginationRequest { Index = 2, ItemsPerPage = 10 };
+            var pagination = await _apiClient.GetShowsPaginated(request);
+
+            Assert.NotEmpty(pagination?.Items);
         }
     }
 }

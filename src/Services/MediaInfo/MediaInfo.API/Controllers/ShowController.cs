@@ -32,5 +32,12 @@ namespace JJ.Media.MediaInfo.API.Controllers {
         [HttpGet("{showId}/overview")]
         public async Task<IActionResult> Overview(int showId)
             => await FindEntity(showId, (Show show) => show.Overview);
+
+        [HttpPost("paginated")]
+        public async Task<IActionResult> Paginated([FromBody] PaginationRequest paginationRequest) {
+            //TODO: add validation to model!!!!! (fluent)
+            var pagination = await _repository.FindPaginatedAsync(paginationRequest.ItemsPerPage, paginationRequest.GetSkip());
+            return Ok(pagination);
+        }
     }
 }

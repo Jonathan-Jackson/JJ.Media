@@ -17,6 +17,27 @@ namespace JJ.Framework.Repository {
         }
 
         /// <summary>
+        /// Returns the entity paginated.
+        /// </summary>
+        public virtual async Task<Pagination<TEntity>> FindPaginatedAsync(int count, int skip) {
+            var pagination = new Pagination<TEntity> { ItemsPerPage = count, Index = skip / count };
+
+            // update to single transaction.
+            pagination.Items = (await Execute((DisposableQueryFactory db)
+                    => db.Query(_tableName)
+                        .Skip(skip)
+                        .Limit(count)
+                        .GetAsync<TEntity>()
+            )).ToArray();
+
+            pagination.Total = await Execute((DisposableQueryFactory db)
+                                => db.Query(_tableName)
+                                    .CountAsync<int>("*"));
+
+            return pagination;
+        }
+
+        /// <summary>
         /// Deletes an entity from the repository using its specified Id.
         /// </summary>
         public virtual Task DeleteAsync(int id)

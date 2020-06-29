@@ -1,4 +1,6 @@
-﻿using MediaInfo.API.Client.Models;
+﻿using JJ.Framework.Controller;
+using JJ.Framework.Repository;
+using MediaInfo.API.Client.Models;
 using System.Threading.Tasks;
 
 namespace MediaInfo.API.Client.Client {
@@ -7,6 +9,9 @@ namespace MediaInfo.API.Client.Client {
 
         public Task<Show> GetShow(int showId)
             => Get<Show>($"api/show/{showId}");
+
+        public Task<Pagination<Show>> GetShowsPaginated(PaginationRequest request)
+            => Post<Pagination<Show>>($"api/show/paginated", request);
 
         public Task<string[]> GetShowImages(int showId)
             => Get<string[]>($"api/show/{showId}/images");

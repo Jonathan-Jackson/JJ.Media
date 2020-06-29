@@ -30,6 +30,9 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/weatherforecast",
+      "environmentVariables": {
+        "TEST": "Value"
+      },
       "publishAllPorts": true,
       "useSSL": true
     }

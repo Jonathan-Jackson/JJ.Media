@@ -12,6 +12,9 @@ namespace Storage.API.Client.Client {
         public Task<ProcessedEpisode> GetProcessedEpisode(int id)
             => Get<ProcessedEpisode>($"/api/processedepisodes/{id}");
 
+        public Task<ProcessedEpisode[]> GetLatestProcessedEpisodes(int count)
+            => Get<ProcessedEpisode[]>($"/api/processedepisodes/latest?count={count}");
+
         public Task AddProcessedEpisode(ProcessedEpisode processedEpisode)
             => Post($"/api/processedepisodes", processedEpisode);
 

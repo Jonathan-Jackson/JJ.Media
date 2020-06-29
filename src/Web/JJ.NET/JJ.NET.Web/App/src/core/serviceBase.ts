@@ -1,14 +1,13 @@
 import Axios, { AxiosRequestConfig } from "axios";
 import queryString from "query-string";
-import SessionManager from "./sessionManager";
 
-export interface IRequestOptions {
+export interface RequestOptions {
   url: string;
   data?: any;
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 }
 
-export interface ISendFormDataOptions {
+export interface SendFormDataOptions {
   url: string;
   data: FormData;
   method: "POST" | "PUT" | "PATCH";
@@ -22,7 +21,7 @@ export abstract class ServiceBase {
    * Make request with JSON data.
    * @param opts
    */
-  public async requestJson<T>(opts: IRequestOptions): Promise<T> {
+  public async requestJson<T>(opts: RequestOptions): Promise<T> {
     let axiosResult = null;
     let result = null;
 
@@ -34,7 +33,7 @@ export abstract class ServiceBase {
     };
 
     // Make SSR requests 'authorized' from the NodeServices to the web server.
-    let axiosRequestConfig: AxiosRequestConfig = {
+    const axiosRequestConfig: AxiosRequestConfig = {
       withCredentials: true,
     };
 
@@ -86,7 +85,7 @@ export abstract class ServiceBase {
    * Allows you to send files to the server.
    * @param opts
    */
-  public async sendFormData<T>(opts: ISendFormDataOptions): Promise<T> {
+  public async sendFormData<T>(opts: SendFormDataOptions): Promise<T> {
     let axiosResult = null;
     let result = null;
 

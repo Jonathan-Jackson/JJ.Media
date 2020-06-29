@@ -9,12 +9,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/underscore": "^1.10.0",
     "axios": "^0.19.2",
     "buefy": "^0.8.20",
     "bulma-carousel": "^4.0.4",
     "core-js": "^3.6.4",
     "lodash.debounce": "^4.0.8",
     "query-string": "^6.12.1",
+    "underscore": "^1.10.2",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.1",

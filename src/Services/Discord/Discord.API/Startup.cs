@@ -37,7 +37,7 @@ namespace Discord.API {
             var discordOptions = Configuration.GetSection("DiscordOptions").Get<DiscordOptions>();
 
             if (string.IsNullOrWhiteSpace(discordOptions.Token))
-                discordOptions.Token = Environment.GetEnvironmentVariable("JJ.NetDiscordToken", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: Token is missing.");
+                discordOptions.Token = Environment.GetEnvironmentVariable("JJNETDISCORDTOKEN", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: JJNETDISCORDTOKEN app/env setting is missing.");
             if (string.IsNullOrWhiteSpace(discordOptions.ViewerDomain))
                 discordOptions.ViewerDomain = Environment.GetEnvironmentVariable("ViewerDomain", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: Viewer Domain is missing.");
 

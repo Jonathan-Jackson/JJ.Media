@@ -2,7 +2,7 @@
   <section>
     <b-autocomplete
       :data="data"
-      placeholder="Show Search"
+      placeholder="Search.."
       field="title"
       :loading="isFetching"
       @typing="getAsyncData"

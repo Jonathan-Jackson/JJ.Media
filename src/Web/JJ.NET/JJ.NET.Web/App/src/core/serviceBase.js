@@ -18,7 +18,7 @@ export class ServiceBase {
             return url;
         };
         // Make SSR requests 'authorized' from the NodeServices to the web server.
-        let axiosRequestConfig = {
+        const axiosRequestConfig = {
             withCredentials: true,
         };
         try {

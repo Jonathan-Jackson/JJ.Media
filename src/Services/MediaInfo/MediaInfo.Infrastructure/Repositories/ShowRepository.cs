@@ -21,6 +21,13 @@ namespace MediaInfo.Infrastructure.Repositories {
             : base("Shows", dbFactory, sqlCompiler) {
         }
 
+        public override async Task<Pagination<Show>> FindPaginatedAsync(int count, int skip) {
+            var pagination = await base.FindPaginatedAsync(count, skip);
+            await PopulateShowTitles(pagination.Items);
+
+            return pagination;
+        }
+
         /// <summary>
         /// Returns a matching Show with the title.
         /// </summary>
@@ -28,8 +35,8 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (string.IsNullOrWhiteSpace(title))
                 return null;
 
-            int showId = await Execute(async (DisposableQueryFactory db)
-                    => await db.Query(ShowTitlesTable)
+            int showId = await Execute((DisposableQueryFactory db)
+                    => db.Query(ShowTitlesTable)
                         .Select("ShowId")
                         .Where("Title", title)
                         .FirstOrDefaultAsync<int>()
@@ -48,12 +55,12 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (titles?.Any() != true)
                 return Enumerable.Empty<Show>();
 
-            int[] showIds = await Execute(async (DisposableQueryFactory db)
-                    => (await db.Query(ShowTitlesTable)
+            int[] showIds = (await Execute((DisposableQueryFactory db)
+                    => db.Query(ShowTitlesTable)
                         .Select("ShowId")
                         .WhereIn("Title", titles)
-                        .GetAsync<int>()).ToArray()
-            );
+                        .GetAsync<int>()))
+                   .ToArray();
 
             if (showIds.Length > 0)
                 return await FindAsync(showIds);
@@ -66,15 +73,11 @@ namespace MediaInfo.Infrastructure.Repositories {
                 throw new ArgumentOutOfRangeException(nameof(id));
 
             // load shows
-            var show = await Execute(async (DisposableQueryFactory db)
-                            => await db.Query(_tableName)
-                                        .Where("id", id)
-                                        .FirstOrDefaultAsync<Show>());
-
+            var show = await base.FindAsync(id);
             if (show != null) {
                 // load titles
-                var titles = await Execute(async (DisposableQueryFactory db)
-                                => await db.Query(ShowTitlesTable)
+                var titles = await Execute((DisposableQueryFactory db)
+                                => db.Query(ShowTitlesTable)
                                             .Where("ShowId", id)
                                             .GetAsync<ShowTitle>());
 
@@ -91,22 +94,31 @@ namespace MediaInfo.Infrastructure.Repositories {
             if (ids?.Any() != true)
                 return Enumerable.Empty<Show>();
 
-            // load shows
-            var shows = await Execute(async (DisposableQueryFactory db)
-                => await db.Query(_tableName)
-                            .WhereIn("id", ids)
-                            .GetAsync<Show>());
-            // load titles
-            var titles = await Execute(async (DisposableQueryFactory db)
-                => await db.Query(ShowTitlesTable)
-                            .WhereIn("ShowId", ids)
-                            .GetAsync<ShowTitle>());
-
-            foreach (var show in shows) {
-                show.Titles = titles.Where(x => x.ShowId == show.Id).ToList();
-            }
+            var shows = await base.FindAsync(ids);
+            await PopulateShowTitles(shows, ids);
 
             return shows;
+        }
+
+        /// <summary>
+        /// Returns the titles related to a collection of show ids.
+        /// </summary>
+        public async Task<ShowTitle[]> FindTitlesAsync(IEnumerable<int> ids) {
+            return (await Execute((DisposableQueryFactory db)
+                => db.Query(ShowTitlesTable)
+                        .WhereIn("ShowId", ids)
+                        .GetAsync<ShowTitle>())
+                ).ToArray();
+        }
+
+        private async Task PopulateShowTitles(IEnumerable<Show> shows, IEnumerable<int> ids = null) {
+            if (ids == null)
+                ids = shows.Select(show => show.Id);
+
+            var titles = await FindTitlesAsync(ids);
+            foreach (var show in shows) {
+                show.Titles = titles.Where(title => title.ShowId == show.Id).ToList();
+            }
         }
 
         /// <summary>
@@ -118,8 +130,8 @@ namespace MediaInfo.Infrastructure.Repositories {
                 throw new ArgumentNullException(nameof(show));
 
             // Look into setting up a transaction!
-            int showId = await Execute(async (DisposableQueryFactory db)
-                => await db.Query(_tableName).InsertGetIdAsync<int>(new {
+            int showId = await Execute((DisposableQueryFactory db)
+                => db.Query(_tableName).InsertGetIdAsync<int>(new {
                     show.Overview,
                     show.AirDate,
                     show.TvDbId
@@ -129,8 +141,8 @@ namespace MediaInfo.Infrastructure.Repositories {
             // Need to look into doing this as bulk!
             // This entire idea needs revisting!
             foreach (var showTitle in show.Titles) {
-                await Execute(async (DisposableQueryFactory db)
-                    => await db.Query(ShowTitlesTable).InsertAsync(new {
+                await Execute((DisposableQueryFactory db)
+                    => db.Query(ShowTitlesTable).InsertAsync(new {
                         showTitle.IsPrimary,
                         showTitle.Title,
                         ShowId = showId

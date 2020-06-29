@@ -24,3 +24,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Discord.API.dll"]
+
+ENV JJNetDiscordToken dfadsfa
+ENV ViewerDomain sdfasfd

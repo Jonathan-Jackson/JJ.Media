@@ -22,60 +22,26 @@
           <div class="container">
             <ul>
               <li
-                v-bind:class="{ 'is-active': selection == 0 }"
-                v-on:click="selection = 0"
+                v-for="tab in tabs"
+                v-bind:key="tab"
+                v-bind:class="{ 'is-active': currentTab === tab }"
+                v-on:click="currentTab = tab"
               >
-                <a>Latest</a>
-              </li>
-              <li
-                v-bind:class="{ 'is-active': selection == 1 }"
-                v-on:click="selection = 1"
-              >
-                <a>Shows</a>
-              </li>
-              <li
-                v-bind:class="{ 'is-active': selection == 2 }"
-                v-on:click="selection = 2"
-              >
-                <a>Anime</a>
-              </li>
-              <li
-                v-bind:class="{ 'is-active': selection == 3 }"
-                v-on:click="selection = 3"
-              >
-                <a>Movies</a>
-              </li>
-              <li
-                v-bind:class="{ 'is-active': selection == 4 }"
-                v-on:click="selection = 4"
-              >
-                <a>Random</a>
+                <a>{{ tab }}</a>
               </li>
             </ul>
           </div>
         </nav>
       </div>
     </section>
+
     <!-- -->
-    <!-- Latest -->
-    <section class="section is-small" v-if="selection == 0">
-      <latestEpisodes />
-    </section>
-    <!-- Shows -->
-    <section class="section is-small" v-if="selection == 1">
-      <shows />
-    </section>
-    <!-- Anime -->
-    <section class="section is-small" v-if="selection == 2">
-      anime
-    </section>
-    <!-- Movies -->
-    <section class="section is-small" v-if="selection == 3">
-      movies
-    </section>
-    <!-- Random -->
-    <section class="section is-small" v-if="selection == 4">
-      random
+    <section class="section is-small">
+      <transition name="fade">
+        <keep-alive>
+          <component v-bind:is="currentTabComponent"></component>
+        </keep-alive>
+      </transition>
     </section>
     <!-- -->
     <footer class="footer is-paddingless" style="background-color: white;">
@@ -95,18 +61,41 @@ import { eHomeSection } from "../core/enums";
 import navbar from "../components/NavBar";
 import latestEpisodes from "../components/LatestEpisodes";
 import showSearch from "../components/ShowSearchBar";
-import shows from "../components/Shows";
+import cards from "../components/MediaCards";
+import anime from "../components/AnimeCards";
+import shows from "../components/ShowCards";
 
 export default {
   name: "home",
   components: {
     navbar,
-    latestEpisodes,
+    "tab-latest": latestEpisodes,
+    "tab-shows": shows,
+    "tab-anime": anime,
+    "tab-movies": cards, //TODO
     showSearch,
-    shows,
+    cards,
   },
   data: function() {
-    return { selection: eHomeSection.Latest };
+    return {
+      selection: eHomeSection.Latest,
+      currentTab: "Latest",
+      tabs: ["Latest", "Shows", "Anime", "Movies"],
+    };
+  },
+  computed: {
+    currentTabComponent: function() {
+      return "tab-" + this.currentTab.toLowerCase();
+    },
   },
 };
 </script>
+
+<style>
+.fade-enter-active {
+  transition: opacity 1.2s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+</style>

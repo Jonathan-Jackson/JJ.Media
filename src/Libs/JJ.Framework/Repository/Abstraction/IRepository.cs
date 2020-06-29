@@ -13,6 +13,8 @@ namespace JJ.Framework.Repository.Abstraction {
 
         public Task<IEnumerable<TEntity>> FindAsync(IEnumerable<int> ids);
 
+        public abstract Task<Pagination<TEntity>> FindPaginatedAsync(int count, int skip);
+
         public abstract Task<int> InsertAsync(TEntity entity);
 
         public abstract Task<IEnumerable<int>> InsertAsync(IEnumerable<TEntity> entities);
