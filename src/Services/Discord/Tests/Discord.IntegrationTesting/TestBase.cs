@@ -23,8 +23,8 @@ namespace Discord.IntegrationTesting {
                 _apiClient = new DiscordClient(_client, new DiscordClientOptions());
             }
             else {
-                _client = new HttpClient { BaseAddress = new Uri("http://htpc:3432") };
-                _apiClient = new DiscordClient(_client, new DiscordClientOptions { Address = "http://htpc:3432" });
+                _client = new HttpClient { BaseAddress = new Uri("http://localhost:3432") };
+                _apiClient = new DiscordClient(_client, new DiscordClientOptions { Address = "http://localhost:3432" });
             }
 
             _services = _app.Server.Services;

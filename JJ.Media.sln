@@ -89,7 +89,12 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Storage.RegisterDirectory",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JJ.NET", "JJ.NET", "{9FF1A1C0-4F11-4C87-A700-2BBF335076D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJ.NET.Web", "src\Web\JJ.NET\JJ.NET.Web\JJ.NET.Web.csproj", "{F81F4C50-7407-4779-B816-FA575A729076}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JJ.NET.Web", "src\Web\JJ.NET\JJ.NET.Web\JJ.NET.Web.csproj", "{F81F4C50-7407-4779-B816-FA575A729076}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{0F1EE083-FD0E-4D8C-BCF3-E4BC085F34AD}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

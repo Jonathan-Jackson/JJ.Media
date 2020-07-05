@@ -18,12 +18,22 @@ namespace JJ.Media.MediaInfo.API {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
+            var logger = CreateTempLogger();
+
             services.AddControllers();
 
             services
-                .AddDomain(Configuration)
-                .AddInfrastructure(Configuration)
-                .AddLogging(config => config.AddConsole().AddEventLog());
+                .AddDomain(Configuration, logger)
+                .AddInfrastructure(Configuration, logger)
+                .AddLogging(config => config.AddConsole());
+        }
+
+        private ILogger CreateTempLogger() {
+            // Log Settings
+            var loggerFactory = LoggerFactory.Create(builder => {
+                builder.AddConsole();
+            });
+            return loggerFactory.CreateLogger<Startup>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

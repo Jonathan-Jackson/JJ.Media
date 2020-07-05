@@ -3,6 +3,7 @@ using Downloader.Core.Helpers;
 using Downloader.Core.Helpers.Options;
 using Downloader.Core.Infrastructure;
 using Downloader.Core.Services;
+using JJ.Framework.Helpers;
 using JJ.Framework.Repository;
 using JJ.Framework.Repository.Abstraction;
 using Microsoft.Extensions.Caching.Memory;
@@ -38,13 +39,24 @@ namespace Downloader.Core.ServiceRegister {
 
             // Add Config Options.
             var storageOptions = configuration.GetSection("StorageServiceOptions").Get<StorageClientOptions>();
-            var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
-            var horribleOptions = configuration.GetSection("HorribleSubsOptions").Get<HorribleSubsOptions>();
-            var qbitOptions = configuration.GetSection("QBitOptions").Get<QBitOptions>();
+            storageOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("STORAGESERVICE_ADDRESS")
+                ?? (!string.IsNullOrWhiteSpace(storageOptions.Address) ? storageOptions.Address : throw new ApplicationException("STORAGESERVICE_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
 
-            var downloaderConnString = configuration.GetConnectionString("DownloaderFactory");
-            if (string.IsNullOrWhiteSpace(downloaderConnString))
-                downloaderConnString = Environment.GetEnvironmentVariable("DownloaderFactory_DB", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DownloaderFactory_DB Database Connection value is missing.");
+            var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
+            torrentOptions.DownloadTorrentPath = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOAD_PATH")
+                ?? (!string.IsNullOrWhiteSpace(torrentOptions.DownloadTorrentPath) ? torrentOptions.DownloadTorrentPath : throw new ApplicationException("DOWNLOAD_PATH NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            // HorribleSubs options.
+            var horribleOptions = configuration.GetSection("HorribleSubsOptions").Get<HorribleSubsOptions>();
+            horribleOptions.Quality = EnviromentHelper.FindGlobalEnviromentVariable("HORRIBLESUBS_QUALITY")
+                ?? (!string.IsNullOrWhiteSpace(horribleOptions.Quality) ? horribleOptions.Quality : throw new ApplicationException("HORRIBLESUBS_QUALITY NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            var qbitOptions = configuration.GetSection("QBitOptions").Get<QBitOptions>();
+            qbitOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("QBITTORRENT_ADDRESS")
+                ?? (!string.IsNullOrWhiteSpace(qbitOptions.Address) ? qbitOptions.Address : throw new ApplicationException("QBITTORRENT_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            var downloaderConnString = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOADFACTORY_DB")
+                ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("DownloaderFactory")) ? configuration.GetConnectionString("DownloaderFactory") : throw new ApplicationException("DOWNLOADFACTORY_DB Database Connection value is missing."));
 
             return services
                 .AddSingleton(storageOptions)

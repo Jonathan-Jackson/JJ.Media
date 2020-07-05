@@ -1,6 +1,7 @@
 ﻿using Discord.API.Models.Options;
 using Discord.API.Services;
 using DSharpPlus;
+using JJ.Framework.Helpers;
 using JJ.HostedService;
 using JJ.HostedService.Abstraction;
 using MediaInfo.API.Client;
@@ -30,16 +31,27 @@ namespace Discord.API {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
-            services.AddLogging(config => config.AddConsole().AddEventLog());
+            services.AddLogging(config => config.AddConsole());
 
-            var mediaInfoOptions = Configuration.GetSection("MediaInfoOptions").Get<MediaInfoClientOptions>();
-            var storageOptions = Configuration.GetSection("StorageOptions").Get<StorageClientOptions>();
+            // ENVIROMENTS OVERRIDE APP.CONFIG DEFAULTS.
+            // Discord Options.
             var discordOptions = Configuration.GetSection("DiscordOptions").Get<DiscordOptions>();
+            discordOptions.Token = EnviromentHelper.FindGlobalEnviromentVariable("JJNETDISCORDTOKEN")
+                ?? (!string.IsNullOrWhiteSpace(discordOptions.Token) ? discordOptions.Token : throw new ApplicationException("JJNETDISCORDTOKEN NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            discordOptions.ViewerDomain = EnviromentHelper.FindGlobalEnviromentVariable("VIEWERDOMAIN")
+                ?? (!string.IsNullOrWhiteSpace(discordOptions.ViewerDomain) ? discordOptions.ViewerDomain : throw new ApplicationException("VIEWERDOMAIN NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            discordOptions.AlertChannelName = EnviromentHelper.FindGlobalEnviromentVariable("ALERTCHANNELNAME")
+                ?? (!string.IsNullOrWhiteSpace(discordOptions.AlertChannelName) ? discordOptions.AlertChannelName : throw new ApplicationException("ALERTCHANNELNAME NOT SPECIFIED. USE AN ENVIROMENT VAR."));
 
-            if (string.IsNullOrWhiteSpace(discordOptions.Token))
-                discordOptions.Token = Environment.GetEnvironmentVariable("JJNETDISCORDTOKEN", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: JJNETDISCORDTOKEN app/env setting is missing.");
-            if (string.IsNullOrWhiteSpace(discordOptions.ViewerDomain))
-                discordOptions.ViewerDomain = Environment.GetEnvironmentVariable("ViewerDomain", EnvironmentVariableTarget.User) ?? throw new ApplicationException("DiscordOptions: Viewer Domain is missing.");
+            // MediaInfo Options.
+            var mediaInfoOptions = Configuration.GetSection("MediaInfoOptions").Get<MediaInfoClientOptions>();
+            mediaInfoOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("MEDIAINFOADDRESS")
+                ?? (!string.IsNullOrWhiteSpace(mediaInfoOptions.Address) ? mediaInfoOptions.Address : throw new ApplicationException("MEDIAINFOADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            // Storage Options.
+            var storageOptions = Configuration.GetSection("StorageOptions").Get<StorageClientOptions>();
+            storageOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("STORAGEOPTIONSADDRESS")
+                ?? (!string.IsNullOrWhiteSpace(storageOptions.Address) ? storageOptions.Address : throw new ApplicationException("STORAGEOPTIONSADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
 
             services
                 .AddTransient<EpisodeAlertService>()
