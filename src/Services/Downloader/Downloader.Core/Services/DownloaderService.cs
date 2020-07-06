@@ -1,4 +1,5 @@
 ﻿using Downloader.Core.Feeds;
+using Downloader.Core.Helpers;
 using Downloader.Core.Helpers.DTOs;
 using Downloader.Core.Infrastructure;
 using JJ.Framework.Extensions;
@@ -14,6 +15,7 @@ namespace Downloader.Core.Services {
         private readonly IReadOnlyCollection<IFeed> _feeds;
         private readonly ILogger<DownloaderService> _log;
         private readonly TorrentService _torrentService;
+        private readonly ITorrentClient _torrentClient;
         private readonly HistoryRepository _historyRepo;
 
         private const int GetFeedIntervalMiliSeconds = 3_600_000;           // 60 minutes.
@@ -22,11 +24,12 @@ namespace Downloader.Core.Services {
         private const int UntrackedDelayIntervalMiliseconds = 126_000;      // 2.1 minutes.
 
         public DownloaderService(IReadOnlyCollection<IFeed> feeds, ILogger<DownloaderService> log,
-                TorrentService torrentService, HistoryRepository historyRepo) {
+                TorrentService torrentService, HistoryRepository historyRepo, ITorrentClient torrentClient) {
             _feeds = feeds;
             _log = log;
             _torrentService = torrentService;
             _historyRepo = historyRepo;
+            _torrentClient = torrentClient;
         }
 
         /// <summary>
@@ -36,6 +39,8 @@ namespace Downloader.Core.Services {
         /// </summary>
         public async Task Run() {
             _log.LogInformation("Downloader Service Ran..");
+            await TryCheckDependencies();
+
             // We should delay immediate checking for untracked downloads,
             // since processing completions may trigger duplicate messages.
             // its not the end of the world, since in theory duplicate messages wont
@@ -61,6 +66,43 @@ namespace Downloader.Core.Services {
 
                 await Task.Delay(5_000);
             }
+        }
+
+        /// <summary>
+        /// Checks that dependency calls don't throw
+        /// exceptions. This will simply log.
+        /// </summary>
+        private async Task TryCheckDependencies() {
+            _log.LogInformation("Trying services..");
+            bool isError = false;
+
+            try {
+                foreach (var feed in _feeds) {
+                    await feed.ReadAsync();
+                }
+            }
+            catch (Exception ex) {
+                _log.LogError(ex, "Failed to load feeds.");
+                isError = true;
+            }
+
+            try {
+                await _historyRepo.FindAsync(1);
+            }
+            catch (Exception ex) {
+                _log.LogError(ex, "Failed to use repository (history - likely database).");
+                isError = true;
+            }
+
+            try {
+                await _torrentClient.GetTorrentsAsync();
+            }
+            catch (Exception ex) {
+                _log.LogError(ex, "Failed to call the torrent client.");
+                isError = true;
+            }
+
+            _log.LogInformation($"Service Status Check: " + (isError ? "FAILURE" : "SUCCESS"));
         }
 
         /// <summary>
@@ -108,7 +150,7 @@ namespace Downloader.Core.Services {
                         await _historyRepo.InsertAsync(new DownloadHistory { Title = torrent.Title, MagnetUri = torrent.MagnetUri });
                     }
 
-                    _log.LogInformation($"Processed torrent feed. Next process in {(GetFeedIntervalMiliSeconds / 1000) / 60} minutes.");
+                    _log.LogDebug($"Processed torrent feed. Next process in {(GetFeedIntervalMiliSeconds / 1000) / 60} minutes.");
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, "A fatal error was thrown while processing the feed!");
@@ -130,7 +172,6 @@ namespace Downloader.Core.Services {
         private async Task<bool> IsTorrentEligibleToDownloadAsync(Torrent torrent) {
             try {
                 bool isEligible = !await _historyRepo.AnyAsync(torrent.Title);
-
                 _log.LogDebug($"{torrent.Title} - Eligible for download: {isEligible}");
 
                 return isEligible;

@@ -7,7 +7,7 @@ services:
       - "ASPNETCORE_ENVIRONMENT=Development"
       - "JJNETDISCORDTOKEN=${JJNETDISCORDTOKEN}"
       - "VIEWERDOMAIN=http://jon-net.com/watch-episode"
-    image: discord.api:dev
+    image: 192.168.1.7:5000/discord.api:latest
     build:
       dockerfile: src/Services/Discord/Discord.API/Dockerfile
       context: .
@@ -27,7 +27,10 @@ services:
       - type: bind
         source: G:/test
         target: /app/jjmedia1
-    image: mediainfo.api:dev
+      - type: bind
+        source: G:/test2
+        target: /app/jjmedia2
+    image: 192.168.1.7:5000/mediainfo.api:latest
     build:
       dockerfile: src/Services/MediaInfo/MediaInfo.API/Dockerfile
       context: .
@@ -35,9 +38,6 @@ services:
       - "4681:80"
     depends_on:
       - redis
-  redis:
-    container_name: "redis"
-    image: redis:latest
   downloader:
     container_name: downloader
     environment:
@@ -51,9 +51,13 @@ services:
       - type: bind
         source: C:\JJDownload
         target: /app/JJDownload
-    image: downloader:dev
+    image: 192.168.1.7:5000/downloader:latest
     build:
       dockerfile: src/Services/Downloader/Downloader.Console/Dockerfile
       context: .
     depends_on:
       - mediainfo.api
+  # Third Party
+  redis:
+    container_name: "jj-redis"
+    image: redis:latest

@@ -15,6 +15,7 @@ using Storage.API.Client;
 using Storage.API.Client.Client;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 
 namespace Downloader.Core.ServiceRegister {
@@ -45,6 +46,9 @@ namespace Downloader.Core.ServiceRegister {
             var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
             torrentOptions.DownloadTorrentPath = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOAD_PATH")
                 ?? (!string.IsNullOrWhiteSpace(torrentOptions.DownloadTorrentPath) ? torrentOptions.DownloadTorrentPath : throw new ApplicationException("DOWNLOAD_PATH NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            if (!Directory.Exists(torrentOptions.DownloadTorrentPath))
+                throw new ApplicationException($"Download Directory does not exist: {torrentOptions.DownloadTorrentPath} (FULL PATH: {Path.GetFullPath(torrentOptions.DownloadTorrentPath)}");
 
             // HorribleSubs options.
             var horribleOptions = configuration.GetSection("HorribleSubsOptions").Get<HorribleSubsOptions>();

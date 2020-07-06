@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  # discord.api:
+  #   container_name: discord-api
+  #   environment:
+  #     - "ASPNETCORE_ENVIRONMENT=Development"
+  #     - "JJNETDISCORDTOKEN=${JJNETDISCORDTOKEN}"
+  #     - "VIEWERDOMAIN=http://jon-net.com/watch-episode"
+  #   image: 192.168.1.7:5000/discord.api:latest
+  #   build:
+  #     dockerfile: src/Services/Discord/Discord.API/Dockerfile
+  #     context: .
+  #   ports:
+  #     - "3432:80"
+  #   depends_on:
+  #     - redis
+  #     - mediainfo.api
+  # mediainfo.api:
+  #   container_name: mediainfo-api
+  #   environment:
+  #     - "ASPNETCORE_ENVIRONMENT=Development"
+  #     - "TVDB_APIKEY=${TVDB_APIKEY}"
+  #     - "MEDIAINFO_DB=Server=192.168.1.7\\EGG,2001;Database=MediaInfoFactory;User Id=egg;Password=egg;MultipleActiveResultSets=True;"
+  #     - STORAGE=["./jjmedia1", "./jjmedia2"]
+  #   volumes:
+  #     - type: bind
+  #       source: F:/Media
+  #       target: /app/jjmedia1
+  #     - type: bind
+  #       source: E:/Media
+  #       target: /app/jjmedia2
+  #   image: 192.168.1.7:5000/mediainfo.api:latest
+  #   build:
+  #     dockerfile: src/Services/MediaInfo/MediaInfo.API/Dockerfile
+  #     context: .
+  #   ports:
+  #     - "4681:80"
+  #   depends_on:
+  #     - redis
+  downloader:
+    container_name: downloader
+    environment:
+      - "ASPNETCORE_ENVIRONMENT=Development"
+      - "STORAGESERVICE_ADDRESS=http://192.168.1.7:4682"
+      - "DOWNLOAD_PATH=/JJDownload"
+      - "HORRIBLESUBS_QUALITY=1080"
+      - "QBITTORRENT_ADDRESS=http://192.168.1.7:8080"
+      - "DOWNLOADFACTORY_DB=Server=192.168.1.7\\EGG,2001;Database=DownloaderFactory;User Id=egg;Password=egg;MultipleActiveResultSets=True;"
+    volumes:
+      - type: bind
+        source: C:\JJDownload
+        target: /app/JJDownload
+    image: 192.168.1.7:5000/downloader:latest
+    build:
+      dockerfile: src/Services/Downloader/Downloader.Console/Dockerfile
+      context: .
+  #   depends_on:
+  #     - mediainfo.api
+  # # Third Party
+  # redis:
+  #   container_name: "jj-redis"
+  #   image: redis:latest
