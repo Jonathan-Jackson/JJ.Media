@@ -1,8 +1,8 @@
 ﻿using Downloader.Core.Helpers;
 using Downloader.Core.Helpers.DTOs;
 using Downloader.Core.Helpers.Options;
+using JJ.Framework.Repository.Abstraction;
 using Microsoft.Extensions.Logging;
-using Storage.API.Client.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,15 +13,18 @@ namespace Downloader.Core.Services {
 
     public class TorrentService {
         private readonly ILogger<TorrentService> _log;
+        private readonly IMessageBroker _broker;
         private readonly ITorrentClient _torrentClient;
-        private readonly StorageClient _storageClient;
         private readonly string _downloadTorrentPath;
 
-        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, StorageClient storageClient, TorrentServiceOptions options) {
+        private const string BrokerExchange = "DownloadedMedia";
+
+        public TorrentService(ILogger<TorrentService> log, ITorrentClient torrentClient, TorrentServiceOptions options, IMessageBroker broker) {
             _log = log;
             _torrentClient = torrentClient;
-            _storageClient = storageClient;
             _downloadTorrentPath = options.DownloadTorrentPath;
+            _broker = broker;
+            _broker.DeclareExchange(BrokerExchange);
         }
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace Downloader.Core.Services {
                 // Allow a pause for file handler / lock release.
                 await Task.Delay(1000);
 
-                await NotifyToProcessFiles(completeTorrents.Select(x => x.Name));
+                TryNotifyToProcessFiles(completeTorrents.Select(x => x.Name));
             }
         }
 
@@ -49,10 +52,7 @@ namespace Downloader.Core.Services {
 
             IEnumerable<string> torrentNames = (await _torrentClient.GetTorrentsAsync()).Select(x => x.Name.ToLower());
             var untracked = files.Where(x => !torrentNames.Contains(x.Name.ToLower()));
-
-            if (untracked.Any()) {
-                await NotifyToProcessFiles(untracked.Select(x => x.Name));
-            }
+            TryNotifyToProcessFiles(untracked.Select(x => x.Name));
         }
 
         /// <summary>
@@ -76,15 +76,15 @@ namespace Downloader.Core.Services {
         /// <summary>
         /// Notifies our end point of files that require processing.
         /// </summary>
-        private async Task NotifyToProcessFiles(IEnumerable<string> fileNames) {
-            foreach (string fileName in fileNames) {
-                try {
-                    var response = await _storageClient.ProcessAnime(fileName);
-                    _log.LogInformation($"Notified Storage of: {fileName} / Response: {response.ReasonPhrase} {await response.Content.ReadAsStringAsync()}");
-                }
-                catch (Exception ex) {
-                    _log.LogError(ex, $"Failed to notify of completion for torrent: {fileName}");
-                }
+        private void TryNotifyToProcessFiles(IEnumerable<string> fileNames) {
+            if (!fileNames.Any())
+                return;
+
+            try {
+                _broker.Publish("FilePath", fileNames.ToArray(), BrokerExchange);
+            }
+            catch (Exception ex) {
+                _log.LogError(ex, $"Failed to notify of completion for torrents: {string.Join(", ", fileNames)}");
             }
         }
     }

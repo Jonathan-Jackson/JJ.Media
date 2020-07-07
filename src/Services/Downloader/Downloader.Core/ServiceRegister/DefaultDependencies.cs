@@ -6,6 +6,7 @@ using Downloader.Core.Services;
 using JJ.Framework.Helpers;
 using JJ.Framework.Repository;
 using JJ.Framework.Repository.Abstraction;
+using JJ.Framework.Repository.RabbitMq;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,10 +33,10 @@ namespace Downloader.Core.ServiceRegister {
                 .AddTransient<IReadOnlyCollection<IFeed>>(builder => new[] { builder.GetRequiredService<HorribleSubsFeed>() })
                 // Repos
                 .AddTransient<HistoryRepository>()
-                .AddTransient<StorageClient>()
                 .AddSingleton<IMemoryCache, MemoryCache>()
                 .AddSingleton<Compiler>(x => new SqlServerCompiler())
                 .AddSingleton<HttpClient>()
+                // Config
                 .AddLogging(configure => configure.AddConsole());
 
             // Add Config Options.
@@ -67,6 +68,7 @@ namespace Downloader.Core.ServiceRegister {
                 .AddSingleton(torrentOptions)
                 .AddSingleton(horribleOptions)
                 .AddSingleton(qbitOptions)
+                .AddSingleton<IMessageBroker, RabbitBroker>(provider => new RabbitBroker("localhost", provider.GetRequiredService<ILogger<RabbitBroker>>()))
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(downloaderConnString));
         }
     }

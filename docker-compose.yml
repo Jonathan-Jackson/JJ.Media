@@ -15,6 +15,7 @@ services:
       - "3432:80"
     depends_on:
       - redis
+      - rabbitMQ
       - mediainfo.api
   mediainfo.api:
     container_name: mediainfo-api
@@ -57,7 +58,14 @@ services:
       context: .
     depends_on:
       - mediainfo.api
+      - rabbitMQ
   # Third Party
   redis:
     container_name: "jj-redis"
     image: redis:latest
+  rabbitMQ:
+    container_name: "jj-rabbitMq"
+    image: rabbitmq:3-management
+    environment:
+        - "RABBITMQ_DEFAULT_USER=user"
+        - "RABBITMQ_DEFAULT_PASS=888ebc0c-ed3c-4466-b684-a302320c50b8"

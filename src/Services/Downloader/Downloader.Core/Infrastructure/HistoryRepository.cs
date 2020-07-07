@@ -25,7 +25,7 @@ namespace Downloader.Core.Infrastructure {
             return await Execute(async (DisposableQueryFactory db)
                     => await db.Query(_tableName)
                         .Where("Title", title)
-                        .CountAsync<int>("*") > 0
+                        .CountAsync<int>() > 0
             );
         }
 

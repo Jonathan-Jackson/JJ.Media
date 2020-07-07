@@ -96,6 +96,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{0F1EE0
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter.Core", "src\Services\Converter\Converter.Core\Converter.Core\Converter.Core.csproj", "{E078389C-4AA7-4F55-B453-0C5D21B4C579}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -202,6 +204,10 @@ Global
 		{F81F4C50-7407-4779-B816-FA575A729076}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F81F4C50-7407-4779-B816-FA575A729076}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F81F4C50-7407-4779-B816-FA575A729076}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E078389C-4AA7-4F55-B453-0C5D21B4C579}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E078389C-4AA7-4F55-B453-0C5D21B4C579}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E078389C-4AA7-4F55-B453-0C5D21B4C579}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E078389C-4AA7-4F55-B453-0C5D21B4C579}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -247,6 +253,7 @@ Global
 		{B8F926A5-C492-4CCB-A52F-93721CAF78FC} = {5C1CF5DA-CC5B-4F6A-8FC1-5531E38ABAB6}
 		{9FF1A1C0-4F11-4C87-A700-2BBF335076D3} = {2F8296A4-B52A-443B-BD61-6F7A0413C0EF}
 		{F81F4C50-7407-4779-B816-FA575A729076} = {9FF1A1C0-4F11-4C87-A700-2BBF335076D3}
+		{E078389C-4AA7-4F55-B453-0C5D21B4C579} = {0D58B964-0AA6-4E65-B686-14DA79D34588}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC7526-4F78-49C0-BF45-FBFFFCF36B72}

@@ -1,8 +1,8 @@
 ﻿using Downloader.Core.ServiceRegister;
 using Downloader.Core.Services;
+using JJ.Framework.Repository.Abstraction;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Threading.Tasks;
 

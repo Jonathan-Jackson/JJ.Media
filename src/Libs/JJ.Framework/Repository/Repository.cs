@@ -32,7 +32,7 @@ namespace JJ.Framework.Repository {
 
             pagination.Total = await Execute((DisposableQueryFactory db)
                                 => db.Query(_tableName)
-                                    .CountAsync<int>("*"));
+                                    .CountAsync<int>());
 
             return pagination;
         }
