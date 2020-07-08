@@ -4,6 +4,7 @@ using Downloader.Core.Helpers.Options;
 using Downloader.Core.Infrastructure;
 using Downloader.Core.Services;
 using JJ.Framework.Helpers;
+using JJ.Framework.Helpers.Options;
 using JJ.Framework.Repository;
 using JJ.Framework.Repository.Abstraction;
 using JJ.Framework.Repository.RabbitMq;
@@ -12,8 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SqlKata.Compilers;
-using Storage.API.Client;
-using Storage.API.Client.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,10 +39,6 @@ namespace Downloader.Core.ServiceRegister {
                 .AddLogging(configure => configure.AddConsole());
 
             // Add Config Options.
-            var storageOptions = configuration.GetSection("StorageServiceOptions").Get<StorageClientOptions>();
-            storageOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("STORAGESERVICE_ADDRESS")
-                ?? (!string.IsNullOrWhiteSpace(storageOptions.Address) ? storageOptions.Address : throw new ApplicationException("STORAGESERVICE_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
-
             var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
             torrentOptions.DownloadTorrentPath = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOAD_PATH")
                 ?? (!string.IsNullOrWhiteSpace(torrentOptions.DownloadTorrentPath) ? torrentOptions.DownloadTorrentPath : throw new ApplicationException("DOWNLOAD_PATH NOT SPECIFIED. USE AN ENVIROMENT VAR."));
@@ -56,19 +51,26 @@ namespace Downloader.Core.ServiceRegister {
             horribleOptions.Quality = EnviromentHelper.FindGlobalEnviromentVariable("HORRIBLESUBS_QUALITY")
                 ?? (!string.IsNullOrWhiteSpace(horribleOptions.Quality) ? horribleOptions.Quality : throw new ApplicationException("HORRIBLESUBS_QUALITY NOT SPECIFIED. USE AN ENVIROMENT VAR."));
 
+            // QBitTorrent Options
             var qbitOptions = configuration.GetSection("QBitOptions").Get<QBitOptions>();
             qbitOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("QBITTORRENT_ADDRESS")
                 ?? (!string.IsNullOrWhiteSpace(qbitOptions.Address) ? qbitOptions.Address : throw new ApplicationException("QBITTORRENT_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
 
+            // Broker Options
+            var brokerOptions = configuration.GetSection("BrokerOptions").Get<BrokerOptions>();
+            brokerOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("BROKER_ADDRESS")
+                ?? (!string.IsNullOrWhiteSpace(brokerOptions.Address) ? brokerOptions.Address : throw new ApplicationException("BROKER_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            // DB String
             var downloaderConnString = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOADFACTORY_DB")
                 ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("DownloaderFactory")) ? configuration.GetConnectionString("DownloaderFactory") : throw new ApplicationException("DOWNLOADFACTORY_DB Database Connection value is missing."));
 
             return services
-                .AddSingleton(storageOptions)
                 .AddSingleton(torrentOptions)
                 .AddSingleton(horribleOptions)
                 .AddSingleton(qbitOptions)
-                .AddSingleton<IMessageBroker, RabbitBroker>(provider => new RabbitBroker("localhost", provider.GetRequiredService<ILogger<RabbitBroker>>()))
+                .AddSingleton(brokerOptions)
+                .AddSingleton<IMessageBroker, RabbitBroker>(provider => new RabbitBroker(provider.GetRequiredService<BrokerOptions>().Address, provider.GetRequiredService<ILogger<RabbitBroker>>()))
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(downloaderConnString));
         }
     }

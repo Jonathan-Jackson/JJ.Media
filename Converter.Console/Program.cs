@@ -1,11 +1,12 @@
-﻿using Downloader.Core.ServiceRegister;
-using Downloader.Core.Services;
+﻿using Converter.Core.ServiceRegister;
+using Converter.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Downloader.ConsoleUI {
+namespace Converter.Console {
 
     internal class Program {
 
@@ -22,7 +23,7 @@ namespace Downloader.ConsoleUI {
             IServiceCollection services = new ServiceCollection();
             var provider = services.AddDependencies(config).BuildServiceProvider();
 
-            await provider.GetRequiredService<DownloaderService>()
+            await provider.GetRequiredService<ConverterService>()
                             .Run();
         }
     }

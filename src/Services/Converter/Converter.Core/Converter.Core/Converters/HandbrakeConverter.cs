@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Converter.Core.Helpers.Options;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Converter.Core.Converters {
@@ -15,13 +18,13 @@ namespace Converter.Core.Converters {
         private readonly string _cmdPath;
         private readonly string _outputDirectory;
 
-        private readonly TaskCompletionSource<bool> _processWaiter;
+        private readonly SemaphoreSlim _semaphore; // Limit 1 file at a time for conversion.
 
         public HandbrakeConverter(HandbrakeOptions options) {
             _subtitleArgs = options.SubtitleArgs;
             _standardArgs = options.StandardArgs;
             _cmdPath = options.CmdPath;
-            _processWaiter = new TaskCompletionSource<bool>();
+            _semaphore = new SemaphoreSlim(1, 1);
         }
 
         public async Task Convert(IReadOnlyCollection<string> files, bool burnSubtitles) {
@@ -37,7 +40,15 @@ namespace Converter.Core.Converters {
             if (!File.Exists(file))
                 throw new IOException($"File cannot be found for processing: {file}");
 
-            var output = await StartProcess(file, burnSubtitles);
+            string output = string.Empty;
+
+            try {
+                await _semaphore.WaitAsync(TimeSpan.FromHours(3));
+                output = await StartProcess(file, burnSubtitles);
+            }
+            finally {
+                _semaphore.Release();
+            }
 
             if (!File.Exists(output))
                 throw new IOException("Failure converting file (Not Found).");
@@ -60,14 +71,15 @@ namespace Converter.Core.Converters {
             // MS Docs note that processes should be
             // disposed, so we should await for it to finish rather
             // than fire & forget.
+            var processWaiter = new TaskCompletionSource<bool>();
             using (var processTemp = new Process()) {
                 processTemp.StartInfo = info;
                 processTemp.Start();
 
                 processTemp.EnableRaisingEvents = true;
-                processTemp.Exited += (_, __) => _processWaiter.TrySetResult(true);
+                processTemp.Exited += (_, __) => processWaiter.TrySetResult(true);
 
-                await Task.WhenAny(_processWaiter.Task, Task.Delay(ProcessTimeout));
+                await Task.WhenAny(processWaiter.Task, Task.Delay(ProcessTimeout));
             }
 
             return outputPath;
