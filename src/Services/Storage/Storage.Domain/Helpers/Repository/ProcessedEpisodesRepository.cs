@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Storage.Infrastructure.Repositories {
+namespace Storage.Domain.Repositories {
 
     public class ProcessedEpisodesRepository : Repository<ProcessedEpisode>, IProcessedEpisodeRepository {
 

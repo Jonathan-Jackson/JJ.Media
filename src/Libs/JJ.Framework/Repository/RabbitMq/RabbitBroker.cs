@@ -5,6 +5,7 @@ using RabbitMQ.Client.Events;
 using System;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JJ.Framework.Repository.RabbitMq {
@@ -63,7 +64,7 @@ namespace JJ.Framework.Repository.RabbitMq {
             });
         }
 
-        public Task RecieverAsync<TObject>(string queueName, Action<TObject> onRecieve) {
+        public Task RecieverAsync<TObject>(string queueName, Action<TObject> onRecieve, CancellationToken? stoppingToken = null) {
             return ProcessChannelAsync(async (channel) => {
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (_, ea) => {
@@ -76,15 +77,19 @@ namespace JJ.Framework.Repository.RabbitMq {
 
                 _logger?.LogDebug($"AWAITING QUEUE: {queueName}");
 
-                await Task.Delay(-1);
+                if (stoppingToken.HasValue)
+                    await Task.Delay(-1, stoppingToken.Value);
+                else
+                    await Task.Delay(-1);
             });
         }
 
-        public Task RecieverAsync<TObject>(string queueName, Func<TObject, Task> onRecieve) {
+        public Task RecieverAsync<TObject>(string queueName, Func<TObject, Task> onRecieve, CancellationToken? stoppingToken = null) {
             return ProcessChannelAsync(async (channel) => {
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += async (_, ea) => {
                     TObject model = JsonSerializer.Deserialize<TObject>(ea.Body.Span);
+                    _logger.LogDebug($"Broker Message Recieved On Queue {queueName}: {ea.Body}");
                     await onRecieve(model);
                 };
                 channel.BasicConsume(queue: queueName,
@@ -93,7 +98,12 @@ namespace JJ.Framework.Repository.RabbitMq {
 
                 _logger?.LogDebug($"AWAITING QUEUE: {queueName}");
 
-                await Task.Delay(-1);
+                if (stoppingToken.HasValue)
+                    await Task.Delay(-1, stoppingToken.Value);
+                else
+                    await Task.Delay(-1);
+
+                _logger.LogWarning($"Closing Reciever on queue: {queueName}");
             });
         }
 

@@ -1,4 +1,4 @@
-﻿using Converter.API.Client.Client;
+﻿using JJ.Framework.Repository.Abstraction;
 using MediaInfo.API.Client.Client;
 using MediaInfo.API.Client.Models;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,6 @@ using Storage.Domain.Helpers.DTOs;
 using Storage.Domain.Helpers.Exceptions;
 using Storage.Domain.Helpers.Repository;
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Processor {
@@ -17,28 +16,31 @@ namespace Storage.Domain.DomainLayer.Processor {
         private readonly IEpisodeStore _episodeStore;
         private readonly MediaInfoClient _mediaInfoRepository;
         private readonly IProcessedEpisodeRepository _repo;
-        private readonly ConverterClient _converterClient;
+        private readonly IMessageBroker _broker;
 
         public EpisodeProcessor(IEpisodeStore episodeStore, ILogger<EpisodeProcessor> logger,
-                MediaInfoClient mediaInfoClient, IProcessedEpisodeRepository processedRepository,
-                ConverterClient converterClient)
+                MediaInfoClient mediaInfoClient, IProcessedEpisodeRepository processedRepository
+                , IMessageBroker broker)
             : base(logger) {
             _episodeStore = episodeStore;
             _mediaInfoRepository = mediaInfoClient;
             _repo = processedRepository;
-            _converterClient = converterClient;
+            _broker = broker;
         }
 
         /// <summary>
         /// Processes the episode file passed into storage.
         /// </summary>
-        public async Task ProcessAsync(string path, eEpisodeType episodeType) {
+        public async Task ProcessAsync(string path, eMediaType mediaType) {
+            if (mediaType == eMediaType.Movie)
+                throw new ArgumentException("Media Type is not an episode");
+
             string episodeFileName = GetFileName(path);
             EpisodeSearchResult episode = await _mediaInfoRepository.EpisodeSearch(episodeFileName);
 
             if (episode.Id > 0) {
-                var processedEpisode = await ProcessFoundEpisodeAsync(path, episode, episodeType);
-                await TrySendNotifications(processedEpisode, episodeType);
+                await ProcessFoundEpisodeAsync(path, episode, mediaType);
+                _broker.Publish(mediaType.ToString(), episode.Id, "ProcessedMedia");
             }
             else {
                 _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Show Id: {episode.ShowId} / Full path: {path}");
@@ -46,8 +48,8 @@ namespace Storage.Domain.DomainLayer.Processor {
             }
         }
 
-        private async Task<ProcessedEpisode> ProcessFoundEpisodeAsync(string path, EpisodeSearchResult episode, eEpisodeType episodeType) {
-            var namer = new EpisodeNamer(path, episode, episodeType);
+        private async Task<ProcessedEpisode> ProcessFoundEpisodeAsync(string path, EpisodeSearchResult episode, eMediaType mediaType) {
+            var namer = new EpisodeNamer(path, episode, mediaType);
             var finalDestination = await _episodeStore.SaveDownload(path, namer.FolderPath, namer.FileName);
 
             // Save.
@@ -66,16 +68,6 @@ namespace Storage.Domain.DomainLayer.Processor {
             }
             else {
                 processedEpisode.Id = await _repo.InsertAsync(processedEpisode);
-            }
-        }
-
-        private async Task TrySendNotifications(ProcessedEpisode processedEpisode, eEpisodeType episodeType) {
-            try {
-                bool burnSubtitles = episodeType == eEpisodeType.Anime;
-                await _converterClient.EpisodeToWebm(processedEpisode.Output, processedEpisode.EpisodeId, burnSubtitles);
-            }
-            catch (Exception ex) {
-                _logger.LogError(ex, $"Failed to notify the converter service of: {JsonSerializer.Serialize(processedEpisode)}");
             }
         }
     }

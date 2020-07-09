@@ -1,4 +1,5 @@
 ﻿using Converter.Core.Converters;
+using Converter.Core.Helpers.Enums;
 using JJ.Framework.Helpers;
 using JJ.Framework.Repository.Abstraction;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,7 @@ namespace Converter.Core.Services {
         private readonly string _downloadStore;
 
         private const int ProcessQueueStoreInterval = 50_000; // 50 seconds.
+        private const string ConverterQueue = "ConverterQueue";
 
         public async Task Run() {
             _log.LogInformation("Converter Service Ran...");
@@ -43,17 +45,16 @@ namespace Converter.Core.Services {
             => source.Where(file => file.EndsWith(".mkv", StringComparison.OrdinalIgnoreCase)
                                 || file.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase));
 
-        private string GetNonSubtitleFolderPath()
-            => Path.Join(_queueStore, "nonsubtitles");
+        private string GetShowFolderPath()
+            => Path.Join(_queueStore, "shows");
 
-        private string GetSubtitleFolderPath()
-            => Path.Join(_queueStore, "subtitles");
+        private string GetAnimeFolderPath()
+            => Path.Join(_queueStore, "anime");
 
         private async Task ProcessBrokerQueue() {
             for (; ; await Task.Delay(5000)) {
                 try {
-                    await _broker.RecieverAsync<string[]>("ConverterQueue",
-                                                        (files) => ProcessFiles(files, true));
+                    await _broker.RecieverAsync<string[]>(ConverterQueue, (files) => ProcessFiles(files, eMediaType.Anime));
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, "A fatal error was thrown while processing the broker queue!");
@@ -65,11 +66,12 @@ namespace Converter.Core.Services {
             for (; ; await Task.Delay(ProcessQueueStoreInterval)) {
                 try {
                     // check folder store
-                    var subtitleFiles = Directory.EnumerateFiles(GetSubtitleFolderPath());
-                    await ProcessFiles(GetConvertableFiles(subtitleFiles), burnSubtitles: true);
+                    // we dont use a folder watch to allow for re-tries.
+                    var subtitleFiles = Directory.EnumerateFiles(GetAnimeFolderPath());
+                    await ProcessFiles(GetConvertableFiles(subtitleFiles), eMediaType.Anime);
 
-                    var nonSubtitleFiles = Directory.EnumerateFiles(GetNonSubtitleFolderPath());
-                    await ProcessFiles(GetConvertableFiles(nonSubtitleFiles), burnSubtitles: false);
+                    var nonSubtitleFiles = Directory.EnumerateFiles(GetShowFolderPath());
+                    await ProcessFiles(GetConvertableFiles(nonSubtitleFiles), eMediaType.Show);
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, "A fatal error was thrown while processing the file queue!");
@@ -77,7 +79,7 @@ namespace Converter.Core.Services {
             }
         }
 
-        private async Task ProcessFiles(IEnumerable<string> files, bool burnSubtitles) {
+        private async Task ProcessFiles(IEnumerable<string> files, eMediaType mediaType) {
             var foundFiles = files.Where(file => File.Exists(file)).ToArray();
 
             foreach (var file in foundFiles) {
@@ -88,7 +90,7 @@ namespace Converter.Core.Services {
 
                 // add delay to ensure any file lock is removed.
                 await Task.Delay(1000);
-                await _converter.Convert(Path.Join(_processingStore, file), burnSubtitles);
+                await _converter.Convert(Path.Join(_processingStore, file), burnSubtitles: mediaType == eMediaType.Anime);
             }
 
             // finally blow up with an error for any that were missing..
@@ -99,9 +101,9 @@ namespace Converter.Core.Services {
         }
 
         private void SetupBroker() {
-            _broker.DeclareQueue("ConverterQueue");
+            _broker.DeclareQueue(ConverterQueue);
             _broker.DeclareExchange("DownloadedMedia");
-            _broker.BindQueue("DownloadedMedia", "ConverterQueue", "FilePath");
+            _broker.BindQueue("DownloadedMedia", ConverterQueue, "FilePath");
         }
     }
 }

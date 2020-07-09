@@ -1,5 +1,4 @@
-﻿using Discord.API.Models;
-using Discord.API.Services;
+﻿using Discord.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +18,7 @@ namespace Discord.API.Controllers {
         }
 
         [HttpPost("episode")]
-        public IActionResult Episode([FromBody]int episodeId) {
+        public IActionResult Episode([FromBody] int episodeId) {
             if (episodeId < 1)
                 return BadRequest();
 

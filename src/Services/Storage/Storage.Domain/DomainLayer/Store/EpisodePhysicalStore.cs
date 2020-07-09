@@ -20,7 +20,7 @@ namespace Storage.Domain.DomainLayer.Store {
             string source = GetProcessPath(sourceFile);
             string outputPath = CreateOutputPath(folderPath, fileName);
 
-            // Return if our file is already where we'd put it
+            // Return if our file is already at the destination
             // We still want to log these as processed so they're in the
             // database!
             if (string.Equals(source, outputPath, StringComparison.OrdinalIgnoreCase)) {

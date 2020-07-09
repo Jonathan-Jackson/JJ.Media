@@ -1,7 +1,8 @@
 ﻿namespace Storage.Domain.Helpers.DTOs {
 
-    public enum eEpisodeType {
+    public enum eMediaType {
         Anime = 1,
-        Shows = 2
+        Show = 2,
+        Movie = 3
     }
 }

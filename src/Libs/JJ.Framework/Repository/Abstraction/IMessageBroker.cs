@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JJ.Framework.Repository.Abstraction {
@@ -13,8 +14,8 @@ namespace JJ.Framework.Repository.Abstraction {
 
         void DeclareExchange(string exchangeName, string type = "direct");
 
-        Task RecieverAsync<TObject>(string queueName, Action<TObject> onRecieve);
+        Task RecieverAsync<TObject>(string queueName, Action<TObject> onRecieve, CancellationToken? stoppingToken = null);
 
-        Task RecieverAsync<TObject>(string queueName, Func<TObject, Task> onRecieve);
+        Task RecieverAsync<TObject>(string queueName, Func<TObject, Task> onRecieve, CancellationToken? stoppingToken = null);
     }
 }

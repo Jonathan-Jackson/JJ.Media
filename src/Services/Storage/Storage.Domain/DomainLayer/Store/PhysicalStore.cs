@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace Storage.Domain.DomainLayer.Store {
 
     public class PhysicalStore {
-        protected const long MinimumSpaceThresholdBytes = 150_000_000_00; // 10gb.
         protected readonly ImmutableArray<StoreArea> _ProcessStores;
         protected readonly ImmutableArray<StoreArea> _mediaStores;
 

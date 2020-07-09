@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Storage.API.HostedService;
 
 namespace Storage.API {
 
@@ -13,6 +15,9 @@ namespace Storage.API {
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureServices(services => {
+                    services.AddHostedService<StorageHostedService>();
                 });
     }
 }
