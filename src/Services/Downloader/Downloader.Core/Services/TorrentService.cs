@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Downloader.Core.Services {
 
-    public class TorrentService {
+    public class TorrentService : ITorrentService {
         private readonly ILogger<TorrentService> _log;
         private readonly IMessageBroker _broker;
         private readonly ITorrentClient _torrentClient;

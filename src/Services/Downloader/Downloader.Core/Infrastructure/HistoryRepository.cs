@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Downloader.Core.Infrastructure {
 
-    public class HistoryRepository : Repository<DownloadHistory> {
+    public class HistoryRepository : Repository<DownloadHistory>, IHistoryRepository {
 
         public HistoryRepository(IDbConnectionFactory dbFactory, Compiler sqlCompiler)
             : base("DownloadHistory", dbFactory, sqlCompiler) {

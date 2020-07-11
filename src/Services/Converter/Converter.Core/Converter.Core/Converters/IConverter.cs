@@ -5,8 +5,6 @@ namespace Converter.Core.Converters {
 
     public interface IConverter {
 
-        Task Convert(IReadOnlyCollection<string> files, bool burnSubtitles);
-
-        Task Convert(string file, bool burnSubtitles);
+        Task Convert(string file, string outputDirectory, bool burnSubtitles);
     }
 }

@@ -33,6 +33,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Services\MediaInfo\MediaInfo.API.Client\MediaInfo.API.Client.csproj" />
-    <ProjectReference Include="..\..\..\Services\Storage\Storage.API.Client\Storage.API.Client.csproj" />
   </ItemGroup>
 </Project>

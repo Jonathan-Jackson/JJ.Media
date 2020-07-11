@@ -40,30 +40,25 @@ namespace Downloader.Core.ServiceRegister {
 
             // Add Config Options.
             var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
-            torrentOptions.DownloadTorrentPath = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOAD_PATH")
-                ?? (!string.IsNullOrWhiteSpace(torrentOptions.DownloadTorrentPath) ? torrentOptions.DownloadTorrentPath : throw new ApplicationException("DOWNLOAD_PATH NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            torrentOptions.DownloadTorrentPath = EnviromentHelper.GetSetting("DOWNLOAD_PATH", torrentOptions.DownloadTorrentPath);
 
             if (!Directory.Exists(torrentOptions.DownloadTorrentPath))
                 throw new ApplicationException($"Download Directory does not exist: {torrentOptions.DownloadTorrentPath} (FULL PATH: {Path.GetFullPath(torrentOptions.DownloadTorrentPath)}");
 
             // HorribleSubs options.
             var horribleOptions = configuration.GetSection("HorribleSubsOptions").Get<HorribleSubsOptions>();
-            horribleOptions.Quality = EnviromentHelper.FindGlobalEnviromentVariable("HORRIBLESUBS_QUALITY")
-                ?? (!string.IsNullOrWhiteSpace(horribleOptions.Quality) ? horribleOptions.Quality : throw new ApplicationException("HORRIBLESUBS_QUALITY NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            horribleOptions.Quality = EnviromentHelper.GetSetting("HORRIBLESUBS_QUALITY", horribleOptions.Quality);
 
             // QBitTorrent Options
             var qbitOptions = configuration.GetSection("QBitOptions").Get<QBitOptions>();
-            qbitOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("QBITTORRENT_ADDRESS")
-                ?? (!string.IsNullOrWhiteSpace(qbitOptions.Address) ? qbitOptions.Address : throw new ApplicationException("QBITTORRENT_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            qbitOptions.Address = EnviromentHelper.GetSetting("QBITTORRENT_ADDRESS", qbitOptions.Address);
 
             // Broker Options
             var brokerOptions = configuration.GetSection("BrokerOptions").Get<BrokerOptions>();
-            brokerOptions.Address = EnviromentHelper.FindGlobalEnviromentVariable("BROKER_ADDRESS")
-                ?? (!string.IsNullOrWhiteSpace(brokerOptions.Address) ? brokerOptions.Address : throw new ApplicationException("BROKER_ADDRESS NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            brokerOptions.Address = EnviromentHelper.GetSetting("BROKER_ADDRESS", brokerOptions.Address);
 
             // DB String
-            var downloaderConnString = EnviromentHelper.FindGlobalEnviromentVariable("DOWNLOADFACTORY_DB")
-                ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("DownloaderFactory")) ? configuration.GetConnectionString("DownloaderFactory") : throw new ApplicationException("DOWNLOADFACTORY_DB Database Connection value is missing."));
+            var downloaderConnString = EnviromentHelper.GetSetting("DOWNLOADFACTORY_DB", configuration.GetConnectionString("DownloaderFactory"));
 
             return services
                 .AddSingleton(torrentOptions)

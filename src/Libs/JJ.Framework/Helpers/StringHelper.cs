@@ -12,6 +12,34 @@ namespace JJ.Framework.Helpers {
                     yield return i;
         }
 
+        public static string GetWordAtIndex(string value, int index) {
+            if (index < 0)
+                throw new ArgumentException("Index value must be greater than zero.");
+            if (index > value.Length - 1)
+                throw new ArgumentException($"Index ({index}) is greater than the length of the value ({value}).");
+            if (value[index] == ' ')
+                return " ";
+
+            int suffix = value.Substring(index).IndexOf(' ');
+            int prefix = value.Substring(0, index + 1).LastIndexOf(' ') + 1;
+
+            if (suffix > -1 && prefix > 0) {
+                suffix += index;
+                suffix -= prefix;
+                return value.Substring(prefix, suffix);
+            }
+            else if (suffix > -1) {
+                suffix += index;
+                return value.Substring(0, suffix);
+            }
+            else if (prefix > 0) {
+                return value.Substring(prefix);
+            }
+            else {
+                return value;
+            }
+        }
+
         public static string RemoveLetters(string value, char replace)
             => new string(value.Select(x => !char.IsLetter(x) ? x : replace).ToArray());
 

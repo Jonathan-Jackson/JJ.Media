@@ -1,9 +1,9 @@
 ﻿using Converter.Core.Helpers.Options;
+using JJ.Framework.Helpers;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,51 +16,50 @@ namespace Converter.Core.Converters {
         private readonly string _subtitleArgs;
         private readonly string _standardArgs;
         private readonly string _cmdPath;
-        private readonly string _outputDirectory;
+        private readonly ILogger<HandbrakeConverter> _log;
 
         private readonly SemaphoreSlim _semaphore; // Limit 1 file at a time for conversion.
 
-        public HandbrakeConverter(HandbrakeOptions options) {
+        public HandbrakeConverter(HandbrakeOptions options, ILogger<HandbrakeConverter> log) {
             _subtitleArgs = options.SubtitleArgs;
             _standardArgs = options.StandardArgs;
             _cmdPath = options.CmdPath;
+            _log = log;
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task Convert(IReadOnlyCollection<string> files, bool burnSubtitles) {
-            // process files that dont exist last
-            // so we can blow up for those.
-            var priorityFiles = files.OrderByDescending(file => File.Exists(file));
-
-            foreach (var file in priorityFiles)
-                await Convert(file, burnSubtitles);
-        }
-
-        public async Task Convert(string file, bool burnSubtitles) {
-            if (!File.Exists(file))
-                throw new IOException($"File cannot be found for processing: {file}");
+        public async Task Convert(string filePath, string outputDirectory, bool burnSubtitles) {
+            if (!File.Exists(filePath))
+                throw new IOException($"File cannot be found for processing: {filePath}");
+            if (!Directory.Exists(outputDirectory))
+                throw new IOException($"Directory for output cannot be found: {outputDirectory}");
 
             string output = string.Empty;
 
             try {
                 await _semaphore.WaitAsync(TimeSpan.FromHours(3));
-                output = await StartProcess(file, burnSubtitles);
+                output = await StartProcess(filePath, outputDirectory, burnSubtitles);
             }
             finally {
                 _semaphore.Release();
             }
 
+            // Await here to allow the processor to have fully
+            // saved the file before checking.
+            await Task.Delay(500);
+
             if (!File.Exists(output))
                 throw new IOException("Failure converting file (Not Found).");
-            if (GetFileLength(output) < (GetFileLength(file) / 8))
+            if (GetFileLength(output) < (GetFileLength(filePath) / 8))
                 throw new IOException("Failure converting file (Corrupt output detected).");
         }
 
         private long GetFileLength(string filePath)
             => new FileInfo(filePath).Length;
 
-        private async Task<string> StartProcess(string file, bool burnSubtitles) {
-            string outputPath = Path.Combine(_outputDirectory, file.Substring(0, file.LastIndexOf('.')) + "." + ConvertExtension);
+        private async Task<string> StartProcess(string file, string outputDirectory, bool burnSubtitles) {
+            string outputPath = Path.Join(outputDirectory, $"{Path.GetFileNameWithoutExtension(file)}.{ConvertExtension}");
+            await FileHelper.DeleteExistingFileWithRetryAsync(outputPath, _log);
 
             var info = new ProcessStartInfo() {
                 FileName = _cmdPath,

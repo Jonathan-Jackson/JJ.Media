@@ -13,5 +13,10 @@ namespace JJ.Framework.Helpers {
             => Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.User)
             ?? Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process)
             ?? Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Machine);
+
+        public static string GetSetting(string settingName, string fallbackValue = "", bool allowEmpty = false) {
+            return FindGlobalEnviromentVariable(settingName)
+                ?? (allowEmpty || !string.IsNullOrWhiteSpace(fallbackValue) ? fallbackValue : throw new ApplicationException($"{settingName} NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+        }
     }
 }

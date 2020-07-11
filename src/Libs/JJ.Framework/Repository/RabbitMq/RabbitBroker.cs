@@ -60,7 +60,7 @@ namespace JJ.Framework.Repository.RabbitMq {
                                      basicProperties: null,
                                      body: body);
 
-                _logger?.LogDebug($"PUBLISHED MESSAGE: {body} WITH KEY: {routingKey}");
+                _logger?.LogDebug($"PUBLISHED MESSAGE: {body} WITH KEY: {routingKey} ON EXCHANGE: {exchangeName}");
             });
         }
 
@@ -105,6 +105,16 @@ namespace JJ.Framework.Repository.RabbitMq {
 
                 _logger.LogWarning($"Closing Reciever on queue: {queueName}");
             });
+        }
+
+        public bool TryConnect() {
+            try {
+                GetConnection().Dispose();
+                return true;
+            }
+            catch {
+                return false;
+            }
         }
 
         private IConnection GetConnection() {

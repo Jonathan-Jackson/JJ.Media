@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace MediaInfo.API.Client.Client {
 
-    public partial class MediaInfoClient : ApiClient {
+    public partial class MediaInfoClient : ApiClient, IMediaInfoClient {
         private readonly MediaInfoClientOptions _options;
 
         public MediaInfoClient(HttpClient client, MediaInfoClientOptions options)
