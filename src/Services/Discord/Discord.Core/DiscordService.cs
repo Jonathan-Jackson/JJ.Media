@@ -52,7 +52,9 @@ namespace Discord.Core {
         private void SetupBroker() {
             _broker.DeclareQueue(DiscordEpisodeAlertQueue);
             _broker.DeclareExchange("StorageProcessed");
-            _broker.BindQueue("StorageProcessed", DiscordEpisodeAlertQueue, "EpisodeAlert");
+            _broker.BindQueue("StorageProcessed", DiscordEpisodeAlertQueue, "Anime");
+            _broker.BindQueue("StorageProcessed", DiscordEpisodeAlertQueue, "Movie");
+            _broker.BindQueue("StorageProcessed", DiscordEpisodeAlertQueue, "Show");
         }
 
         private async Task SetupClient() {

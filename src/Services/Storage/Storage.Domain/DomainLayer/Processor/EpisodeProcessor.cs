@@ -8,18 +8,19 @@ using Storage.Domain.Helpers.DTOs;
 using Storage.Domain.Helpers.Exceptions;
 using Storage.Domain.Helpers.Repository;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Storage.Domain.DomainLayer.Processor {
 
     public class EpisodeProcessor : Processor {
         private readonly IEpisodeStore _episodeStore;
-        private readonly MediaInfoClient _mediaInfoRepository;
+        private readonly IMediaInfoClient _mediaInfoRepository;
         private readonly IProcessedEpisodeRepository _repo;
         private readonly IMessageBroker _broker;
 
         public EpisodeProcessor(IEpisodeStore episodeStore, ILogger<EpisodeProcessor> logger,
-                MediaInfoClient mediaInfoClient, IProcessedEpisodeRepository processedRepository
+                IMediaInfoClient mediaInfoClient, IProcessedEpisodeRepository processedRepository
                 , IMessageBroker broker)
             : base(logger) {
             _episodeStore = episodeStore;
@@ -35,15 +36,15 @@ namespace Storage.Domain.DomainLayer.Processor {
             if (mediaType == eMediaType.Movie)
                 throw new ArgumentException("Media Type is not an episode");
 
-            string episodeFileName = GetFileName(path);
+            string episodeFileName = Path.GetFileName(path);
             EpisodeSearchResult episode = await _mediaInfoRepository.EpisodeSearch(episodeFileName);
 
-            if (episode.Id > 0) {
+            if (episode?.Id > 0) {
                 await ProcessFoundEpisodeAsync(path, episode, mediaType);
-                _broker.Publish(mediaType.ToString(), episode.Id, "ProcessedMedia");
+                _broker.Publish(mediaType.ToString(), episode.Id, "StorageProcessed");
             }
             else {
-                _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Show Id: {episode.ShowId} / Full path: {path}");
+                _logger.LogWarning($"Did not process '{episodeFileName}' as it was not found by the media information service. Show Id: {episode?.ShowId.ToString() ?? "0 (SHOW NOT FOUND)"} / Full path: {path}");
                 throw new EpisodeNotFoundException();
             }
         }

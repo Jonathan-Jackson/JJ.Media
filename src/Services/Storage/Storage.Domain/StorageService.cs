@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Storage.Domain.DomainLayer.Processor;
 using Storage.Domain.Helpers.DTOs;
+using Storage.Domain.Helpers.Exceptions;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Storage.Domain.Services {
@@ -15,30 +15,44 @@ namespace Storage.Domain.Services {
 
         private const string StorageQueue = "StorageQueue";
 
-        public async Task Run(CancellationToken stoppingToken) {
+        public StorageService(ILogger<StorageService> log, IMessageBroker broker, EpisodeProcessor episodeProcessor) {
+            _log = log;
+            _broker = broker;
+            _episodeProcessor = episodeProcessor;
+        }
+
+        public async Task Run() {
             _log.LogInformation("Storage Service Ran..");
             SetupBroker();
 
-            while (!stoppingToken.IsCancellationRequested) {
+            while (true) {
                 try {
                     _log.LogInformation($"Awaiting broker messages on: {StorageQueue}");
-                    await _broker.RecieverAsync<string>(StorageQueue, ProcessFile, stoppingToken);
+                    await _broker.RecieverAsync(StorageQueue, ProcessFile);
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, "Fatal error awaiting broker message");
-                    await Task.Delay(5000, stoppingToken);
+                    await Task.Delay(5000);
                 }
             }
         }
 
         private async Task ProcessFile(string file) {
-            _log.LogInformation($"Processing File: {file}");
-            eMediaType media = GetMediaTypeFromPath(file);
+            try {
+                _log.LogInformation($"Processing File: {file}");
+                eMediaType media = GetMediaTypeFromPath(file);
 
-            if (media == eMediaType.Anime || media == eMediaType.Show)
-                await _episodeProcessor.ProcessAsync(file, media);
-            else
-                throw new NotImplementedException($"Media type not supported yet: {media} (Path: {file})");
+                if (media == eMediaType.Anime || media == eMediaType.Show)
+                    await _episodeProcessor.ProcessAsync(file, media);
+                else
+                    throw new NotImplementedException($"Media type not supported yet: {media} (Path: {file})");
+            }
+            catch (EpisodeNotFoundException) {
+                // Already logged further down. We can go on freely.
+            }
+            catch (Exception ex) {
+                _log.LogError(ex, "Error thrown while processing a file to the media store.");
+            }
         }
 
         private eMediaType GetMediaTypeFromPath(string file) {

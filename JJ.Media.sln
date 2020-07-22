@@ -72,9 +72,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Converter.Core", "src\Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Core", "src\Services\Discord\Discord.Core\Discord.Core.csproj", "{809A457B-CBF3-4AFC-872B-AA9883EE9D78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter.Console", "src\Services\Converter\Converter.Console\Converter.Console.csproj", "{324141D9-1A06-45EB-B5D2-28E9698C79C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Converter.Console", "src\Services\Converter\Converter.Console\Converter.Console.csproj", "{324141D9-1A06-45EB-B5D2-28E9698C79C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Console", "src\Services\Discord\Discord.Console\Discord.Console.csproj", "{EC822A25-8714-4CE2-B4B7-F48F78A42B8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Console", "src\Services\Discord\Discord.Console\Discord.Console.csproj", "{EC822A25-8714-4CE2-B4B7-F48F78A42B8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage.Console", "src\Services\Storage\Storage.Console\Storage.Console.csproj", "{EE5494B1-05F8-405B-9A27-2906A2BFBF6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -154,6 +156,10 @@ Global
 		{EC822A25-8714-4CE2-B4B7-F48F78A42B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC822A25-8714-4CE2-B4B7-F48F78A42B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC822A25-8714-4CE2-B4B7-F48F78A42B8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE5494B1-05F8-405B-9A27-2906A2BFBF6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE5494B1-05F8-405B-9A27-2906A2BFBF6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE5494B1-05F8-405B-9A27-2906A2BFBF6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE5494B1-05F8-405B-9A27-2906A2BFBF6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -189,6 +195,7 @@ Global
 		{809A457B-CBF3-4AFC-872B-AA9883EE9D78} = {A3DB27A5-E89B-4D8A-A4D7-3F79E1B608F3}
 		{324141D9-1A06-45EB-B5D2-28E9698C79C8} = {0D58B964-0AA6-4E65-B686-14DA79D34588}
 		{EC822A25-8714-4CE2-B4B7-F48F78A42B8E} = {A3DB27A5-E89B-4D8A-A4D7-3F79E1B608F3}
+		{EE5494B1-05F8-405B-9A27-2906A2BFBF6F} = {9CD70DE2-3448-4091-BD04-542600F66AB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDAC7526-4F78-49C0-BF45-FBFFFCF36B72}

@@ -30,21 +30,26 @@ namespace Converter.Core.Services {
                 throw new IOException($"File Path Missing: {file}");
 
             string fileName = Path.GetFileName(file);
-            string processingPath = Path.Join(_options.ProcessingStore, fileName);
+            string processingPath = Path.Join(GetFolderPath(mediaType, _options.ProcessingStore), fileName);
 
             await FileHelper.DeleteExistingFileWithRetryAsync(processingPath, _log);
             await FileHelper.CopyFileWithRetryAsync(file, processingPath, _log);
 
             // add delay to ensure any file lock is removed.
             await Task.Delay(1000);
-            await _converter.Convert(processingPath, _options.ProcessedStore, burnSubtitles: mediaType == eMediaType.Anime);
+            string processedPath = GetFolderPath(mediaType, _options.ProcessedStore);
+            await _converter.Convert(processingPath, processedPath, burnSubtitles: mediaType == eMediaType.Anime);
 
-            _broker.Publish(mediaType.ToString(), fileName, "ConvertedMedia");
+            NotifyProcessedFile(mediaType, fileName);
 
             // Clean up the ProcessingFolder + the original origin of the file.
             await Task.WhenAll(
                 FileHelper.DeleteExistingFileWithRetryAsync(processingPath, _log),
                 FileHelper.DeleteExistingFileWithRetryAsync(file, _log));
+        }
+
+        public void NotifyProcessedFile(eMediaType mediaType, string fileName) {
+            _broker.Publish(mediaType.ToString(), fileName, "ConvertedMedia");
         }
 
         public async Task ProcessFiles(IEnumerable<string> files, eMediaType mediaType) {
@@ -60,24 +65,50 @@ namespace Converter.Core.Services {
             }
         }
 
+        public void PushProcessedStore() {
+            // check folder store
+            // we dont use a folder watch to allow for re-tries.
+            var subtitleFiles = Directory.EnumerateFiles(GetAnimeFolderPath(_options.ProcessedStore));
+            foreach (var path in subtitleFiles)
+                NotifyProcessedFile(eMediaType.Anime, Path.GetFileName(path));
+
+            var nonSubtitleFiles = Directory.EnumerateFiles(GetShowFolderPath(_options.ProcessedStore));
+            foreach (var path in nonSubtitleFiles)
+                NotifyProcessedFile(eMediaType.Show, Path.GetFileName(path));
+        }
+
         public async Task ProcessQueueStore() {
             // check folder store
             // we dont use a folder watch to allow for re-tries.
-            var subtitleFiles = Directory.EnumerateFiles(GetAnimeFolderPath());
+            var subtitleFiles = Directory.EnumerateFiles(GetAnimeFolderPath(_options.QueueStore));
             await ProcessFiles(GetConvertableFiles(subtitleFiles), eMediaType.Anime);
 
-            var nonSubtitleFiles = Directory.EnumerateFiles(GetShowFolderPath());
+            var nonSubtitleFiles = Directory.EnumerateFiles(GetShowFolderPath(_options.QueueStore));
             await ProcessFiles(GetConvertableFiles(nonSubtitleFiles), eMediaType.Show);
         }
 
-        private string GetAnimeFolderPath()
-            => Path.Join(_options.QueueStore, "anime");
+        private string GetFolderPath(eMediaType mediaType, string area) {
+            switch (mediaType) {
+                case eMediaType.Anime:
+                    return GetAnimeFolderPath(area);
+
+                case eMediaType.Show:
+                    return GetShowFolderPath(area);
+
+                case eMediaType.Movie:
+                default:
+                    throw new NotImplementedException($"{mediaType} not implemented.");
+            }
+        }
+
+        private string GetAnimeFolderPath(string area)
+            => Path.Join(area, "anime");
 
         private IEnumerable<string> GetConvertableFiles(IEnumerable<string> source)
-                    => source.Where(file => file.EndsWith(".mkv", StringComparison.OrdinalIgnoreCase)
+            => source.Where(file => file.EndsWith(".mkv", StringComparison.OrdinalIgnoreCase)
                         || file.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase));
 
-        private string GetShowFolderPath()
-            => Path.Join(_options.QueueStore, "shows");
+        private string GetShowFolderPath(string area)
+            => Path.Join(area, "shows");
     }
 }

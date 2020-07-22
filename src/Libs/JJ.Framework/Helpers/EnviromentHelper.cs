@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 
 namespace JJ.Framework.Helpers {
 
@@ -13,6 +14,15 @@ namespace JJ.Framework.Helpers {
             => Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.User)
             ?? Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process)
             ?? Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Machine);
+
+        public static TOutput FindGlobalEnviromentJsonVariable<TOutput>(string key) {
+            var json = FindGlobalEnviromentVariable(key);
+
+            if (json == null)
+                return default;
+            else
+                return JsonSerializer.Deserialize<TOutput>(json);
+        }
 
         public static string GetSetting(string settingName, string fallbackValue = "", bool allowEmpty = false) {
             return FindGlobalEnviromentVariable(settingName)

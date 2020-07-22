@@ -2,12 +2,12 @@ version: "3.8"
 
 services:
   discord.api:
-    container_name: discord-api
+    container_name: discord
     environment:
       - "ASPNETCORE_ENVIRONMENT=Development"
       - "JJNETDISCORDTOKEN=${JJNETDISCORDTOKEN}"
       - "VIEWERDOMAIN=http://jon-net.com/watch-episode"
-    image: 192.168.1.7:5000/discord.api:latest
+    image: 192.168.1.7:5000/jjnet/discord:latest
     build:
       dockerfile: src/Services/Discord/Discord.API/Dockerfile
       context: .
@@ -31,7 +31,7 @@ services:
       - type: bind
         source: G:/test2
         target: /app/jjmedia2
-    image: 192.168.1.7:5000/mediainfo.api:latest
+    image: 192.168.1.7:5000/jjnet/mediainfo.api:latest
     build:
       dockerfile: src/Services/MediaInfo/MediaInfo.API/Dockerfile
       context: .
@@ -52,13 +52,29 @@ services:
       - type: bind
         source: C:\JJDownload
         target: /app/JJDownload
-    image: 192.168.1.7:5000/downloader:latest
+    image: 192.168.1.7:5000/jjnet/downloader:latest
     build:
       dockerfile: src/Services/Downloader/Downloader.Console/Dockerfile
       context: .
     depends_on:
       - mediainfo.api
       - rabbitMQ
+   storage:
+        container_name: storage
+        environment:
+          - "ASPNETCORE_ENVIRONMENT=Development"
+        volumes:
+          - type: bind
+            source: C:\JJDownload
+            target: /app/JJDownload
+        image: 192.168.1.7:5000/jjnet/storage:latest
+        build:
+          dockerfile: src/Services/Downloader/Downloader.Console/Dockerfile
+          context: .
+        depends_on:
+          - mediainfo.api
+          - rabbitMQ
+
   # Third Party
   redis:
     container_name: "jj-redis"

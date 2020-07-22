@@ -12,6 +12,8 @@ namespace Converter.Core.Services {
         private readonly IFileService _fileService;
 
         private const int ProcessQueueStoreInterval = 50_000; // 50 seconds.
+        private const int NotifyProcessedFilesInterval = 50_000; // 50 seconds.
+
         private const string ConverterQueue = "ConverterQueue";
 
         public ConverterService(ILogger<ConverterService> log, IMessageBroker broker, IFileService fileService) {
@@ -28,13 +30,25 @@ namespace Converter.Core.Services {
                 try {
                     _log.LogInformation("Awaiting Event..");
                     await Task.WhenAll(ProcessBrokerQueue(),
-                                        ProcessFileQueue());
+                                        ProcessFileQueue(),
+                                        PushProcessedFiles());
                 }
                 catch (Exception ex) {
                     _log.LogError(ex, "Exception thrown when executing the main program");
                 }
 
                 await Task.Delay(5_000);
+            }
+        }
+
+        private async Task PushProcessedFiles() {
+            for (; ; await Task.Delay(NotifyProcessedFilesInterval)) {
+                try {
+                    _fileService.PushProcessedStore();
+                }
+                catch (Exception ex) {
+                    _log.LogError(ex, "A fatal error was thrown while processing the broker queue!");
+                }
             }
         }
 

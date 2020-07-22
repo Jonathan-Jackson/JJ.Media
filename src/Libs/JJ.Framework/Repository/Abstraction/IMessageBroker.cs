@@ -18,6 +18,8 @@ namespace JJ.Framework.Repository.Abstraction {
 
         Task RecieverAsync<TObject>(string queueName, Func<TObject, Task> onRecieve, CancellationToken? stoppingToken = null);
 
+        Task RecieverAsync(string queueName, Func<string, Task> onRecieve, CancellationToken? stoppingToken = null);
+
         bool TryConnect();
     }
 }

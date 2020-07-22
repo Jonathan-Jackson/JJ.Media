@@ -84,12 +84,36 @@ namespace JJ.Framework.Repository.RabbitMq {
             });
         }
 
+        public Task RecieverAsync(string queueName, Func<string, Task> onRecieve, CancellationToken? stoppingToken = null) {
+            return ProcessChannelAsync(async (channel) => {
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += async (_, ea) => {
+                    var text = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    _logger.LogDebug($"Broker Message Recieved On Queue {queueName}: {text}");
+                    await onRecieve(text);
+                };
+                channel.BasicConsume(queue: queueName,
+                                     autoAck: true,
+                                     consumer: consumer);
+
+                _logger?.LogDebug($"AWAITING QUEUE: {queueName}");
+
+                if (stoppingToken.HasValue)
+                    await Task.Delay(-1, stoppingToken.Value);
+                else
+                    await Task.Delay(-1);
+
+                _logger.LogWarning($"Closing Reciever on queue: {queueName}");
+            });
+        }
+
         public Task RecieverAsync<TObject>(string queueName, Func<TObject, Task> onRecieve, CancellationToken? stoppingToken = null) {
             return ProcessChannelAsync(async (channel) => {
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += async (_, ea) => {
-                    TObject model = JsonSerializer.Deserialize<TObject>(ea.Body.Span);
-                    _logger.LogDebug($"Broker Message Recieved On Queue {queueName}: {ea.Body}");
+                    var json = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    TObject model = JsonSerializer.Deserialize<TObject>(json);
+                    _logger.LogDebug($"Broker Message Recieved On Queue {queueName}: {json}");
                     await onRecieve(model);
                 };
                 channel.BasicConsume(queue: queueName,

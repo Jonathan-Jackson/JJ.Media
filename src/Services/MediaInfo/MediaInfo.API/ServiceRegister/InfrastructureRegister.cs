@@ -41,7 +41,7 @@ namespace MediaInfo.API.ServiceRegister {
                 ?? (!string.IsNullOrWhiteSpace(tvDbOptions.ApiKey) ? tvDbOptions.ApiKey : throw new ApplicationException("TVDB_APIKEY NOT SPECIFIED. USE AN ENVIROMENT VAR."));
             // MediaInfo Options
             var mediaInfoConnString = EnviromentHelper.FindGlobalEnviromentVariable("MEDIAINFO_DB")
-                    ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("MediaInfo")) ? configuration.GetConnectionString("MediaInfo") : throw new ApplicationException("MediaInfo_DB NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+                    ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("MediaInfo")) ? configuration.GetConnectionString("MediaInfo") : throw new ApplicationException("MEDIAINFO_DB NOT SPECIFIED. USE AN ENVIROMENT VAR."));
 
             logger?.LogInformation($"[SETTINGS]: TVDB_APIKEY - {tvDbOptions.ApiKey}");
             logger?.LogInformation($"[SETTINGS]: MEDIAINFO_DB - {mediaInfoConnString}");

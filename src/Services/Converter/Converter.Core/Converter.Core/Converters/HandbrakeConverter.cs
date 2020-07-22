@@ -34,14 +34,19 @@ namespace Converter.Core.Converters {
             if (!Directory.Exists(outputDirectory))
                 throw new IOException($"Directory for output cannot be found: {outputDirectory}");
 
+            // Hash the name to cheat escape all characters.
+            string hashedPath = Path.Join(Path.GetDirectoryName(filePath), $"{filePath.GetHashCode()}{Path.GetExtension(filePath)}");
+            await FileHelper.MoveFileWithRetryAsync(filePath, hashedPath);
+
             string output = string.Empty;
 
             try {
                 await _semaphore.WaitAsync(TimeSpan.FromHours(3));
-                output = await StartProcess(filePath, outputDirectory, burnSubtitles);
+                output = await StartProcess(hashedPath, outputDirectory, burnSubtitles);
             }
             finally {
                 _semaphore.Release();
+                await FileHelper.MoveFileWithRetryAsync(hashedPath, filePath);
             }
 
             // Await here to allow the processor to have fully
@@ -52,6 +57,9 @@ namespace Converter.Core.Converters {
                 throw new IOException("Failure converting file (Not Found).");
             if (GetFileLength(output) < (GetFileLength(filePath) / 8))
                 throw new IOException("Failure converting file (Corrupt output detected).");
+
+            // Rename output to have original file name
+            await FileHelper.MoveFileWithRetryAsync(output, Path.Join(outputDirectory, $"{Path.GetFileNameWithoutExtension(filePath)}{Path.GetExtension(output)}"));
         }
 
         private long GetFileLength(string filePath)
@@ -63,7 +71,7 @@ namespace Converter.Core.Converters {
 
             var info = new ProcessStartInfo() {
                 FileName = _cmdPath,
-                Arguments = $"{GetSettingArgs(burnSubtitles)} -i {file} -o {outputPath}",
+                Arguments = $"{GetSettingArgs(burnSubtitles)} -i \"{file}\" -o \"{outputPath}\"",
                 CreateNoWindow = true
             };
 
