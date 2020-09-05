@@ -24,7 +24,7 @@ namespace MediaInfo.API.ServiceRegister {
             // Add Config Options.
             var storagePaths = Array.Empty<string>();
 
-            if (EnviromentHelper.TryGetGlobalEnviromentVariable("STORAGE", out string envValue)) {
+            if (EnviromentHelper.TryGetGlobalEnviromentVariable("MEDIAINFO_STORAGE", out string envValue)) {
                 storagePaths = JsonSerializer.Deserialize<string[]>(envValue);
             }
             else

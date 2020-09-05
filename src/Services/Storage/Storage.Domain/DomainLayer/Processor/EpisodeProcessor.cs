@@ -56,7 +56,7 @@ namespace Storage.Domain.DomainLayer.Processor {
             // Save.
             var processedEpisode = new ProcessedEpisode { EpisodeId = episode.Id, Source = path, Output = finalDestination };
             await UpdateOrAddToRepo(processedEpisode);
-            _logger.LogInformation($"Processed Episode - FROM: {path} | TO: {finalDestination}");
+            _logger.LogInformation($"Processed Episode - FROM: (processorStore)/{path} | TO: (mediaStore)/{finalDestination}");
 
             return processedEpisode;
         }

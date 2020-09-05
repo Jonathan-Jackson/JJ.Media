@@ -24,6 +24,10 @@ namespace JJ.Framework.Helpers {
                 return JsonSerializer.Deserialize<TOutput>(json);
         }
 
+        public static string FindGlobalEnviromentJsonVariable(string key) {
+            return FindGlobalEnviromentVariable(key);
+        }
+
         public static string GetSetting(string settingName, string fallbackValue = "", bool allowEmpty = false) {
             return FindGlobalEnviromentVariable(settingName)
                 ?? (allowEmpty || !string.IsNullOrWhiteSpace(fallbackValue) ? fallbackValue : throw new ApplicationException($"{settingName} NOT SPECIFIED. USE AN ENVIROMENT VAR."));

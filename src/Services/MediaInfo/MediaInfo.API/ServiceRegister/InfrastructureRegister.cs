@@ -1,4 +1,5 @@
-﻿using JJ.Framework.Helpers;
+﻿using Dapper;
+using JJ.Framework.Helpers;
 using JJ.Framework.Repository;
 using JJ.Framework.Repository.Abstraction;
 using JJ.Media.MediaInfo.API;
@@ -40,8 +41,7 @@ namespace MediaInfo.API.ServiceRegister {
             tvDbOptions.ApiKey = EnviromentHelper.FindGlobalEnviromentVariable("TVDB_APIKEY")
                 ?? (!string.IsNullOrWhiteSpace(tvDbOptions.ApiKey) ? tvDbOptions.ApiKey : throw new ApplicationException("TVDB_APIKEY NOT SPECIFIED. USE AN ENVIROMENT VAR."));
             // MediaInfo Options
-            var mediaInfoConnString = EnviromentHelper.FindGlobalEnviromentVariable("MEDIAINFO_DB")
-                    ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("MediaInfo")) ? configuration.GetConnectionString("MediaInfo") : throw new ApplicationException("MEDIAINFO_DB NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            var mediaInfoConnString = GetMediaInfoDbConnection(configuration);
 
             logger?.LogInformation($"[SETTINGS]: TVDB_APIKEY - {tvDbOptions.ApiKey}");
             logger?.LogInformation($"[SETTINGS]: MEDIAINFO_DB - {mediaInfoConnString}");
@@ -49,6 +49,18 @@ namespace MediaInfo.API.ServiceRegister {
             return services
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(mediaInfoConnString))
                 .AddSingleton(tvDbOptions);
+        }
+
+        private static string GetMediaInfoDbConnection(IConfiguration configuration, ILogger? logger = null) {
+            var connection = EnviromentHelper.FindGlobalEnviromentVariable("MEDIAINFO_DB")
+                    ?? (!string.IsNullOrWhiteSpace(configuration.GetConnectionString("MediaInfo")) ? configuration.GetConnectionString("MediaInfo") : throw new ApplicationException("MEDIAINFO_DB NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+
+            // Ensure we can connect..
+            using (var db = new SqlConnectionFactory(connection).Create()) {
+                int result = db.QueryFirst<int>("SELECT 1");
+            }
+
+            return connection;
         }
     }
 }

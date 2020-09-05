@@ -51,7 +51,7 @@ namespace Storage.Domain.Services {
                 // Already logged further down. We can go on freely.
             }
             catch (Exception ex) {
-                _log.LogError(ex, "Error thrown while processing a file to the media store.");
+                _log.LogError(ex, "Error with request to MediaInfo.");
             }
         }
 

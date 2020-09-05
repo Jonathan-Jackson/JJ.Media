@@ -3,6 +3,7 @@ using JJ.Framework.Helpers;
 using MediaInfo.Domain.Helpers.DTOs.Miners;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace MediaInfo.DomainLayer.Miners {
@@ -46,8 +47,11 @@ namespace MediaInfo.DomainLayer.Miners {
         }
 
         private int GetEpisodeNumber(string episodeName) {
+            // Remove extension.
+            string extensionless = Path.GetFileNameWithoutExtension(episodeName);
+
             // Try removing metadata first to stop "[1080p-FLAC]" breaking the hyphen splitting
-            string metadataRemoved = RemoveCircularBrackets(RemoveSquareBrackets(episodeName));
+            string metadataRemoved = RemoveCircularBrackets(RemoveSquareBrackets(extensionless));
 
             string removedShow = metadataRemoved.Split('-').Count() > 1
                                     ? metadataRemoved.Split('-').Last()

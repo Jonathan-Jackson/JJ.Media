@@ -20,15 +20,15 @@ namespace JJ.Framework.Client {
             PropertyNameCaseInsensitive = true
         };
 
-        public Task<HttpResponseMessage> Get(string path)
+        protected Task<HttpResponseMessage> Get(string path)
             => _client.GetAsync(CreateEndAddress(path));
 
-        public async Task<TResult> Get<TResult>(string path) {
+        protected async Task<TResult> Get<TResult>(string path) {
             string json = await _client.GetStringAsync(CreateEndAddress(path));
             return JsonSerializer.Deserialize<TResult>(json, JsonOptions);
         }
 
-        public async Task<TResult> Find<TResult>(string path) {
+        protected async Task<TResult> Find<TResult>(string path) {
             var response = await _client.GetAsync(CreateEndAddress(path));
 
             if (response.IsSuccessStatusCode) {
@@ -41,16 +41,16 @@ namespace JJ.Framework.Client {
                 throw new HttpRequestException(response.ReasonPhrase);
         }
 
-        public Task<HttpResponseMessage> Post(string path, object body)
+        protected Task<HttpResponseMessage> Post(string path, object body)
             => Post(path, JsonSerializer.Serialize(body));
 
-        private Task<HttpResponseMessage> Post(string path, string body)
+        protected Task<HttpResponseMessage> Post(string path, string body)
             => _client.PostAsync(CreateEndAddress(path), new StringContent(body, Encoding.UTF8, "application/json"));
 
-        public Task<TResult> Post<TResult>(string path, object body)
+        protected Task<TResult> Post<TResult>(string path, object body)
             => Post<TResult>(path, JsonSerializer.Serialize(body));
 
-        public async Task<TResult> Post<TResult>(string path, string body) {
+        protected async Task<TResult> Post<TResult>(string path, string body) {
             var response = await _client.PostAsync(CreateEndAddress(path), new StringContent(body, Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode) {
                 string json = await response.Content.ReadAsStringAsync();

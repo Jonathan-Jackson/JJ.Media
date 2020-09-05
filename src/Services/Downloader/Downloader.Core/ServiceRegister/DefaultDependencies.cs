@@ -56,6 +56,8 @@ namespace Downloader.Core.ServiceRegister {
             // Broker Options
             var brokerOptions = configuration.GetSection("BrokerOptions").Get<BrokerOptions>();
             brokerOptions.Address = EnviromentHelper.GetSetting("BROKER_ADDRESS", brokerOptions.Address);
+            brokerOptions.UserName = EnviromentHelper.GetSetting("BROKER_USERNAME", brokerOptions.UserName, allowEmpty: true);
+            brokerOptions.Password = EnviromentHelper.GetSetting("BROKER_PASSWORD", brokerOptions.Password, allowEmpty: true);
 
             // DB String
             var downloaderConnString = EnviromentHelper.GetSetting("DOWNLOADFACTORY_DB", configuration.GetConnectionString("DownloaderFactory"));
@@ -65,7 +67,10 @@ namespace Downloader.Core.ServiceRegister {
                 .AddSingleton(horribleOptions)
                 .AddSingleton(qbitOptions)
                 .AddSingleton(brokerOptions)
-                .AddSingleton<IMessageBroker, RabbitBroker>(provider => new RabbitBroker(provider.GetRequiredService<BrokerOptions>().Address, provider.GetRequiredService<ILogger<RabbitBroker>>()))
+                .AddSingleton<IMessageBroker, RabbitBroker>(provider => {
+                    var options = provider.GetRequiredService<BrokerOptions>();
+                    return new RabbitBroker(options.Address, options.UserName, options.Password, provider.GetRequiredService<ILogger<RabbitBroker>>());
+                })
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(downloaderConnString));
         }
     }

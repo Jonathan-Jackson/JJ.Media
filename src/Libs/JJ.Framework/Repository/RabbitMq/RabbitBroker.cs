@@ -16,9 +16,11 @@ namespace JJ.Framework.Repository.RabbitMq {
         private readonly object _semaphore = new object();
         private IConnection _conn;
 
-        public RabbitBroker(string hostName, ILogger<RabbitBroker> logger = null) {
+        public RabbitBroker(string hostName, string userName, string password, ILogger<RabbitBroker> logger = null) {
             _connFactory = new ConnectionFactory {
-                HostName = hostName
+                HostName = hostName,
+                UserName = userName,
+                Password = password
             };
             _logger = logger;
         }

@@ -27,7 +27,10 @@ namespace Converter.Core.ServiceRegister {
                 .AddSingleton(BuildConverterOptions(config))
                 .AddSingleton(BuildBrokerOptions(config))
                 // Infrastructure
-                .AddSingleton<IMessageBroker, RabbitBroker>(provider => new RabbitBroker(provider.GetRequiredService<BrokerOptions>().Address, provider.GetRequiredService<ILogger<RabbitBroker>>()));
+                .AddSingleton<IMessageBroker, RabbitBroker>(provider => {
+                    var options = provider.GetRequiredService<BrokerOptions>();
+                    return new RabbitBroker(options.Address, options.UserName, options.Password, provider.GetRequiredService<ILogger<RabbitBroker>>());
+                });
         }
 
         #region Option Configuration
@@ -89,10 +92,12 @@ namespace Converter.Core.ServiceRegister {
             // Get.
             var options = config.GetSection("BrokerOptions").Get<BrokerOptions>();
             options.Address = EnviromentHelper.GetSetting("BROKER_ADDRESS", options.Address);
+            options.UserName = EnviromentHelper.GetSetting("BROKER_USERNAME", options.UserName, allowEmpty: true);
+            options.Password = EnviromentHelper.GetSetting("BROKER_PASSWORD", options.Password, allowEmpty: true);
 
             // Validate.
-            if (!RabbitMqHelper.TryConnect(options.Address))
-                throw new ApplicationException($"Could not connect to RabbitMq Server on the hostname: {options.Address}");
+            if (!RabbitMqHelper.TryConnect(options.Address, options.UserName, options.Password, out Exception ex))
+                throw new ApplicationException($"Could not connect to RabbitMq Server on the hostname: {options.Address}, username: {options.UserName}, password: {options.Password} ({ex.Message})");
 
             return options;
         }

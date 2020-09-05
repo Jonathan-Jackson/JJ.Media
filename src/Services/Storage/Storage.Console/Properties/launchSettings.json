@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Storage.Console": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
