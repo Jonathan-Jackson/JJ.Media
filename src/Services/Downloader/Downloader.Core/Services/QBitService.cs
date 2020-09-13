@@ -39,7 +39,7 @@ namespace Downloader.Core.Services {
         /// <param name="hashes">Hash that is assigned to the torrent.</param>
         public Task TryDeleteAsync(IEnumerable<string> hashes) {
             return Task.WhenAll(hashes.Select(async hash => {
-                using (var request = new HttpRequestMessage(new HttpMethod("GET"), $"{_address}/api/v2/torrents/pause?hashes={hash}")) {
+                using (var request = new HttpRequestMessage(new HttpMethod("GET"), $"{_address}/api/v2/torrents/delete?hashes={hash}&deleteFiles=false")) {
                     request.Headers.TryAddWithoutValidation("Cookie", await GetCookieAuthAsync());
                     await _client.SendAsync(request);
                 }

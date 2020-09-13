@@ -36,7 +36,7 @@ namespace Downloader.Core.ServiceRegister {
                 .AddSingleton<Compiler>(x => new SqlServerCompiler())
                 .AddSingleton<HttpClient>()
                 // Config
-                .AddLogging(configure => configure.AddConsole().SetMinimumLevel(LogLevel.Trace));
+                .AddLogging(configure => configure.AddConsole());
 
             // Add Config Options.
             var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
