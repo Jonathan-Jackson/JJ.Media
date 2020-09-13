@@ -2,6 +2,7 @@
 using Downloader.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -20,10 +21,20 @@ namespace Downloader.ConsoleUI {
                 .Build();
 
             IServiceCollection services = new ServiceCollection();
-            var provider = services.AddDependencies(config).BuildServiceProvider();
+
+            var provider = services.AddDependencies(config, CreateTempLogger()).BuildServiceProvider();
 
             await provider.GetRequiredService<DownloaderService>()
                             .Run();
+        }
+
+        private static ILogger CreateTempLogger() {
+            // Log Settings
+            var loggerFactory = LoggerFactory.Create(builder => {
+                builder.AddConsole();
+                builder.SetMinimumLevel(LogLevel.Trace);
+            });
+            return loggerFactory.CreateLogger<Program>();
         }
     }
 }

@@ -6,7 +6,9 @@ namespace Downloader.Core.Helpers {
 
     public interface ITorrentClient {
 
-        Task DeleteAsync(IEnumerable<string> hashes);
+        Task<bool> TryAuth();
+
+        Task TryDeleteAsync(IEnumerable<string> hashes);
 
         Task DownloadAsync(string magnet);
 

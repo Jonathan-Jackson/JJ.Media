@@ -1,53 +1,54 @@
 version: "3.8"
 
 services:
-  discord:
-    container_name: discord
-    environment:
-      - "BROKER_ADDRESS=jj-rabbitMq"
-      - "BROKER_USERNAME=${BROKER_USERNAME}"
-      - "BROKER_PASSWORD=${BROKER_PASSWORD}"
-      - "DISCORD_TOKEN=${DISCORD_TOKEN}"
-      - "DISCORD_ALERTCHANNELNAME=eggdotnet"
-      - "DISCORD_VIEWERDOMAIN=${DISCORD_VIEWERDOMAIN}"
-      - "MEDIAINFO_ADDRESS=http://mediainfo"
-    image: jon-net.com:5000/jjnet/discord:latest
-    build:
-      dockerfile: src/Services/Discord/Discord.Console/Dockerfile
-      context: .
-    depends_on:
-      - redis
-      - rabbitMQ
-      - mediainfo
-  mediainfo:
-    container_name: mediainfo
-    environment:
-      - "TVDB_APIKEY=${TVDB_APIKEY}"
-      - "MEDIAINFO_DB=Server=192.168.1.7\\EGG,2001;Database=MediaInfoFactory;User Id=egg;Password=egg;MultipleActiveResultSets=True;"
-      - MEDIAINFO_STORAGE=["./jjmedia1", "./jjmedia2"]
-    volumes:
-      - type: bind
-        source: G:\\JJTest\MediaStore
-        target: /app/jjmedia1
-      - type: bind
-        source: G:\\JJTest\MediaStore
-        target: /app/jjmedia2
-    image: jon-net.com:5000/jjnet/mediainfo:latest
-    build:
-      dockerfile: src/Services/MediaInfo/MediaInfo.API/Dockerfile
-      context: .
-    ports:
-      - "9100:80"
-    depends_on:
-      - redis
+  # discord:
+  #   container_name: discord
+  #   environment:
+  #     - "BROKER_ADDRESS=jj-rabbitMq"
+  #     - "BROKER_USERNAME=${BROKER_USERNAME}"
+  #     - "BROKER_PASSWORD=${BROKER_PASSWORD}"
+  #     - "DISCORD_TOKEN=${DISCORD_TOKEN}"
+  #     - "DISCORD_ALERTCHANNELNAME=eggdotnet"
+  #     - "DISCORD_VIEWERDOMAIN=${DISCORD_VIEWERDOMAIN}"
+  #     - "MEDIAINFO_ADDRESS=http://mediainfo"
+  #   image: jon-net.com:5000/jjnet/discord:latest
+  #   build:
+  #     dockerfile: src/Services/Discord/Discord.Console/Dockerfile
+  #     context: .
+  #   depends_on:
+  #     - redis
+  #     - rabbitMQ
+  #     - mediainfo
+  # mediainfo:
+  #   container_name: mediainfo
+  #   environment:
+  #     - "TVDB_APIKEY=${TVDB_APIKEY}"
+  #     - "MEDIAINFO_DB=Server=192.168.1.7\\EGG,2001;Database=MediaInfoFactory;User Id=egg;Password=egg;MultipleActiveResultSets=True;"
+  #     - MEDIAINFO_STORAGE=["./jjmedia1", "./jjmedia2"]
+  #   volumes:
+  #     - type: bind
+  #       source: E:\Media
+  #       target: /app/jjmedia1
+  #     - type: bind
+  #       source: F:\Media
+  #       target: /app/jjmedia2
+  #   image: jon-net.com:5000/jjnet/mediainfo:latest
+  #   build:
+  #     dockerfile: src/Services/MediaInfo/MediaInfo.API/Dockerfile
+  #     context: .
+  #   ports:
+  #     - "9100:80"
+  #   depends_on:
+  #     - redis
   downloader:
     container_name: downloader
+    network_mode: bridge # We need access QBit.
     environment:
-      - "DOWNLOAD_PATH=/JJDownload"
+      - "DOWNLOAD_PATH=/app/JJDownload"
       - "HORRIBLESUBS_QUALITY=1080"
       - "QBITTORRENT_ADDRESS=http://192.168.1.7:8080"
       - "DOWNLOADFACTORY_DB=Server=192.168.1.7\\EGG,2001;Database=DownloaderFactory;User Id=egg;Password=egg;MultipleActiveResultSets=True;"
-      - "BROKER_ADDRESS=jj-rabbitMq"
+      - "BROKER_ADDRESS=192.168.1.7"
       - "BROKER_USERNAME=${BROKER_USERNAME}"
       - "BROKER_PASSWORD=${BROKER_PASSWORD}"
     volumes:
@@ -59,31 +60,30 @@ services:
       dockerfile: src/Services/Downloader/Downloader.Console/Dockerfile
       context: .
     depends_on:
-      - mediainfo
       - rabbitMQ
-      - storage
-  storage:
-    container_name: storage
-    environment:
-      - "BROKER_ADDRESS=jj-rabbitMq"
-      - "BROKER_USERNAME=${BROKER_USERNAME}"
-      - "BROKER_PASSWORD=${BROKER_PASSWORD}"
-      - "STORAGE_MEDIAINFOADDRESS=http://mediainfo"
-    volumes:
-      - type: bind
-        source: G:\\JJTest\\Processed
-        target: /app/processed
-      - type: bind
-        source: G:\\JJTest\MediaStore
-        target: /app/jjmedia2
-    image: jon-net.com:5000/jjnet/storage:latest
-    build:
-        dockerfile: src/Services/Storage/Storage.Console/Dockerfile
-        context: .
-    depends_on:
-      - mediainfo
-      - rabbitMQ
-      - discord
+      #- storage
+  # storage:
+  #   container_name: storage
+  #   environment:
+  #     - "BROKER_ADDRESS=jj-rabbitMq"
+  #     - "BROKER_USERNAME=${BROKER_USERNAME}"
+  #     - "BROKER_PASSWORD=${BROKER_PASSWORD}"
+  #     - "STORAGE_MEDIAINFOADDRESS=http://mediainfo"
+  #   volumes:
+  #     - type: bind
+  #       source: G:\JJProcessed
+  #       target: /app/processed
+  #     - type: bind
+  #       source: F:\Media
+  #       target: /app/jjmedia2
+  #   image: jon-net.com:5000/jjnet/storage:latest
+  #   build:
+  #       dockerfile: src/Services/Storage/Storage.Console/Dockerfile
+  #       context: .
+  #   depends_on:
+  #     - mediainfo
+  #     - rabbitMQ
+  #     - discord
   # Third Party
   redis:
     container_name: jj-redis
@@ -97,4 +97,5 @@ services:
       - "RABBITMQ_DEFAULT_USER=${BROKER_USERNAME}"
       - "RABBITMQ_DEFAULT_PASS=${BROKER_PASSWORD}"
     ports:
-      - "9001:5672"
+      - "9001:15672"
+      - "5672:5672"

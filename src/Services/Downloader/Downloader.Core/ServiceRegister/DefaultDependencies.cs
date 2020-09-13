@@ -22,7 +22,7 @@ namespace Downloader.Core.ServiceRegister {
 
     public static class DefaultDependencies {
 
-        public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration) {
+        public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration, ILogger logger) {
             services
                 // Services
                 .AddTransient<ITorrentClient, QBitService>()
@@ -36,33 +36,38 @@ namespace Downloader.Core.ServiceRegister {
                 .AddSingleton<Compiler>(x => new SqlServerCompiler())
                 .AddSingleton<HttpClient>()
                 // Config
-                .AddLogging(configure => configure.AddConsole());
+                .AddLogging(configure => configure.AddConsole().SetMinimumLevel(LogLevel.Trace));
 
             // Add Config Options.
             var torrentOptions = configuration.GetSection("TorrentServiceOptions").Get<TorrentServiceOptions>();
-            torrentOptions.DownloadTorrentPath = EnviromentHelper.GetSetting("DOWNLOAD_PATH", torrentOptions.DownloadTorrentPath);
+            torrentOptions.DownloadTorrentPath = EnviromentHelper.GetLoggedSetting(logger, "DOWNLOAD_PATH", torrentOptions.DownloadTorrentPath);
 
             if (!Directory.Exists(torrentOptions.DownloadTorrentPath))
                 throw new ApplicationException($"Download Directory does not exist: {torrentOptions.DownloadTorrentPath} (FULL PATH: {Path.GetFullPath(torrentOptions.DownloadTorrentPath)}");
 
             // HorribleSubs options.
             var horribleOptions = configuration.GetSection("HorribleSubsOptions").Get<HorribleSubsOptions>();
-            horribleOptions.Quality = EnviromentHelper.GetSetting("HORRIBLESUBS_QUALITY", horribleOptions.Quality);
+            horribleOptions.Quality = EnviromentHelper.GetLoggedSetting(logger, "HORRIBLESUBS_QUALITY", horribleOptions.Quality);
 
             // QBitTorrent Options
             var qbitOptions = configuration.GetSection("QBitOptions").Get<QBitOptions>();
-            qbitOptions.Address = EnviromentHelper.GetSetting("QBITTORRENT_ADDRESS", qbitOptions.Address);
+            qbitOptions.Address = EnviromentHelper.GetLoggedSetting(logger, "QBITTORRENT_ADDRESS", qbitOptions.Address);
+            qbitOptions.UserName = EnviromentHelper.GetLoggedSetting(logger, "QBITTORRENT_USERNAME", qbitOptions.UserName);
+            qbitOptions.Password = EnviromentHelper.GetLoggedSetting(logger, "QBITTORRENT_PASSWORD", qbitOptions.Password);
 
             // Broker Options
             var brokerOptions = configuration.GetSection("BrokerOptions").Get<BrokerOptions>();
-            brokerOptions.Address = EnviromentHelper.GetSetting("BROKER_ADDRESS", brokerOptions.Address);
-            brokerOptions.UserName = EnviromentHelper.GetSetting("BROKER_USERNAME", brokerOptions.UserName, allowEmpty: true);
-            brokerOptions.Password = EnviromentHelper.GetSetting("BROKER_PASSWORD", brokerOptions.Password, allowEmpty: true);
+            brokerOptions.Address = EnviromentHelper.GetLoggedSetting(logger, "BROKER_ADDRESS", brokerOptions.Address);
+            brokerOptions.UserName = EnviromentHelper.GetLoggedSetting(logger, "BROKER_USERNAME", brokerOptions.UserName, allowEmpty: true);
+            brokerOptions.Password = EnviromentHelper.GetLoggedSetting(logger, "BROKER_PASSWORD", brokerOptions.Password, allowEmpty: true);
+
+            if (!RabbitMqHelper.TryConnect(brokerOptions.Address, brokerOptions.UserName, brokerOptions.Password, out Exception ex))
+                throw new ApplicationException($"Could not connect to RabbitMq Server on the hostname: {brokerOptions.Address} ({ex.Message})");
 
             // DB String
-            var downloaderConnString = EnviromentHelper.GetSetting("DOWNLOADFACTORY_DB", configuration.GetConnectionString("DownloaderFactory"));
+            var downloaderConnString = EnviromentHelper.GetLoggedSetting(logger, "DOWNLOADFACTORY_DB", configuration.GetConnectionString("DownloaderFactory"));
 
-            return services
+            services
                 .AddSingleton(torrentOptions)
                 .AddSingleton(horribleOptions)
                 .AddSingleton(qbitOptions)
@@ -72,6 +77,8 @@ namespace Downloader.Core.ServiceRegister {
                     return new RabbitBroker(options.Address, options.UserName, options.Password, provider.GetRequiredService<ILogger<RabbitBroker>>());
                 })
                 .AddSingleton<IDbConnectionFactory>(_ => new SqlConnectionFactory(downloaderConnString));
+
+            return services;
         }
     }
 }

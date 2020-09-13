@@ -15,6 +15,7 @@ namespace JJ.Framework.Repository.RabbitMq {
         private readonly ILogger<RabbitBroker> _logger;
         private readonly object _semaphore = new object();
         private IConnection _conn;
+        private IModel _channel;
 
         public RabbitBroker(string hostName, string userName, string password, ILogger<RabbitBroker> logger = null) {
             _connFactory = new ConnectionFactory {
@@ -62,7 +63,7 @@ namespace JJ.Framework.Repository.RabbitMq {
                                      basicProperties: null,
                                      body: body);
 
-                _logger?.LogDebug($"PUBLISHED MESSAGE: {body} WITH KEY: {routingKey} ON EXCHANGE: {exchangeName}");
+                _logger?.LogDebug($"PUBLISHED MESSAGE: {message} WITH KEY: {routingKey} ON EXCHANGE: {exchangeName}");
             });
         }
 
@@ -135,7 +136,7 @@ namespace JJ.Framework.Repository.RabbitMq {
 
         public bool TryConnect() {
             try {
-                GetConnection().Dispose();
+                GetChannel();
                 return true;
             }
             catch {
@@ -143,30 +144,33 @@ namespace JJ.Framework.Repository.RabbitMq {
             }
         }
 
-        private IConnection GetConnection() {
-            if (_conn != null && _conn.IsOpen)
-                return _conn;
+        private IModel GetChannel() {
+            if (_channel != null && _channel.IsOpen)
+                return _channel;
 
             lock (_semaphore) {
-                if (_conn == null || !_conn.IsOpen)
+                if (_conn?.IsOpen != true) {
+                    _conn?.Dispose();
                     _conn = _connFactory.CreateConnection();
+                }
+
+                if (_channel?.IsOpen != true) {
+                    _channel?.Dispose();
+                    _channel = _conn.CreateModel();
+                }
             }
 
-            return _conn;
+            return _channel;
         }
 
         private void ProcessChannel(Action<IModel> action) {
-            using (var connection = GetConnection())
-            using (var channel = connection.CreateModel()) {
+            using (var channel = GetChannel())
                 action(channel);
-            }
         }
 
         private async Task ProcessChannelAsync(Func<IModel, Task> action) {
-            using (var connection = GetConnection())
-            using (var channel = connection.CreateModel()) {
+            using (var channel = GetChannel())
                 await action(channel);
-            }
         }
     }
 }

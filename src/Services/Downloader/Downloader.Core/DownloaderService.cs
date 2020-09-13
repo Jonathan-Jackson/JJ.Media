@@ -39,7 +39,8 @@ namespace Downloader.Core.Services {
         /// </summary>
         public async Task Run() {
             _log.LogInformation("Downloader Service Ran..");
-            await TryCheckDependencies();
+            if (!await TryCheckDependencies())
+                await Task.Delay(60_000);
 
             // We should delay immediate checking for untracked downloads,
             // since processing completions may trigger duplicate messages.
@@ -72,7 +73,7 @@ namespace Downloader.Core.Services {
         /// Checks that dependency calls don't throw
         /// exceptions. This will simply log.
         /// </summary>
-        private async Task TryCheckDependencies() {
+        private async Task<bool> TryCheckDependencies() {
             _log.LogInformation("Trying services..");
             bool isError = false;
 
@@ -95,7 +96,10 @@ namespace Downloader.Core.Services {
             }
 
             try {
-                await _torrentClient.GetTorrentsAsync();
+                if (!await _torrentClient.TryAuth()) {
+                    _log.LogError("Failed to authorize with Torrent client.");
+                    isError = true;
+                }
             }
             catch (Exception ex) {
                 _log.LogError(ex, "Failed to call the torrent client.");
@@ -103,6 +107,7 @@ namespace Downloader.Core.Services {
             }
 
             _log.LogInformation($"Service Status Check: " + (isError ? "FAILURE" : "SUCCESS"));
+            return !isError;
         }
 
         /// <summary>

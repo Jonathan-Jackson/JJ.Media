@@ -35,7 +35,7 @@ namespace Downloader.Core.Services {
             IEnumerable<QBitTorrent> completeTorrents = await _torrentClient.GetCompletedTorrentsAsync();
 
             if (completeTorrents.Any()) {
-                await _torrentClient.DeleteAsync(completeTorrents.Select(x => x.Hash));
+                await _torrentClient.TryDeleteAsync(completeTorrents.Select(x => x.Hash));
                 // Allow a pause for file handler / lock release.
                 await Task.Delay(1000);
 

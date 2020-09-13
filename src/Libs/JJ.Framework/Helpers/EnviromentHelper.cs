@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Text.Json;
 
 namespace JJ.Framework.Helpers {
@@ -31,6 +32,13 @@ namespace JJ.Framework.Helpers {
         public static string GetSetting(string settingName, string fallbackValue = "", bool allowEmpty = false) {
             return FindGlobalEnviromentVariable(settingName)
                 ?? (allowEmpty || !string.IsNullOrWhiteSpace(fallbackValue) ? fallbackValue : throw new ApplicationException($"{settingName} NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+        }
+
+        public static string GetLoggedSetting(ILogger logger, string settingName, string fallbackValue = "", bool allowEmpty = false) {
+            string value = FindGlobalEnviromentVariable(settingName)
+                ?? (allowEmpty || !string.IsNullOrWhiteSpace(fallbackValue) ? fallbackValue : throw new ApplicationException($"{settingName} NOT SPECIFIED. USE AN ENVIROMENT VAR."));
+            logger.LogInformation($"Setting '{settingName}' found value '{value}'");
+            return value;
         }
     }
 }
