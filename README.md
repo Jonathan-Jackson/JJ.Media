@@ -1,2 +1,3 @@
 ## JJ.Media
 
+NOTE: Deprecated
